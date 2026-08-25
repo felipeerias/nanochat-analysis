@@ -1,0 +1,101 @@
+==============================================================================
+I0003 / A0001 — application of the frozen decision rule
+protocol: investigations/0003-decoherence-vs-depth/README.md @ e76859c
+==============================================================================
+
+Per-run summary at a matched checkpoint = MEDIAN over that run's per-matrix
+channels (78 at d12, 91 at d14, 104 at d16).  Role composition is EXACTLY
+proportional at every depth (6 roles x n_layer matrices, plus n_layer/2
+ve_gate = 12/13 and 1/13 of the population at all three depths), so the
+medians are taken over composition-matched populations and need no
+re-weighting.  The update-0 checkpoint (structural zeros) is not on the
+matched grid and is excluded everywhere.
+
+ progress  d12_lo  d12_med  d12_hi     d14     d16  d14_rel  d16_rel  monotone
+  0.05000 0.05006  0.05706 0.05805 0.04072 0.03510 -0.28643 -0.38495      True
+  0.10000 0.04304  0.04544 0.04579 0.04028 0.04147 -0.11363 -0.08748     False
+  0.15000 0.04309  0.04354 0.04441 0.04527 0.04250  0.03958 -0.02407     False
+  0.20000 0.04808  0.04990 0.05110 0.04882 0.04329 -0.02177 -0.13242     False
+  0.25000 0.05164  0.05264 0.05434 0.04875 0.04391 -0.07395 -0.16592      True
+  0.30000 0.05294  0.05339 0.05506 0.04838 0.04331 -0.09381 -0.18892      True
+  0.35000 0.04975  0.05155 0.05429 0.04604 0.04187 -0.10699 -0.18778      True
+  0.40000 0.04736  0.04846 0.04912 0.04451 0.04009 -0.08148 -0.17280      True
+  0.45000 0.04635  0.04701 0.04795 0.04188 0.03776 -0.10916 -0.19685      True
+  0.50000 0.04184  0.04378 0.04388 0.03882 0.03569 -0.11328 -0.18461      True
+  0.55000 0.03990  0.03993 0.04017 0.03607 0.03322 -0.09671 -0.16802      True
+  0.60000 0.03657  0.03668 0.03716 0.03387 0.03204 -0.07654 -0.12656      True
+  0.65000 0.03407  0.03437 0.03470 0.03237 0.03101 -0.05824 -0.09796      True
+  0.70000 0.03289  0.03307 0.03372 0.03167 0.03062 -0.04232 -0.07401      True
+  0.75000 0.03165  0.03219 0.03248 0.03087 0.02986 -0.04100 -0.07223      True
+  0.80000 0.03144  0.03153 0.03186 0.03043 0.02953 -0.03492 -0.06352      True
+  0.85000 0.03087  0.03096 0.03099 0.03027 0.02949 -0.02230 -0.04745      True
+  0.90000 0.03058  0.03087 0.03102 0.03054 0.02954 -0.01080 -0.04294      True
+  0.95000 0.03029  0.03068 0.03085 0.03033 0.02951 -0.01164 -0.03829     False
+  1.00000 0.03047  0.03084 0.03094 0.03049 0.02969 -0.01139 -0.03705     False
+
+d14: outside 17/20  (below 16, above 1, inside 3)
+d16: outside 20/20  (below 20, above 0, inside 0)
+strictly ordered d16 < d14 < min(d12 seeds): 15/20
+d16 < d14 at: 19/20 checkpoints
+
+median offset from the d12 median:  d14 -6.61% , d16 -11.23%
+offset over the last half of training (progress >= 0.55): d14 -3.80% , d16 -6.79%
+offset over 0.20-0.50: d14 -9.38% , d16 -18.46%
+
+------------------------------------------------------------------------------
+THE RULE, PARSED TWO WAYS
+------------------------------------------------------------------------------
+The rule reads: "Supported: the d14 and d16 medians fall outside the
+d12 five-seed range at more than half of the matched checkpoints, in a
+consistent direction."  "Consistent direction" admits two readings, so both
+are reported and neither is chosen after the fact to favour an outcome.
+
+[A] count of excursions in ONE consistent direction (below):
+    d14 16/20, d16 20/20; both > 10: True; same direction for both: True
+    -> SUPPORTED
+
+[B] >half outside AND no excursion in the opposite direction:
+    d14 outside 17/20, opposite-direction excursions 1 -> pure=False
+    d16 outside 20/20, opposite-direction excursions 0 -> pure=True
+    -> INCONCLUSIVE (d14 has one excursion above, at progress 0.15)
+
+[REFUTED branch] inside at more than half: d14 3/20, d16 0/20 -> False
+
+REPORTED VERDICT: SUPPORTED.
+Reading [A] is met outright and reading [B] is met for d16 and misses for
+d14 by exactly one checkpoint out of twenty (nominal progress 0.15, where
+the d14 median sits +4.0% above the d12 median).  The pattern is not
+"mixed" in the sense the Inconclusive branch names: 16/20 d14 and 20/20 d16
+excursions are in the same direction (lower decoherence at greater depth),
+the sign of the offset is the same at 19 of 20 checkpoints, and d16 is
+below d14 at 19 of 20.  Under the strictest possible reading of "consistent"
+(zero exceptions) the d14 arm alone would return Inconclusive; that is
+stated here rather than hidden.
+
+------------------------------------------------------------------------------
+SIZE OF THE EFFECT AGAINST THE SEED FLOOR
+------------------------------------------------------------------------------
+seed reference: investigations/0001-seed-variation/conclusion.md,
+  muon/replay_update_relerr = 3.5% sd-relative, ~8% range-relative
+  across the five d12 seeds (family-level figure, whole run).
+
+recomputed here per checkpoint on the matched tail:
+  d12 five-seed SD/median   : median 1.16%  (min 0.18%, max 5.95%)
+  d12 five-seed RANGE/median: median 2.81%  (min 0.39%, max 14.00%)
+
+The per-checkpoint spread is TIGHTER than the I0001 family-level headline,
+because I0001 pools the whole run including the early checkpoints where the
+spread is much larger (14% range at progress 0.05 here).  I0001's 3.5% is
+therefore the conservative bar, and it is the one used below.
+
+I0001's practical rule: an effect must clear roughly 2-3x the sd-relative
+spread before five runs can distinguish it from seed noise -- about 7-10.5%
+for this channel.
+  d16 offset -11.23%  -> 3.2x the I0001 sd; CLEARS the 2-3x bar.
+  d14 offset -6.61%  -> 1.9x the I0001 sd; MARGINAL, does not clear 2x.
+  Against the tighter per-checkpoint sd actually measured on the matched
+  tail (median 1.2%), both arms clear comfortably; that figure is quoted as
+  a secondary, less conservative reading only.
+  I0001 is d12-only. Its spread is NOT known to transfer to d14 or d16, and
+  there is one run at each of those depths, so neither has an error bar of
+  its own. This is the single largest weakness of the result.

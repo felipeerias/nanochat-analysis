@@ -1,0 +1,56 @@
+==============================================================================
+A. e_sym_gradient (shadow) at the first four deep checkpoints
+==============================================================================
+step                   1          2          3          5     median        max
+depth run                                                                      
+12    d12-s10 3.9902e-06 4.3414e-06 4.6761e-06 1.6924e-06 4.1658e-06 4.6761e-06
+      d12-s11 2.8841e-05 2.7632e-05 2.2305e-05 2.0602e-05 2.4969e-05 2.8841e-05
+      d12-s7  2.4666e-05 2.3702e-05 2.0959e-05 1.6729e-05 2.2330e-05 2.4666e-05
+      d12-s8  1.2187e-05 1.4182e-05 1.1667e-05 4.6141e-06 1.1927e-05 1.4182e-05
+      d12-s9  9.6783e-06 5.5598e-06 8.5409e-06 2.2189e-05 9.1096e-06 2.2189e-05
+14    d14-s7  7.4073e-06 7.0987e-06 9.1561e-06 1.2586e-05 8.2817e-06 1.2586e-05
+16    d16-s7  7.5042e-05 1.1115e-04 1.3593e-04 9.0077e-05 1.0061e-04 1.3593e-04
+
+Apply the frozen decision rule to this EARLY slice (exploratory):
+  median: d12=1.193e-05 [4.166e-06,2.497e-05] d14=8.282e-06 d16=1.006e-04 -> inconclusive
+        d12 sd-relative=74.2%, d16/d12med=8.44x = 10.0 sd
+  max: d12=2.219e-05 [4.676e-06,2.884e-05] d14=1.259e-05 d16=1.359e-04 -> inconclusive
+        d12 sd-relative=43.2%, d16/d12med=6.13x = 11.9 sd
+
+==============================================================================
+B. Extrapolating the EARLY slice to the 1e-4 threshold
+==============================================================================
+
+median: d12=1.193e-05  d14=8.282e-06  d16=1.006e-04
+  log-linear slope +0.5331/depth (x2.90 per +2), R2=0.625
+  crossing 1e-4 at depth 16.9
+    pair d12->d14: slope -0.1824, crossing depth nan
+    pair d14->d16: slope +1.2486, crossing depth 16.0
+    pair d12->d16: slope +0.5331, crossing depth 16.0
+
+max: d12=2.219e-05  d14=1.259e-05  d16=1.359e-04
+  log-linear slope +0.4531/depth (x2.48 per +2), R2=0.532
+  crossing 1e-4 at depth 16.4
+    pair d12->d14: slope -0.2835, crossing depth nan
+    pair d14->d16: slope +1.1898, crossing depth 15.7
+    pair d12->d16: slope +0.4531, crossing depth 15.3
+
+==============================================================================
+C. Same early slice, other directions and e_lin (context)
+==============================================================================
+  e_sym_random: d12=7.020e-07  d14=3.688e-07  d16=4.154e-06
+  e_sym_gradient: d12=1.193e-05  d14=8.282e-06  d16=1.006e-04
+  e_sym_update: d12=5.187e-07  d14=1.204e-07  d16=6.083e-07
+  e_lin_random: d12=7.957e-07  d14=9.361e-07  d16=8.951e-07
+  e_lin_gradient: d12=1.927e-05  d14=2.955e-05  d16=2.628e-05
+  e_lin_update: d12=6.811e-07  d14=7.794e-07  d16=7.738e-07
+
+==============================================================================
+D. Excluding the first four checkpoints entirely (steps > 5)
+==============================================================================
+  e_sym_random: d12=7.015e-07 [3.937e-07,1.139e-06] d14=1.747e-06 d16=1.576e-06 -> inconclusive
+  e_sym_gradient: d12=6.268e-07 [3.026e-07,1.224e-06] d14=8.080e-07 d16=5.864e-07 -> refuted
+  e_sym_update: d12=9.398e-07 [5.341e-07,1.153e-06] d14=1.389e-06 d16=1.066e-06 -> refuted
+  e_lin_random: d12=7.585e-07 [7.474e-07,7.706e-07] d14=7.614e-07 d16=8.688e-07 -> supported
+  e_lin_gradient: d12=4.867e-07 [4.765e-07,5.131e-07] d14=4.641e-07 d16=5.081e-07 -> refuted
+  e_lin_update: d12=7.309e-07 [7.186e-07,7.628e-07] d14=8.137e-07 d16=8.824e-07 -> supported

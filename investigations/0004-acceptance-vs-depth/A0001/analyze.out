@@ -1,0 +1,265 @@
+
+==============================================================================
+1. Per-run medians over deep checkpoints (all checkpoints)
+==============================================================================
+
+--- shadow_fp32 / e_sym_random ---
+ depth     run     median
+    12 d12-s10 1.0524e-06
+    12 d12-s11 1.1374e-06
+    12  d12-s7 8.2742e-07
+    12  d12-s8 4.4829e-07
+    12  d12-s9 3.8145e-07
+    14  d14-s7 1.2738e-06
+    16  d16-s7 1.8696e-06
+  decision: supported  (d16>1.137e-06? True; monotone? True)
+
+--- shadow_fp32 / e_sym_gradient ---
+ depth     run     median
+    12 d12-s10 6.3757e-07
+    12 d12-s11 3.6849e-07
+    12  d12-s7 1.5494e-06
+    12  d12-s8 7.7474e-07
+    12  d12-s9 8.1306e-07
+    14  d14-s7 8.8136e-07
+    16  d16-s7 7.0381e-07
+  decision: refuted  (d16>1.549e-06? False; monotone? False)
+
+--- shadow_fp32 / e_sym_update ---
+ depth     run     median
+    12 d12-s10 8.3052e-07
+    12 d12-s11 8.8769e-07
+    12  d12-s7 1.0727e-06
+    12  d12-s8 8.3211e-07
+    12  d12-s9 6.1256e-07
+    14  d14-s7 1.0922e-06
+    16  d16-s7 9.4544e-07
+  decision: refuted  (d16>1.073e-06? False; monotone? False)
+
+--- shadow_fp32 / e_lin_random ---
+ depth     run     median
+    12 d12-s10 7.7435e-07
+    12 d12-s11 7.5578e-07
+    12  d12-s7 7.4919e-07
+    12  d12-s8 7.7115e-07
+    12  d12-s9 7.6661e-07
+    14  d14-s7 7.7508e-07
+    16  d16-s7 8.7172e-07
+  decision: supported  (d16>7.743e-07? True; monotone? True)
+
+--- shadow_fp32 / e_lin_gradient ---
+ depth     run     median
+    12 d12-s10 4.9454e-07
+    12 d12-s11 4.9492e-07
+    12  d12-s7 4.9606e-07
+    12  d12-s8 5.3154e-07
+    12  d12-s9 5.1119e-07
+    14  d14-s7 4.6496e-07
+    16  d16-s7 5.1152e-07
+  decision: refuted  (d16>5.315e-07? False; monotone? False)
+
+--- shadow_fp32 / e_lin_update ---
+ depth     run     median
+    12 d12-s10 7.2484e-07
+    12 d12-s11 7.1478e-07
+    12  d12-s7 7.2134e-07
+    12  d12-s8 7.4466e-07
+    12  d12-s9 7.5214e-07
+    14  d14-s7 8.0821e-07
+    16  d16-s7 8.6282e-07
+  decision: supported  (d16>7.521e-07? True; monotone? True)
+
+--- native / e_sym_random ---
+ depth     run     median
+    12 d12-s10 1.1647e-02
+    12 d12-s11 1.5839e-02
+    12  d12-s7 1.2856e-02
+    12  d12-s8 7.5421e-03
+    12  d12-s9 1.1588e-02
+    14  d14-s7 9.3372e-03
+    16  d16-s7 2.2190e-02
+  decision: inconclusive  (d16>1.584e-02? True; monotone? False)
+
+--- native / e_sym_gradient ---
+ depth     run     median
+    12 d12-s10 4.6143e-03
+    12 d12-s11 5.9806e-03
+    12  d12-s7 9.0067e-03
+    12  d12-s8 6.1423e-03
+    12  d12-s9 4.1654e-03
+    14  d14-s7 4.2904e-03
+    16  d16-s7 1.2181e-02
+  decision: inconclusive  (d16>9.007e-03? True; monotone? False)
+
+--- native / e_sym_update ---
+ depth     run     median
+    12 d12-s10 7.2655e-03
+    12 d12-s11 1.3974e-02
+    12  d12-s7 1.7273e-02
+    12  d12-s8 1.7943e-02
+    12  d12-s9 1.4315e-02
+    14  d14-s7 1.7231e-02
+    16  d16-s7 9.4471e-03
+  decision: refuted  (d16>1.794e-02? False; monotone? False)
+
+--- native / e_lin_random ---
+ depth     run     median
+    12 d12-s10 1.1409e-02
+    12 d12-s11 1.1284e-02
+    12  d12-s7 1.1110e-02
+    12  d12-s8 1.1443e-02
+    12  d12-s9 1.1307e-02
+    14  d14-s7 1.0359e-02
+    16  d16-s7 9.9623e-03
+  decision: inconclusive  (d16>1.144e-02? False; monotone? False)
+
+--- native / e_lin_gradient ---
+ depth     run     median
+    12 d12-s10 5.6529e-03
+    12 d12-s11 5.2418e-03
+    12  d12-s7 5.1929e-03
+    12  d12-s8 6.0438e-03
+    12  d12-s9 5.7499e-03
+    14  d14-s7 4.3677e-03
+    16  d16-s7 4.9043e-03
+  decision: inconclusive  (d16>6.044e-03? False; monotone? False)
+
+--- native / e_lin_update ---
+ depth     run     median
+    12 d12-s10 1.0750e-02
+    12 d12-s11 1.0432e-02
+    12  d12-s7 1.0381e-02
+    12  d12-s8 1.1424e-02
+    12  d12-s9 1.0929e-02
+    14  d14-s7 9.2359e-03
+    16  d16-s7 1.0395e-02
+  decision: refuted  (d16>1.142e-02? False; monotone? False)
+
+==============================================================================
+2. Decision summary, all 12 channels
+==============================================================================
+        arm family direction      verdict  d12_median    d12_min    d12_max        d14        d16  d16_above_d12max  monotone  d16_inside_d12_range
+shadow_fp32  e_sym    random    supported  8.2742e-07 3.8145e-07 1.1374e-06 1.2738e-06 1.8696e-06              True      True                 False
+shadow_fp32  e_sym  gradient      refuted  7.7474e-07 3.6849e-07 1.5494e-06 8.8136e-07 7.0381e-07             False     False                  True
+shadow_fp32  e_sym    update      refuted  8.3211e-07 6.1256e-07 1.0727e-06 1.0922e-06 9.4544e-07             False     False                  True
+shadow_fp32  e_lin    random    supported  7.6661e-07 7.4919e-07 7.7435e-07 7.7508e-07 8.7172e-07              True      True                 False
+shadow_fp32  e_lin  gradient      refuted  4.9606e-07 4.9454e-07 5.3154e-07 4.6496e-07 5.1152e-07             False     False                  True
+shadow_fp32  e_lin    update    supported  7.2484e-07 7.1478e-07 7.5214e-07 8.0821e-07 8.6282e-07              True      True                 False
+     native  e_sym    random inconclusive  1.1647e-02 7.5421e-03 1.5839e-02 9.3372e-03 2.2190e-02              True     False                 False
+     native  e_sym  gradient inconclusive  5.9806e-03 4.1654e-03 9.0067e-03 4.2904e-03 1.2181e-02              True     False                 False
+     native  e_sym    update      refuted  1.4315e-02 7.2655e-03 1.7943e-02 1.7231e-02 9.4471e-03             False     False                  True
+     native  e_lin    random inconclusive  1.1307e-02 1.1110e-02 1.1443e-02 1.0359e-02 9.9623e-03             False     False                 False
+     native  e_lin  gradient inconclusive  5.6529e-03 5.1929e-03 6.0438e-03 4.3677e-03 4.9043e-03             False     False                 False
+     native  e_lin    update      refuted  1.0750e-02 1.0381e-02 1.1424e-02 9.2359e-03 1.0395e-02             False     False                  True
+
+==============================================================================
+3. Headline channel: shadow_fp32 e_sym_gradient, full detail
+==============================================================================
+               n_ckpt        min     median       mean        max  n_over_1e-4
+depth run                                                                     
+12    d12-s10      30 1.1519e-09 6.3757e-07 2.9679e-06 2.8869e-05            0
+      d12-s11      30 9.0306e-09 3.6849e-07 4.5044e-06 2.8841e-05            0
+      d12-s7       30 1.7289e-07 1.5494e-06 5.1082e-06 2.4666e-05            0
+      d12-s8       30 3.8454e-08 7.7474e-07 2.2344e-06 1.4182e-05            0
+      d12-s9       30 1.2916e-07 8.1306e-07 2.2958e-06 2.2189e-05            0
+14    d14-s7       32 8.9107e-09 8.8136e-07 4.0597e-06 5.2557e-05            0
+16    d16-s7       33 1.0997e-08 7.0381e-07 1.4097e-05 1.3593e-04            2
+
+fraction of checkpoints over the 1e-4 threshold, by depth:
+       sum  size      mean
+depth                     
+12       0   150  0.000000
+14       0    32  0.000000
+16       2    33  0.060606
+
+==============================================================================
+4. Sensitivity: matched normalized-progress window (>= 0.2)
+==============================================================================
+Caveat 3 in DATASET.md: warmups are absolute, so the geometric
+prefix of deep checkpoints covers different progress fractions.
+Recompute medians over checkpoints with normalized_progress >= 0.2.
+  shadow e_sym_random: n/run=[np.int64(17), np.int64(18)] d12med=8.149e-07 [3.714e-07,1.294e-06] d14=4.690e-06 d16=2.296e-06 -> inconclusive
+  shadow e_sym_gradient: n/run=[np.int64(17), np.int64(18)] d12med=6.763e-07 [3.269e-07,1.366e-06] d14=8.080e-07 d16=8.585e-07 -> refuted
+  shadow e_sym_update: n/run=[np.int64(17), np.int64(18)] d12med=1.205e-06 [5.624e-07,2.351e-06] d14=2.131e-06 d16=1.322e-06 -> refuted
+  shadow e_lin_random: n/run=[np.int64(17), np.int64(18)] d12med=7.926e-07 [7.537e-07,8.241e-07] d14=7.546e-07 d16=8.700e-07 -> inconclusive
+  shadow e_lin_gradient: n/run=[np.int64(17), np.int64(18)] d12med=4.881e-07 [4.746e-07,5.028e-07] d14=4.638e-07 d16=5.003e-07 -> refuted
+  shadow e_lin_update: n/run=[np.int64(17), np.int64(18)] d12med=7.640e-07 [7.504e-07,7.798e-07] d14=8.317e-07 d16=8.944e-07 -> supported
+
+==============================================================================
+5. Sensitivity: last-10-checkpoint medians (late training)
+==============================================================================
+  shadow e_sym_random: d12med=7.752e-07 [3.170e-07,1.535e-06] d14=1.258e-05 d16=2.296e-06 -> inconclusive
+  shadow e_sym_gradient: d12med=8.425e-07 [7.078e-07,3.338e-06] d14=1.033e-06 d16=4.092e-07 -> inconclusive
+  shadow e_sym_update: d12med=1.068e-06 [4.356e-07,2.596e-06] d14=5.384e-06 d16=1.633e-06 -> refuted
+  shadow e_lin_random: d12med=8.130e-07 [7.866e-07,8.426e-07] d14=7.348e-07 d16=8.767e-07 -> inconclusive
+  shadow e_lin_gradient: d12med=4.931e-07 [4.723e-07,5.131e-07] d14=4.608e-07 d16=4.998e-07 -> refuted
+  shadow e_lin_update: d12med=7.904e-07 [7.729e-07,8.122e-07] d14=8.188e-07 d16=9.103e-07 -> supported
+
+==============================================================================
+6. Seed-noise floor at d12 (this dataset, headline channel)
+==============================================================================
+  e_sym_random: sd-relative= 41.5%  range-relative= 91.4%  d16-vs-d12 effect=+126.0%  effect/sd=3.03
+  e_sym_gradient: sd-relative= 56.7%  range-relative=152.4%  d16-vs-d12 effect=  -9.2%  effect/sd=-0.16
+  e_sym_update: sd-relative= 19.8%  range-relative= 55.3%  d16-vs-d12 effect= +13.6%  effect/sd=0.69
+  e_lin_random: sd-relative=  1.4%  range-relative=  3.3%  d16-vs-d12 effect= +13.7%  effect/sd=9.91
+  e_lin_gradient: sd-relative=  3.2%  range-relative=  7.5%  d16-vs-d12 effect=  +3.1%  effect/sd=0.96
+  e_lin_update: sd-relative=  2.2%  range-relative=  5.2%  d16-vs-d12 effect= +19.0%  effect/sd=8.61
+
+==============================================================================
+7. Extrapolation attempt: median e_sym_gradient (shadow) vs depth
+==============================================================================
+points: {12: '7.7474e-07', 14: '8.8136e-07', 16: '7.0381e-07'}
+
+linear   y = 1.0349e-06 + -1.7734e-08*depth   R2=0.1575 se(slope)=4.102e-08
+
+log-linear ln y = -13.7237 + -0.0240*depth  R2=0.1809 se(slope)=0.0511   (x0.95 per +2 depth)
+
+power-law  ln y = -13.2599 + -0.3039*ln depth  R2=0.1502 se(exp)=0.7228
+
+Leave-one-out on the three depth points (log-linear):
+  drop d12: slope=-0.1125/depth  crossing depth=nan
+  drop d14: slope=-0.0240/depth  crossing depth=nan
+  drop d16: slope=+0.0645/depth  crossing depth=87.4
+
+Seed-band sensitivity: refit the log-linear through the d12 seed
+extremes instead of the d12 median (d14/d16 have one seed each):
+  d12=min: slope=+0.1618/depth R2=0.511 crossing=45.5
+  d12=median: slope=-0.0240/depth R2=0.181 crossing=nan
+  d12=max: slope=-0.1973/depth R2=0.942 crossing=nan
+
+==============================================================================
+8. Verdict context (per-direction, shadow arm)
+==============================================================================
+                         sum  size
+depth run     direction           
+12    d12-s10 gradient    26    30
+              random       0    30
+              update       0    30
+      d12-s11 gradient    26    30
+              random       0    30
+              update       0    30
+      d12-s7  gradient    26    30
+              random       0    30
+              update       0    30
+      d12-s8  gradient    26    30
+              random       0    30
+              update       0    30
+      d12-s9  gradient    25    30
+              random       0    30
+              update       0    30
+14    d14-s7  gradient    28    32
+              random       0    32
+              update       0    32
+16    d16-s7  gradient    29    33
+              random       0    33
+              update       0    33
+
+==============================================================================
+9. Native arm medians (reported, not decisive)
+==============================================================================
+  native e_sym_random: d12=1.165e-02  d14=9.337e-03  d16=2.219e-02
+  native e_sym_gradient: d12=5.981e-03  d14=4.290e-03  d16=1.218e-02
+  native e_sym_update: d12=1.431e-02  d14=1.723e-02  d16=9.447e-03
+  native e_lin_random: d12=1.131e-02  d14=1.036e-02  d16=9.962e-03
+  native e_lin_gradient: d12=5.653e-03  d14=4.368e-03  d16=4.904e-03
+  native e_lin_update: d12=1.075e-02  d14=9.236e-03  d16=1.040e-02

@@ -1,7 +1,7 @@
 ---
 id: I0003
 kind: hypothesis
-status: open
+status: closed
 data: sweep; all seven schema-v3 segments
 selection: muon/replay_update_relerr; defined rows only; per matrix
   (parameter_name); aligned on normalized_progress

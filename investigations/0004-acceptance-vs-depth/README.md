@@ -1,7 +1,7 @@
 ---
 id: I0004
 kind: hypothesis
-status: open
+status: closed
 data: sweep; all seven schema-v3 segments
 selection: shadow_fp32 arm; curvature/e_sym_* and curvature/e_lin_* at deep
   checkpoints; defined rows only; report each direction separately

@@ -1,0 +1,158 @@
+families(curv+update)=100  scalar=64  vector-excluded=36  both-arms=62  one-arm-only=['curvature/native_verdict_code', 'curvature/shadow_verdict_code']
+pair slots=13330  both-defined=11366  rel-defined=10770  zero-pair families=9 ['curvature/e_curv_gradient', 'curvature/e_curv_random', 'curvature/e_curv_update', 'curvature/e_fd_gradient', 'curvature/e_fd_random', 'curvature/e_fd_update', 'curvature/fd_cos_gradient', 'curvature/fd_cos_random', 'curvature/fd_cos_update']
+
+=== per class ===
+   mclass  n_families  n_pairs  median_rel  median_abs_rel       ci_lo        ci_hi       q25          q75  sign_disagree  rho_progress  p_progress
+    error           9     1935 9281.004290    10012.778170 9330.550716 11099.860315 35.652981 15213.239215       0.120413     -0.037581      0.0998
+     flag           6     1290    1.000000        1.000000    1.000000     1.000000 -1.000000     1.000000       0.343411     -0.001065      0.9792
+    floor          14     3010  654.742291      654.742291  654.467634   656.465079  2.000000 65535.000000       0.000000      0.053254      0.0044
+quadratic           9     1906   -0.000037        0.003412    0.002898     0.003812 -0.002881     0.004054       0.000000     -0.074385      0.0015
+      snr           6     1290   -0.997974        0.997974    0.997766     0.998308 -0.999525    -0.982752       0.008527     -0.518572      0.0000
+   update           9     1935    0.000000        0.005359    0.004721     0.006498 -0.003709     0.007896       0.053230      0.163899      0.0000
+
+=== per metric ===
+                          metric    mclass  n_pairs    median_rel      q25_rel       q75_rel  median_abs_rel        ci_lo         ci_hi  p90_abs_rel  sign_disagree_frac  rho_progress  p_progress
+          curvature/e_lin_random     error      215  14474.047431 13254.043815  15462.097794    14474.047431 13685.453059  14882.492861 1.697431e+04            0.000000     -0.670232      0.0000
+          curvature/e_lin_update     error      215  14464.164589 12917.288597  17459.920783    14464.164589 13551.871198  14956.292767 3.484584e+04            0.000000     -0.802527      0.0000
+          curvature/e_sym_update     error      215  13136.736932  4347.132764  51126.690331    13136.736932  9620.089791  20935.584163 1.759514e+05            0.000000     -0.544156      0.0000
+          curvature/e_sym_random     error      215  11859.429699  4956.766695  36930.527824    11859.429699  7839.988253  16317.464008 1.008844e+05            0.000000     -0.142870      0.0380
+        curvature/e_lin_gradient     error      215  10589.375969  8893.904388  11880.083123    10589.375969  9642.633930  10976.720146 1.416426e+04            0.000000      0.343922      0.0000
+        curvature/e_sym_gradient     error      215   6834.015126  2013.037520  23619.926782     6834.015126  5386.777223   9966.467393 9.010544e+04            0.000000      0.030801      0.6620
+           curvature/c_fd_update     error      215     -3.455200 -2195.450000   1396.625000     1853.500000  1195.000000   2806.400000 6.347141e+05            0.497674      0.424402      0.0000
+           curvature/c_fd_random     error      215     -1.563425 -1243.000000    497.833333      688.240000   555.690000   1243.000000 2.460785e+05            0.530233      0.374002      0.0000
+         curvature/c_fd_gradient     error      215     -0.010173    -0.050709      0.025434        0.039396     0.032642      0.045456 1.063077e+00            0.055814     -0.664116      0.0000
+       curvature/e_curv_gradient     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+         curvature/e_curv_random     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+         curvature/e_curv_update     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+         curvature/e_fd_gradient     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+           curvature/e_fd_random     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+           curvature/e_fd_update     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+       curvature/fd_cos_gradient     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+         curvature/fd_cos_random     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+         curvature/fd_cos_update     error        0           NaN          NaN           NaN             NaN          NaN           NaN          NaN                 NaN           NaN         NaN
+curvature/fd_conclusive_gradient      flag      215     -1.000000    -1.000000     -1.000000        1.000000     1.000000      1.000000 1.000000e+00            1.000000           NaN         NaN
+  curvature/fd_conclusive_random      flag      215     -1.000000    -1.000000     -1.000000        1.000000     1.000000      1.000000 1.000000e+00            0.186047           NaN         NaN
+  curvature/fd_conclusive_update      flag      215     -1.000000    -1.000000     -1.000000        1.000000     1.000000      1.000000 1.000000e+00            0.009302           NaN         NaN
+ curvature/verdict_code_gradient      flag      215      1.000000     1.000000      1.000000        1.000000     1.000000      1.000000 1.000000e+00            0.865116      0.279270      0.1510
+   curvature/verdict_code_random      flag      215      1.000000     1.000000      1.000000        1.000000     1.000000      1.000000 1.000000e+00            0.000000     -0.107338      0.1161
+   curvature/verdict_code_update      flag      215      1.000000     1.000000      1.000000        1.000000     1.000000      1.000000 1.000000e+00            0.000000      0.002203      0.9959
+       curvature/fd_floor_random     floor      215 195918.149589 65530.821303 655885.162731   195918.149589 65668.569991 196325.034638 6.552415e+06            0.000000      0.479064      0.0000
+       curvature/fd_floor_update     floor      215  66144.367491 65529.921678 196903.936531    66144.367491 65607.839571 196478.753957 6.555142e+05            0.000000      0.373170      0.0000
+     curvature/curv_floor_update     floor      215  65535.188134  5892.886038 728188.707786    65535.188134 65505.111750  65547.407337 6.554342e+06            0.000000      0.222066      0.0007
+             curvature/arith_eps     floor      215  65535.000000 65535.000000  65535.000000    65535.000000 65535.000000  65535.000000 6.553500e+04            0.000000           NaN         NaN
+curvature/eta_star_rho_threshold     floor      215  65535.000000 65535.000000  65535.000000    65535.000000 65535.000000  65535.000000 6.553500e+04            0.000000           NaN         NaN
+     curvature/curv_floor_random     floor      215  65520.174482   654.764853 589859.290415    65520.174482 36392.241127  65532.700551 6.554015e+06            0.000000      0.074191      0.2765
+     curvature/fd_floor_gradient     floor      215   2203.209722  2185.247736   6557.369941     2203.209722  2191.508427   2214.692400 2.186295e+04            0.000000     -0.569518      0.0000
+   curvature/curv_floor_gradient     floor      215    486.626444   127.757563   1966.928373      486.626444   486.141731    656.643238 6.553538e+04            0.000000     -0.900720      0.0000
+       curvature/fd_eps_gradient     floor      215     29.000000     9.000000     29.000000       29.000000    29.000000     29.000000 9.900000e+01            0.000000      0.770781      0.0000
+     curvature/curv_eps_gradient     floor      215     10.624114     4.773503     21.946029       10.624114     9.000000     10.624114 2.767602e+01            0.000000      0.908560      0.0000
+       curvature/curv_eps_random     floor      215      0.000000    -0.666667      9.000000        0.970000     0.900000      1.485000 9.000000e+00            0.000000     -0.019578      0.7751
+       curvature/curv_eps_update     floor      215      0.000000    -0.700000      2.333333        0.900000     0.900000      0.970000 9.000000e+00            0.000000     -0.150247      0.0301
+         curvature/fd_eps_random     floor      215     -0.666667    -0.900000      0.000000        0.666667     0.000000      0.666667 9.900000e-01            0.000000      0.476411      0.0000
+         curvature/fd_eps_update     floor      215      0.000000    -0.666667      0.000000        0.000000     0.000000      0.666667 9.000000e-01            0.000000      0.387243      0.0000
+                   curvature/gHg quadratic      215      0.001123    -0.006503      0.014294        0.009351     0.007994      0.009705 4.618651e-02            0.000000     -0.127283      0.0616
+          curvature/vhv_gradient quadratic      215      0.000514    -0.005682      0.011361        0.006732     0.006254      0.007527 3.870852e-02            0.000000     -0.197725      0.0036
+              curvature/eta_star quadratic      186      0.000188    -0.006605      0.005868        0.006052     0.005805      0.006692 2.302528e-02            0.000000     -0.025651      0.7267
+               curvature/Hg_norm quadratic      215     -0.000345    -0.006087      0.004422        0.005243     0.004310      0.006280 2.309865e-02            0.000000      0.114571      0.0950
+            curvature/vhv_random quadratic      215     -0.001038    -0.004981      0.003285        0.004347     0.003438      0.005071 1.641339e-02            0.000000     -0.156383      0.0226
+                   curvature/dhd quadratic      215     -0.000061    -0.001957      0.002556        0.002188     0.001901      0.002346 1.387187e-02            0.000000     -0.256850      0.0001
+          curvature/eta_star_rho quadratic      215      0.000334    -0.001218      0.003090        0.002106     0.001826      0.002610 1.594558e-02            0.000000     -0.259831      0.0003
+            curvature/vhv_update quadratic      215     -0.000155    -0.001913      0.002526        0.002084     0.001877      0.002289 1.362553e-02            0.000000     -0.168992      0.0129
+                    curvature/gg quadratic      215     -0.000093    -0.002018      0.001566        0.001812     0.001528      0.002421 6.454390e-03            0.000000      0.292203      0.0000
+       curvature/fd_snr_gradient       snr      215     -0.999546    -0.999847     -0.999528        0.999546     0.999543      0.999549 9.999557e-01            0.000000     -0.621030      0.0000
+         curvature/fd_snr_random       snr      215     -0.998821    -0.999165     -0.998611        0.998821     0.998762      0.998880 9.998976e-01            0.000000     -0.547329      0.0000
+     curvature/curv_snr_gradient       snr      215     -0.998364    -0.999432     -0.993121        0.998364     0.997922      0.998565 9.998863e-01            0.000000     -0.914451      0.0000
+         curvature/fd_snr_update       snr      215     -0.993894    -0.997893     -0.992150        0.993894     0.993508      0.994341 9.997918e-01            0.000000     -0.883114      0.0000
+       curvature/curv_snr_random       snr      215     -0.945039    -0.978343     -0.911467        0.945039     0.941766      0.949898 9.995606e-01            0.027907     -0.668578      0.0000
+       curvature/curv_snr_update       snr      215     -0.944746    -0.980383     -0.894819        0.944746     0.937722      0.953302 9.989976e-01            0.023256     -0.665664      0.0000
+              update/residual_p2    update      215      0.029415    -0.524237      1.827731        0.837069     0.560116      0.929490 8.024991e+01            0.204651      0.418322      0.0000
+      update/normalized_residual    update      215      0.021507    -0.522630      1.753268        0.779027     0.530795      0.876870 5.728235e+01            0.204651      0.403882      0.0000
+                   update/actual    update      215      0.002985    -0.027376      0.028620        0.028036     0.023718      0.033584 4.453362e-01            0.032558      0.632053      0.0000
+              update/residual_p1    update      215      0.003960    -0.022240      0.037339        0.027742     0.022895      0.032701 7.478424e-01            0.027907      0.360453      0.0000
+                       update/p2    update      215     -0.000151    -0.004830      0.004445        0.004607     0.004309      0.005753 3.365573e-02            0.004651      0.341669      0.0000
+                       update/p1    update      215      0.000033    -0.003475      0.003518        0.003514     0.002935      0.004313 2.458635e-02            0.004651      0.458086      0.0000
+               update/loss_after    update      215      0.000057    -0.000203      0.000317        0.000281     0.000251      0.000302 1.125738e-03            0.000000      0.343128      0.0000
+              update/loss_before    update      215      0.000012    -0.000191      0.000290        0.000242     0.000203      0.000299 8.295881e-04            0.000000      0.402347      0.0000
+           update/direction_norm    update      215      0.000000     0.000000      0.000000        0.000000     0.000000      0.000000 0.000000e+00            0.000000           NaN         NaN
+
+=== pooled physical curvature ===
+{
+ "metrics": [
+  "curvature/gHg",
+  "curvature/dhd",
+  "curvature/vhv_gradient",
+  "curvature/vhv_random",
+  "curvature/vhv_update"
+ ],
+ "n": 1075,
+ "median_abs_rel": 0.0036193256077804233,
+ "ci95": [
+  0.002924678704955122,
+  0.004029956333261672
+ ],
+ "median_rel": -6.457692333140294e-05,
+ "q25": -0.002847423306473789,
+ "q75": 0.0045445402590968895,
+ "p90_abs_rel": 0.02663539055308031,
+ "max_abs_rel": 0.7721492733113606,
+ "sign_disagree": 0.0,
+ "rho_progress": -0.16521061864081552,
+ "p_progress": 0.0,
+ "n_progress": 1075
+}
+
+=== depth vs the d12 five-seed floor (pooled per class) ===
+   mclass   d12_pooled         d14         d16  d12_seed_mean  d12_seed_sd  d12_seed_sd_rel  d12_seed_lo  d12_seed_hi  d16_over_d12  d16_z_vs_d12_seeds  d14_z_vs_d12_seeds
+    error 10894.726940 8274.366725 9386.668426   11040.876790   381.721573         0.034573 10618.297857 11552.588518      0.861579           -4.333547           -7.247455
+     flag     1.000000    1.000000    1.000000       1.000000     0.000000         0.000000     1.000000     1.000000      1.000000                 NaN                 NaN
+    floor   654.693229  654.381882  654.944273     655.881840     2.951838         0.004501   654.446118   661.158894      1.000383           -0.317622           -0.508144
+quadratic     0.003085    0.003662    0.004144       0.003136     0.000549         0.174946     0.002745     0.004024      1.343594            1.837020            0.957189
+      snr     0.998290    0.997852    0.997295       0.998309     0.000065         0.000065     0.998215     0.998372      0.999003          -15.695408           -7.072149
+   update     0.005034    0.008471    0.005378       0.004829     0.000485         0.100433     0.004179     0.005407      1.068228            1.130340            7.508213
+
+=== depth monotonicity of median |rel| (d12<d14<d16) ===
+           monotone_up  monotone_down   n
+mclass                                   
+error                0              4   9
+flag                 0              0   5
+floor                1              1  14
+quadratic            4              0   9
+snr                  0              1   6
+update               1              1   9
+
+=== trend over training (within-run Spearman, |rel| vs progress) ===
+                    metric    mclass  rho_pooled  p_pooled  rho_run_median  n_runs_positive  n_runs  median_abs_rel_early  median_abs_rel_late  late_over_early
+         curvature/Hg_norm quadratic    0.114571    0.0957        0.137463                7       7              0.005074             0.005324         1.049205
+             curvature/dhd quadratic   -0.256850    0.0004       -0.278754                0       7              0.002287             0.001892         0.827119
+        curvature/eta_star quadratic   -0.025651    0.7280        0.007179                4       7              0.006869             0.005805         0.845153
+    curvature/eta_star_rho quadratic   -0.259831    0.0000       -0.257397                0       7              0.003370             0.001585         0.470134
+             curvature/gHg quadratic   -0.127283    0.0601       -0.129255                2       7              0.010506             0.007493         0.713254
+              curvature/gg quadratic    0.292203    0.0000        0.313014                7       7              0.001358             0.002142         1.576612
+    curvature/vhv_gradient quadratic   -0.197725    0.0038       -0.173463                0       7              0.009381             0.006018         0.641434
+      curvature/vhv_random quadratic   -0.156383    0.0217       -0.135484                1       7              0.005122             0.003440         0.671531
+      curvature/vhv_update quadratic   -0.168992    0.0125       -0.120356                0       7              0.002139             0.001975         0.923302
+             update/actual    update    0.632053    0.0000        0.658732                7       7              0.018151             0.136776         7.535600
+     update/direction_norm    update         NaN       NaN             NaN                0       0              0.000000             0.000000              NaN
+         update/loss_after    update    0.343128    0.0000        0.354394                7       7              0.000228             0.000457         2.003551
+        update/loss_before    update    0.402347    0.0000        0.442047                7       7              0.000178             0.000347         1.945689
+update/normalized_residual    update    0.403882    0.0000        0.399333                7       7              0.339236            10.933831        32.230753
+                 update/p1    update    0.458086    0.0000        0.448721                7       7              0.002155             0.006494         3.013487
+                 update/p2    update    0.341669    0.0000        0.364182                7       7              0.003919             0.007864         2.006873
+        update/residual_p1    update    0.360453    0.0000        0.340156                7       7              0.017925             0.127110         7.091224
+        update/residual_p2    update    0.418322    0.0000        0.406007                7       7              0.374925            12.849694        34.272663
+
+=== shadow per-direction passing checkpoints (of 215) === {'gradient': 186}
+=== verdict-conditioned sensitivity (shadow gradient passing only) ===
+                          metric direction  n_pairs  median_abs_rel   median_rel  sign_disagree
+         curvature/c_fd_gradient  gradient      186        0.029438    -0.010204            0.0
+     curvature/curv_eps_gradient  gradient      186       12.512002    12.512002            0.0
+   curvature/curv_floor_gradient  gradient      186      360.233437   360.233437            0.0
+     curvature/curv_snr_gradient  gradient      186        0.997270    -0.997270            0.0
+        curvature/e_lin_gradient  gradient      186    10809.111202 10809.111202            0.0
+        curvature/e_sym_gradient  gradient      186     8743.888723  8743.888723            0.0
+curvature/fd_conclusive_gradient  gradient      186        1.000000    -1.000000            1.0
+       curvature/fd_eps_gradient  gradient      186       29.000000    29.000000            0.0
+     curvature/fd_floor_gradient  gradient      186     2195.151639  2195.151639            0.0
+       curvature/fd_snr_gradient  gradient      186        0.999544    -0.999544            0.0
+ curvature/verdict_code_gradient  gradient      186             NaN          NaN            1.0
+          curvature/vhv_gradient  gradient      186        0.006227    -0.000206            0.0

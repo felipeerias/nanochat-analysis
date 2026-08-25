@@ -1,0 +1,13 @@
+metric,direction,n_pairs,median_abs_rel,median_rel,sign_disagree
+curvature/c_fd_gradient,gradient,186,0.029438089862342868,-0.010204467713787229,0.0
+curvature/curv_eps_gradient,gradient,186,12.512001548070344,12.512001548070344,0.0
+curvature/curv_floor_gradient,gradient,186,360.2334366818697,360.2334366818697,0.0
+curvature/curv_snr_gradient,gradient,186,0.9972701711811907,-0.9972701711811907,0.0
+curvature/e_lin_gradient,gradient,186,10809.111201619884,10809.111201619884,0.0
+curvature/e_sym_gradient,gradient,186,8743.888723025075,8743.888723025075,0.0
+curvature/fd_conclusive_gradient,gradient,186,1.0,-1.0,1.0
+curvature/fd_eps_gradient,gradient,186,28.999999999999996,28.999999999999996,0.0
+curvature/fd_floor_gradient,gradient,186,2195.1516387986303,2195.1516387986303,0.0
+curvature/fd_snr_gradient,gradient,186,0.9995436434985157,-0.9995436434985157,0.0
+curvature/verdict_code_gradient,gradient,186,,,1.0
+curvature/vhv_gradient,gradient,186,0.006227250849182585,-0.0002056754146400122,0.0

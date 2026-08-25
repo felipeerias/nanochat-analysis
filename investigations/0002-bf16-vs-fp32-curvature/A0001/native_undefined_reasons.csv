@@ -1,0 +1,12 @@
+metric,nat_reason,n
+curvature/e_curv_gradient,noise_floor_inconclusive,215
+curvature/e_curv_random,noise_floor_inconclusive,215
+curvature/e_curv_update,noise_floor_inconclusive,215
+curvature/e_fd_gradient,noise_floor_inconclusive,215
+curvature/e_fd_random,noise_floor_inconclusive,215
+curvature/e_fd_update,noise_floor_inconclusive,215
+curvature/eta_star,gHg_not_positive,14
+curvature/eta_star,sign_below_noise,15
+curvature/fd_cos_gradient,noise_floor_inconclusive,215
+curvature/fd_cos_random,noise_floor_inconclusive,215
+curvature/fd_cos_update,noise_floor_inconclusive,215

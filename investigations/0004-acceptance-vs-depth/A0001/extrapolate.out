@@ -1,0 +1,62 @@
+==============================================================================
+A. Headline: median e_sym_gradient. Every reasonable variant of the
+   three-point fit, so the reader can see the spread of answers.
+==============================================================================
+  d12 = five-seed median             slope -0.0240/depth  R2=0.181  NO CROSSING (trend is downward)
+  d12 = five-seed min                slope +0.1618/depth  R2=0.511  crossing depth 46
+  d12 = five-seed max                slope -0.1973/depth  R2=0.942  NO CROSSING (trend is downward)
+  d12 = seed-7 only (seed-matched)   slope -0.1973/depth  R2=0.942  NO CROSSING (trend is downward)
+
+  leave-one-out on the three depth points (d12 = five-seed median):
+    drop d12: slope -0.1125/depth  NO CROSSING
+    drop d14: slope -0.0240/depth  NO CROSSING
+    drop d16: slope +0.0645/depth  crossing depth 87
+
+  how big a change is even needed?
+    d12 five-seed median            7.747e-07
+    factor to reach 1e-4            129x
+    observed d12->d16 change        -9.2%
+    d12 seed sd-relative (I0001 stat) 56.7%
+    I0001 detectability bar (2-3x sd) 113%-170%
+
+==============================================================================
+B. The three channels that DID move monotonically: how far is 1e-4?
+==============================================================================
+
+  e_sym_random: d12=8.274e-07 d14=1.274e-06 d16=1.870e-06  (2.26x over +4 depth)
+    exponential in depth: slope +0.2038/depth R2=0.999 -> crossing depth 35
+    power law in depth:   exponent +2.833 R2=1.000 -> crossing depth 65   (sqrt(depth) would be +0.500)
+
+  e_lin_random: d12=7.666e-07 d14=7.751e-07 d16=8.717e-07  (1.14x over +4 depth)
+    exponential in depth: slope +0.0321/depth R2=0.814 -> crossing depth 164
+    power law in depth:   exponent +0.437 R2=0.780 -> crossing depth 865604   (sqrt(depth) would be +0.500)
+
+  e_lin_update: d12=7.248e-07 d14=8.082e-07 d16=8.628e-07  (1.19x over +4 depth)
+    exponential in depth: slope +0.0436/depth R2=0.980 -> crossing depth 125
+    power law in depth:   exponent +0.608 R2=0.990 -> crossing depth 39211   (sqrt(depth) would be +0.500)
+
+==============================================================================
+C. Extrapolating the early transient (steps 1,2,3,5), exploratory
+==============================================================================
+  d12=1.193e-05 d14=8.282e-06 d16=1.006e-04
+  d16 is already OVER 1e-4 here, and d14 is BELOW d12: the sequence
+  is not monotone, so a crossing depth is not defined by a fit.
+  (for the record, the 3-point log-linear fit: slope +0.5331, R2=0.625, crossing depth 16.9)
+  the two adjacent-pair slopes it averages are -0.182 and +1.249 per unit depth - opposite signs, 6.8x apart in magnitude.
+
+==============================================================================
+D. Seed-uncertainty envelope on the crossing depth
+==============================================================================
+d14 and d16 have ONE seed each, so their points carry an unmeasured
+seed error. Take the d12 sd-relative of the same channel as a proxy,
+perturb d14 and d16 by +/- that, and sweep d12 over its five seeds.
+45 variants per channel.
+
+  e_sym_gradient: d12 sd-relative=56.7%   18/45 variants cross at all
+      crossing depth among those: min=32  median=58  max=224
+  e_sym_random: d12 sd-relative=41.5%   42/45 variants cross at all
+      crossing depth among those: min=23  median=33  max=508
+  e_lin_random: d12 sd-relative= 1.4%   45/45 variants cross at all
+      crossing depth among those: min=131  median=160  max=199
+  e_lin_update: d12 sd-relative= 2.2%   45/45 variants cross at all
+      crossing depth among those: min=106  median=131  max=182

@@ -1,0 +1,38 @@
+==============================================================================
+Seed 7 only, arm=shadow_fp32: median over ALL deep checkpoints
+==============================================================================
+  e_sym_random: d12=8.274e-07  d14=1.274e-06  d16=1.870e-06   monotone-increasing? True
+  e_sym_gradient: d12=1.549e-06  d14=8.814e-07  d16=7.038e-07   monotone-increasing? False
+  e_sym_update: d12=1.073e-06  d14=1.092e-06  d16=9.454e-07   monotone-increasing? False
+  e_lin_random: d12=7.492e-07  d14=7.751e-07  d16=8.717e-07   monotone-increasing? True
+  e_lin_gradient: d12=4.961e-07  d14=4.650e-07  d16=5.115e-07   monotone-increasing? False
+  e_lin_update: d12=7.213e-07  d14=8.082e-07  d16=8.628e-07   monotone-increasing? True
+
+==============================================================================
+Seed 7 only, arm=native: median over ALL deep checkpoints
+==============================================================================
+  e_sym_random: d12=1.286e-02  d14=9.337e-03  d16=2.219e-02   monotone-increasing? False
+  e_sym_gradient: d12=9.007e-03  d14=4.290e-03  d16=1.218e-02   monotone-increasing? False
+  e_sym_update: d12=1.727e-02  d14=1.723e-02  d16=9.447e-03   monotone-increasing? False
+  e_lin_random: d12=1.111e-02  d14=1.036e-02  d16=9.962e-03   monotone-increasing? False
+  e_lin_gradient: d12=5.193e-03  d14=4.368e-03  d16=4.904e-03   monotone-increasing? False
+  e_lin_update: d12=1.038e-02  d14=9.236e-03  d16=1.040e-02   monotone-increasing? False
+
+==============================================================================
+Seed 7 only, shadow: median over the first four deep checkpoints
+==============================================================================
+  e_sym_random: d12=5.372e-06  d14=3.688e-07  d16=4.154e-06   monotone-increasing? False
+  e_sym_gradient: d12=2.233e-05  d14=8.282e-06  d16=1.006e-04   monotone-increasing? False
+  e_sym_update: d12=5.187e-07  d14=1.204e-07  d16=6.083e-07   monotone-increasing? False
+  e_lin_random: d12=7.871e-07  d14=9.361e-07  d16=8.951e-07   monotone-increasing? False
+  e_lin_gradient: d12=1.942e-05  d14=2.955e-05  d16=2.628e-05   monotone-increasing? False
+  e_lin_update: d12=6.811e-07  d14=7.794e-07  d16=7.738e-07   monotone-increasing? False
+
+==============================================================================
+Seed 7 only, shadow e_sym_gradient: counts over 1e-4
+==============================================================================
+        n        p50       pmax  n_over
+depth                                  
+12     30 1.5494e-06 2.4666e-05       0
+14     32 8.8136e-07 5.2557e-05       0
+16     33 7.0381e-07 1.3593e-04       2

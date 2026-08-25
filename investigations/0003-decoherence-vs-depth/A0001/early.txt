@@ -1,0 +1,47 @@
+I0003/A0001 — SUPPLEMENTARY, not part of the decision rule.
+
+The decision rule aligns on normalized_progress, and the deep schedule's
+geometric prefix is defined in STEP space, so no checkpoint below progress
+0.05 is shared across depths. This script looks at the early phase the only
+way it can be looked at -- aligned on absolute STEP -- because DATASET.md
+caveat 3 says the warmups are absolute (40-step LR warmup, 400-step Muon
+momentum ramp) and therefore occupy a different fraction of each run.
+Alignment on step is the natural frame for a warmup-driven effect and the
+wrong frame for a progress-driven one; both are reported so the reader can
+see which one the early data follows.
+
+
+deep-checkpoint STEPS shared by all seven runs: [np.int64(1), np.int64(2), np.int64(3), np.int64(5), np.int64(9), np.int64(17), np.int64(33), np.int64(41), np.int64(65), np.int64(401)]
+early ones used here (step <= 401): [np.int64(1), np.int64(2), np.int64(3), np.int64(5), np.int64(9), np.int64(17), np.int64(33), np.int64(41), np.int64(65), np.int64(401)]
+
+ALIGNED ON ABSOLUTE STEP (structural zeros excluded at step 1):
+ step  zeros_dropped  prog_d12  prog_d16  d12_lo  d12_med  d12_hi     d14     d16  d14_rel  d16_rel  d14_out  d16_out
+    1            405   0.00040   0.00019 0.12177  0.12311 0.12562 0.12408 0.12309  0.00790 -0.00014    False    False
+    2              0   0.00079   0.00037 0.01210  0.01281 0.01365 0.01062 0.01077 -0.17115 -0.15926     True     True
+    3              0   0.00119   0.00056 0.06319  0.06661 0.06994 0.06185 0.06335 -0.07150 -0.04898     True    False
+    5              0   0.00198   0.00093 0.12039  0.12139 0.12325 0.11854 0.12128 -0.02351 -0.00096     True    False
+    9              0   0.00357   0.00167 0.12675  0.13023 0.13445 0.12445 0.13456 -0.04435  0.03328     True     True
+   17              0   0.00675   0.00316 0.11764  0.12085 0.13753 0.11791 0.11304 -0.02432 -0.06461    False     True
+   33              0   0.01310   0.00614 0.11157  0.11363 0.11520 0.10863 0.10266 -0.04398 -0.09656     True     True
+   41              0   0.01627   0.00763 0.10384  0.10524 0.10581 0.10035 0.09717 -0.04642 -0.07664     True     True
+   65              0   0.02579   0.01209 0.07562  0.07969 0.08125 0.07054 0.07519 -0.11481 -0.05649     True     True
+  401              0   0.15913   0.07459 0.04438  0.04450 0.04522 0.03925 0.03613 -0.11783 -0.18803     True     True
+
+d14 outside the d12 range at 8/10 early steps; d16 at 7/10
+median offset: d14 -4.54%, d16 -6.06%
+
+Reading: at matched absolute step the three depths sit essentially on top of
+each other for the first ~40 steps (the LR-warmup window), and the deeper
+runs only separate downward later. On the progress axis the same data looks
+like a large early gap (-29% for d14 and -38% for d16 at progress 0.05),
+because progress 0.05 is step 127 at d12 but step 270 at d16 -- different
+points in the absolute warmup schedule. The first two matched-progress
+checkpoints (0.05, 0.10) are therefore the ones most exposed to caveat 3.
+Dropping them changes nothing: see below.
+
+DECISION RULE RE-RUN ON THE 18 CHECKPOINTS WITH progress >= 0.15,
+dropping the two most warmup-exposed matched points:
+  d14: outside 15/18 (below 14, above 1, inside 3)
+  d16: outside 18/18 (below 18, above 0, inside 0)
+  median offset: d14 -5.03%, d16 -11.23%
+  -> same verdict, smaller effect size.

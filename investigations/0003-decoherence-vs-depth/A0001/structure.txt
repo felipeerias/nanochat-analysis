@@ -1,0 +1,291 @@
+matched per-matrix rows: 11700  (20 checkpoints x {78,91,104} matrices x runs)
+run      depth
+d12-s10  12       1560
+d12-s11  12       1560
+d12-s7   12       1560
+d12-s8   12       1560
+d12-s9   12       1560
+d14-s7   14       1820
+d16-s7   16       2080
+
+==============================================================================
+MATRIX SHAPE (from optimizer_group_id) x ROLE x DEPTH
+==============================================================================
+ depth param_role optimizer_group_id  n_matrices
+    12     attn_k    g7-muon-768x768          12
+    12   attn_out    g7-muon-768x768          12
+    12     attn_q    g7-muon-768x768          12
+    12     attn_v    g7-muon-768x768          12
+    12     mlp_in   g9-muon-3072x768          12
+    12    mlp_out   g8-muon-768x3072          12
+    12    ve_gate       g6-muon-6x12           6
+    14     attn_k    g7-muon-896x896          14
+    14   attn_out    g7-muon-896x896          14
+    14     attn_q    g7-muon-896x896          14
+    14     attn_v    g7-muon-896x896          14
+    14     mlp_in   g9-muon-3584x896          14
+    14    mlp_out   g8-muon-896x3584          14
+    14    ve_gate       g6-muon-7x12           7
+    16     attn_k  g7-muon-1024x1024          16
+    16   attn_out  g7-muon-1024x1024          16
+    16     attn_q  g7-muon-1024x1024          16
+    16     attn_v  g7-muon-1024x1024          16
+    16     mlp_in  g9-muon-4096x1024          16
+    16    mlp_out  g8-muon-1024x4096          16
+    16    ve_gate       g6-muon-8x12           8
+
+==============================================================================
+Q1. PARAMETER ROLE
+==============================================================================
+
+median decoherence over the 20 matched checkpoints, by role and depth:
+depth           12      14      16
+param_role                        
+attn_k     0.03778 0.03507 0.03273
+attn_out   0.04293 0.03930 0.03619
+attn_q     0.03882 0.03696 0.03393
+attn_v     0.05878 0.05485 0.05138
+mlp_in     0.04143 0.03640 0.03316
+mlp_out    0.03578 0.03284 0.03117
+ve_gate    0.08196 0.07789 0.07507
+
+same, normalized to each depth's own all-matrix median (shape of the role profile):
+depth         12    14    16
+param_role                  
+attn_k     0.891 0.903 0.905
+attn_out   1.012 1.011 1.000
+attn_q     0.915 0.951 0.938
+attn_v     1.386 1.412 1.420
+mlp_in     0.977 0.937 0.917
+mlp_out    0.844 0.845 0.861
+ve_gate    1.933 2.005 2.075
+
+role rank order (low -> high decoherence) per depth:
+  d12: mlp_out < attn_k < attn_q < mlp_in < attn_out < attn_v < ve_gate
+  d14: mlp_out < attn_k < mlp_in < attn_q < attn_out < attn_v < ve_gate
+  d16: mlp_out < attn_k < mlp_in < attn_q < attn_out < attn_v < ve_gate
+
+Spearman rho of the role profile between depths (7 roles):
+  d12 vs d14: +0.964
+  d12 vs d16: +0.964
+  d14 vs d16: +1.000
+
+eta^2 (variance of log decoherence explained by ROLE alone), pooled over matched checkpoints:
+  d12: 0.448
+  d14: 0.540
+  d16: 0.615
+  (computed within depth; checkpoint-to-checkpoint drift inflates the
+   denominator, so these are lower bounds on the role effect)
+
+same eta^2 computed WITHIN each checkpoint, then averaged:
+  d12: 0.802
+  d14: 0.821
+  d16: 0.834
+
+==============================================================================
+Q2. RELATIVE DEPTH   r = layer / (n_layer - 1)
+==============================================================================
+
+median decoherence by layer (absolute layer index), per depth:
+depth      12      14      16
+layer                        
+0     0.03816 0.03563 0.03384
+1     0.04212 0.03899 0.03689
+2     0.04153 0.03817 0.03628
+3     0.04384 0.04106 0.03679
+4     0.04077 0.03666 0.03485
+5     0.04272 0.03850 0.03552
+6     0.04095 0.03746 0.03598
+7     0.04485 0.04091 0.03836
+8     0.04227 0.03836 0.03498
+9     0.04260 0.03993 0.03801
+10    0.04279 0.03810 0.03602
+11    0.04558 0.04012 0.03683
+12        NaN 0.03944 0.03564
+13        NaN 0.04275 0.03625
+14        NaN     NaN 0.03756
+15        NaN     NaN 0.03859
+
+normalized to each depth's own all-matrix median:
+depth    12    14    16
+layer                  
+0     0.900 0.917 0.935
+1     0.993 1.004 1.020
+2     0.979 0.982 1.003
+3     1.034 1.057 1.017
+4     0.961 0.943 0.963
+5     1.007 0.991 0.982
+6     0.966 0.964 0.994
+7     1.058 1.053 1.060
+8     0.997 0.987 0.967
+9     1.005 1.028 1.051
+10    1.009 0.981 0.995
+11    1.075 1.033 1.018
+12      NaN 1.015 0.985
+13      NaN 1.100 1.002
+14      NaN   NaN 1.038
+15      NaN   NaN 1.067
+
+Spearman rho( r , decoherence ) within each depth (pooled over roles and matched checkpoints):
+  d12: r = +0.065   (within-role, mean over roles: attn_k:-0.02, attn_out:+0.09, attn_q:-0.01, attn_v:+0.17, mlp_in:+0.01, mlp_out:+0.15, ve_gate:-0.08)
+  d14: r = +0.084   (within-role, mean over roles: attn_k:-0.01, attn_out:+0.10, attn_q:+0.02, attn_v:+0.30, mlp_in:+0.01, mlp_out:+0.18, ve_gate:-0.01)
+  d16: r = +0.057   (within-role, mean over roles: attn_k:-0.04, attn_out:-0.01, attn_q:+0.02, attn_v:+0.32, mlp_in:-0.03, mlp_out:+0.24, ve_gate:-0.34)
+
+eta^2 explained by relative depth (as a categorical layer index),
+within checkpoint, averaged over the 20 matched checkpoints:
+  d12: 0.048
+  d14: 0.073
+  d16: 0.060
+
+Role + layer jointly (categorical role x layer is saturated; instead
+eta^2 of layer AFTER removing the role median, within checkpoint):
+  d12: 0.106
+  d14: 0.202
+  d16: 0.158
+
+Is the relative-depth profile PRESERVED across depths?
+Comparison on the common r grid by linear interpolation of the
+depth-normalized profile (role-controlled: per-role z within depth,
+then averaged over roles at each layer).
+
+role-controlled z-profile vs relative depth (interpolated to 25 pts):
+     r    d12    d14    d16
++0.000 -0.835 -0.911 -0.992
++0.042 -0.525 -0.434 -0.426
++0.083 -0.216 -0.022 +0.009
++0.125 +0.030 +0.039 +0.246
++0.167 +0.263 +0.093 +0.236
++0.208 +0.270 +0.132 +0.173
++0.250 +0.149 +0.082 +0.144
++0.292 +0.061 -0.071 -0.003
++0.333 +0.013 -0.181 -0.228
++0.375 -0.046 -0.264 -0.081
++0.417 -0.135 -0.207 +0.069
++0.458 -0.207 -0.108 +0.222
++0.500 -0.103 +0.048 +0.137
++0.542 +0.002 +0.203 +0.024
++0.583 +0.050 +0.285 +0.041
++0.625 +0.093 +0.273 +0.088
++0.667 +0.248 -0.051 +0.156
++0.708 +0.446 -0.166 +0.079
++0.750 +0.342 +0.055 +0.075
++0.792 -0.013 +0.081 +0.181
++0.833 -0.119 -0.058 -0.143
++0.875 +0.211 +0.181 -0.354
++0.917 +0.440 +0.586 +0.314
++0.958 +0.212 +0.460 +0.343
++1.000 -0.016 +0.236 -0.055
+
+Spearman rho between depth profiles on the common r grid:
+  d12 vs d14: +0.534
+  d12 vs d16: +0.506
+  d14 vs d16: +0.482
+
+Same test with the other normalization r_frac = layer/n_layer:
+  d12 vs d14: +0.450
+  d12 vs d16: +0.273
+  d14 vs d16: +0.364
+
+Role-controlled per-layer profile (each matrix divided by its own
+role's median at that depth), first / interior / last layer:
+  d12: layer 0 = 0.916   interior median = 1.015   last layer = 1.031   (last/first = 1.125)
+  d14: layer 0 = 0.910   interior median = 1.001   last layer = 1.057   (last/first = 1.162)
+  d16: layer 0 = 0.938   interior median = 1.000   last layer = 1.036   (last/first = 1.106)
+  The endpoints agree at all three depths: the FIRST block decoheres
+  least and the LAST block most, with a spread of only ~10-20% between
+  them -- small next to the ~2x spread between parameter roles.
+
+Absolute-layer-index comparison (NO depth normalization), on the
+layers all three depths share (0..11):
+  d12 vs d14: +0.909
+  d12 vs d16: +0.615
+  d14 vs d16: +0.594
+
+==============================================================================
+Q3. MATRIX SHAPE
+==============================================================================
+ depth optimizer_group_id  rows  cols   numel  minmn  aspect  median  size
+    12       g6-muon-6x12     6    12      72      6 2.00000 0.08196   600
+    12    g7-muon-768x768   768   768  589824    768 1.00000 0.04237  4800
+    12   g8-muon-768x3072   768  3072 2359296    768 4.00000 0.03578  1200
+    12   g9-muon-3072x768  3072   768 2359296    768 4.00000 0.04143  1200
+    14       g6-muon-7x12     7    12      84      7 1.71429 0.07789   140
+    14    g7-muon-896x896   896   896  802816    896 1.00000 0.03953  1120
+    14   g8-muon-896x3584   896  3584 3211264    896 4.00000 0.03284   280
+    14   g9-muon-3584x896  3584   896 3211264    896 4.00000 0.03640   280
+    16       g6-muon-8x12     8    12      96      8 1.50000 0.07507   160
+    16  g7-muon-1024x1024  1024  1024 1048576   1024 1.00000 0.03716  1280
+    16  g8-muon-1024x4096  1024  4096 4194304   1024 4.00000 0.03117   320
+    16  g9-muon-4096x1024  4096  1024 4194304   1024 4.00000 0.03316   320
+
+Spearman rho( shape descriptor , per-matrix decoherence ), pooled:
+  d12:  numel -0.342   min(m,n) -0.402   aspect -0.075
+  d14:  numel -0.417   min(m,n) -0.426   aspect -0.143
+  d16:  numel -0.454   min(m,n) -0.437   aspect -0.177
+
+Across depths, at matched progress, per shape-class median:
+depth                   12      14      16
+optimizer_group_id                        
+g6-muon-6x12       0.08196     NaN     NaN
+g6-muon-7x12           NaN 0.07789     NaN
+g6-muon-8x12           NaN     NaN 0.07507
+g7-muon-1024x1024      NaN     NaN 0.03716
+g7-muon-768x768    0.04237     NaN     NaN
+g7-muon-896x896        NaN 0.03953     NaN
+g8-muon-1024x4096      NaN     NaN 0.03117
+g8-muon-768x3072   0.03578     NaN     NaN
+g8-muon-896x3584       NaN 0.03284     NaN
+g9-muon-3072x768   0.04143     NaN     NaN
+g9-muon-3584x896       NaN 0.03640     NaN
+g9-muon-4096x1024      NaN     NaN 0.03316
+
+same, as ratio to d12:
+depth                 12  14  16
+optimizer_group_id              
+g6-muon-6x12       1.000 NaN NaN
+g6-muon-7x12         NaN NaN NaN
+g6-muon-8x12         NaN NaN NaN
+g7-muon-1024x1024    NaN NaN NaN
+g7-muon-768x768    1.000 NaN NaN
+g7-muon-896x896      NaN NaN NaN
+g8-muon-1024x4096    NaN NaN NaN
+g8-muon-768x3072   1.000 NaN NaN
+g8-muon-896x3584     NaN NaN NaN
+g9-muon-3072x768   1.000 NaN NaN
+g9-muon-3584x896     NaN NaN NaN
+g9-muon-4096x1024    NaN NaN NaN
+
+Square attention blocks (width x width) vs MLP blocks, by depth:
+depth                  12      14      16
+cls                                      
+attn (square WxW) 0.04237 0.03953 0.03716
+mlp (Wx4W)        0.03746 0.03357 0.03172
+ve_gate           0.08196 0.07789 0.07507
+
+Cross-depth ratio within class (d/d12):
+depth                12    14    16
+cls                                
+attn (square WxW) 1.000 0.933 0.877
+mlp (Wx4W)        1.000 0.896 0.847
+ve_gate           1.000 0.950 0.916
+
+==============================================================================
+IS THE DEPTH EFFECT UNIFORM ACROSS ROLES?
+(per-role median at each matched checkpoint, d14/d16 vs the d12
+ five-seed range for the SAME role)
+==============================================================================
+    role arm  outside  of  below  above  median_rel_%
+  attn_k d14       17  20     15      2         -5.37
+  attn_k d16       20  20     20      0        -10.55
+attn_out d14       16  20     16      0         -6.59
+attn_out d16       20  20     20      0        -12.48
+  attn_q d14       17  20     16      1         -4.49
+  attn_q d16       18  20     18      0         -8.92
+  attn_v d14       15  20     15      0         -5.78
+  attn_v d16       17  20     16      1        -13.01
+  mlp_in d14       20  20     19      1         -9.92
+  mlp_in d16       20  20     20      0        -15.99
+ mlp_out d14       18  20     17      1         -7.34
+ mlp_out d16       20  20     20      0         -8.77
+ ve_gate d14        6  20      4      2         -5.89
+ ve_gate d16        9  20      8      1        -12.22

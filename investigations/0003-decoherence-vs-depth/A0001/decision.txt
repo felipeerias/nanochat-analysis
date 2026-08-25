@@ -1,0 +1,223 @@
+==============================================================================
+I0003 / A0001 — muon/replay_update_relerr vs depth
+==============================================================================
+
+rows loaded (defined, post_update): 18044
+               rows  matrices  ckpts
+run     depth                       
+d12-s10 12     2340        78     30
+d12-s11 12     2340        78     30
+d12-s7  12     2340        78     30
+d12-s8  12     2340        78     30
+d12-s9  12     2340        78     30
+d14-s7  14     2912        91     32
+d16-s7  16     3432       104     33
+
+------------------------------------------------------------------------------
+INIT-TIME STRUCTURAL ZEROS (reported separately, never averaged in)
+------------------------------------------------------------------------------
+exact zeros anywhere in the channel: 405 of 18044 rows
+all at step: [np.int64(1)]  (= deep checkpoint at update index 0)
+
+zero-valued matrices at the update-0 checkpoint, by role:
+param_role  attn_k  attn_q  attn_v  mlp_in  ve_gate
+run                                                
+d12-s10         12      12      12      12        6
+d12-s11         12      12      12      12        6
+d12-s7          12      12      12      12        6
+d12-s8          12      12      12      12        6
+d12-s9          12      12      12      12        6
+d14-s7          14      14      14      14        7
+d16-s7          16      16      16      16        8
+
+non-zero matrices at the update-0 checkpoint, by role:
+param_role  attn_out  mlp_out
+run                          
+d12-s10           12       12
+d12-s11           12       12
+d12-s7            12       12
+d12-s8            12       12
+d12-s9            12       12
+d14-s7            14       14
+d16-s7            16       16
+
+fraction of matrices that are structurally zero at update 0:
+  d12-s7    54/ 78 = 69.2%
+  d12-s8    54/ 78 = 69.2%
+  d12-s9    54/ 78 = 69.2%
+  d12-s10   54/ 78 = 69.2%
+  d12-s11   54/ 78 = 69.2%
+  d14-s7    63/ 91 = 69.2%
+  d16-s7    72/104 = 69.2%
+
+Decoherence at update 0 over the ACTIVE (non-zero) matrices only:
+               size    median      mean       min       max
+run     depth                                              
+d12-s10 12       24  0.124544  0.126662  0.113594  0.152204
+d12-s11 12       24  0.123105  0.125959  0.113728  0.147665
+d12-s7  12       24  0.125617  0.127524  0.112601  0.151595
+d12-s8  12       24  0.121774  0.123585  0.113304  0.147379
+d12-s9  12       24  0.122941  0.126672  0.115300  0.145139
+d14-s7  14       28  0.124078  0.127218  0.112469  0.153272
+d16-s7  16       32  0.123088  0.125558  0.108044  0.153379
+
+If the zeros were averaged in blindly the update-0 mean would be:
+                   mean  median
+run     depth                  
+d12-s10 12     0.038973     0.0
+d12-s11 12     0.038757     0.0
+d12-s7  12     0.039238     0.0
+d12-s8  12     0.038026     0.0
+d12-s9  12     0.038976     0.0
+d14-s7  14     0.039144     0.0
+d16-s7  16     0.038633     0.0
+
+=> the update-0 checkpoint is EXCLUDED from every number below.
+   It is also not on the matched grid (see next section), so it drops
+   out of the decision rule on its own.
+
+------------------------------------------------------------------------------
+MATCHED CHECKPOINTS on normalized_progress
+------------------------------------------------------------------------------
+matched checkpoints: 20 of 20 nominal tail points
+max |progress - nominal| over all runs and points: 0.000397
+
+(unmatched: the geometric prefix and the recipe landmarks — they are
+ step-defined, so d12 step 1 is progress 3.97e-4 but d16 step 1 is
+ 1.86e-4. No early-training checkpoint is shared across all depths.)
+
+nominal grid: 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00
+
+==============================================================================
+DECISION RULE (fixed before looking; README.md @ e76859c)
+==============================================================================
+
+######################################################################
+# per-run summary statistic across matrices: MEDIAN   <-- PRIMARY
+######################################################################
+ progress  d12_lo  d12_hi  d12_med  d12_range_rel  d12_sd_rel     d14     d16  d14_out  d16_out d14_dir d16_dir  d14_rel  d16_rel
+  0.05000 0.05006 0.05805  0.05706        0.13998     0.05954 0.04072 0.03510     True     True   below   below -0.28643 -0.38495
+  0.10000 0.04304 0.04579  0.04544        0.06050     0.02461 0.04028 0.04147     True     True   below   below -0.11363 -0.08748
+  0.15000 0.04309 0.04441  0.04354        0.03037     0.01361 0.04527 0.04250     True     True   above   below  0.03958 -0.02407
+  0.20000 0.04808 0.05110  0.04990        0.06037     0.02431 0.04882 0.04329    False     True      in   below -0.02177 -0.13242
+  0.25000 0.05164 0.05434  0.05264        0.05123     0.01843 0.04875 0.04391     True     True   below   below -0.07395 -0.16592
+  0.30000 0.05294 0.05506  0.05339        0.03960     0.01542 0.04838 0.04331     True     True   below   below -0.09381 -0.18892
+  0.35000 0.04975 0.05429  0.05155        0.08801     0.03787 0.04604 0.04187     True     True   below   below -0.10699 -0.18778
+  0.40000 0.04736 0.04912  0.04846        0.03627     0.01455 0.04451 0.04009     True     True   below   below -0.08148 -0.17280
+  0.45000 0.04635 0.04795  0.04701        0.03415     0.01291 0.04188 0.03776     True     True   below   below -0.10916 -0.19685
+  0.50000 0.04184 0.04388  0.04378        0.04654     0.02005 0.03882 0.03569     True     True   below   below -0.11328 -0.18461
+  0.55000 0.03990 0.04017  0.03993        0.00682     0.00278 0.03607 0.03322     True     True   below   below -0.09671 -0.16802
+  0.60000 0.03657 0.03716  0.03668        0.01625     0.00697 0.03387 0.03204     True     True   below   below -0.07654 -0.12656
+  0.65000 0.03407 0.03470  0.03437        0.01833     0.00797 0.03237 0.03101     True     True   below   below -0.05824 -0.09796
+  0.70000 0.03289 0.03372  0.03307        0.02509     0.00996 0.03167 0.03062     True     True   below   below -0.04232 -0.07401
+  0.75000 0.03165 0.03248  0.03219        0.02585     0.01030 0.03087 0.02986     True     True   below   below -0.04100 -0.07223
+  0.80000 0.03144 0.03186  0.03153        0.01330     0.00511 0.03043 0.02953     True     True   below   below -0.03492 -0.06352
+  0.85000 0.03087 0.03099  0.03096        0.00389     0.00178 0.03027 0.02949     True     True   below   below -0.02230 -0.04745
+  0.90000 0.03058 0.03102  0.03087        0.01433     0.00580 0.03054 0.02954     True     True   below   below -0.01080 -0.04294
+  0.95000 0.03029 0.03085  0.03068        0.01829     0.00690 0.03033 0.02951    False     True      in   below -0.01164 -0.03829
+  1.00000 0.03047 0.03094  0.03084        0.01527     0.00662 0.03049 0.02969    False     True      in   below -0.01139 -0.03705
+
+d14: outside the d12 five-seed range at 17/20 checkpoints (85%); above 1, below 16, inside 3
+     median offset vs the d12 median: -6.61%  (range -28.64% to +3.96%)
+
+d16: outside the d12 five-seed range at 20/20 checkpoints (100%); above 0, below 20, inside 0
+     median offset vs the d12 median: -11.23%  (range -38.50% to -2.41%)
+
+both d14 and d16 outside at the same checkpoint: 17/20
+d12 five-seed RANGE relative to the d12 median: median 2.81%, min 0.39%, max 14.00%
+d12 five-seed SD relative to the d12 median:    median 1.16%, min 0.18%, max 5.95%
+
+  -> d14 outside at 17/20 (need >10 for supported, inside 3 need >10 for refuted)
+  -> d16 outside at 20/20 (inside 0)
+  -> verdict under the STRICT parse of 'consistent direction' (zero excursions the other way), reading [B] in verdict.txt: INCONCLUSIVE
+  -> verdict under the COUNT parse (excursions sharing one direction > half), reading [A] in verdict.txt, d14 16/20 and d16 20/20 below: SUPPORTED
+     (verdict.txt applies the rule in full and reports [A].)
+
+######################################################################
+# per-run summary statistic across matrices: MEAN   (robustness)
+######################################################################
+ progress  d12_lo  d12_hi  d12_med  d12_range_rel  d12_sd_rel     d14     d16  d14_out  d16_out d14_dir d16_dir  d14_rel  d16_rel
+  0.05000 0.06121 0.06780  0.06669        0.09879     0.03996 0.04858 0.04312     True     True   below   below -0.27156 -0.35344
+  0.10000 0.05068 0.05456  0.05311        0.07319     0.03173 0.04565 0.04503     True     True   below   below -0.14040 -0.15218
+  0.15000 0.04996 0.05190  0.05028        0.03858     0.01585 0.05048 0.04782    False     True      in   below  0.00416 -0.04881
+  0.20000 0.05546 0.05748  0.05621        0.03596     0.01445 0.05388 0.04676     True     True   below   below -0.04133 -0.16813
+  0.25000 0.05712 0.05852  0.05831        0.02400     0.01165 0.05275 0.04904     True     True   below   below -0.09530 -0.15897
+  0.30000 0.05839 0.05912  0.05857        0.01247     0.00503 0.05231 0.04768     True     True   below   below -0.10687 -0.18586
+  0.35000 0.05546 0.05808  0.05713        0.04579     0.01803 0.05026 0.04558     True     True   below   below -0.12011 -0.20212
+  0.40000 0.05426 0.05578  0.05507        0.02752     0.01054 0.05030 0.04453     True     True   below   below -0.08668 -0.19141
+  0.45000 0.05053 0.05380  0.05158        0.06327     0.02465 0.04669 0.04272     True     True   below   below -0.09465 -0.17177
+  0.50000 0.04677 0.04929  0.04857        0.05184     0.01962 0.04370 0.04133     True     True   below   below -0.10037 -0.14923
+  0.55000 0.04474 0.04645  0.04592        0.03733     0.01477 0.04196 0.03971     True     True   below   below -0.08619 -0.13523
+  0.60000 0.04145 0.04299  0.04210        0.03655     0.01448 0.04073 0.03756     True     True   below   below -0.03248 -0.10772
+  0.65000 0.03924 0.04150  0.04137        0.05456     0.02746 0.03892 0.03628     True     True   below   below -0.05934 -0.12307
+  0.70000 0.03861 0.03956  0.03926        0.02429     0.00944 0.03816 0.03599     True     True   below   below -0.02791 -0.08323
+  0.75000 0.03760 0.03845  0.03805        0.02257     0.00876 0.03649 0.03451     True     True   below   below -0.04091 -0.09303
+  0.80000 0.03697 0.03745  0.03740        0.01283     0.00622 0.03488 0.03389     True     True   below   below -0.06752 -0.09405
+  0.85000 0.03519 0.03696  0.03603        0.04899     0.02098 0.03557 0.03482    False     True      in   below -0.01272 -0.03354
+  0.90000 0.03547 0.03658  0.03594        0.03098     0.01190 0.03606 0.03356    False     True      in   below  0.00321 -0.06630
+  0.95000 0.03445 0.03639  0.03580        0.05423     0.02466 0.03383 0.03377     True     True   below   below -0.05521 -0.05679
+  1.00000 0.03517 0.03641  0.03597        0.03452     0.01261 0.03538 0.03416    False     True      in   below -0.01655 -0.05037
+
+d14: outside the d12 five-seed range at 16/20 checkpoints (80%); above 0, below 16, inside 4
+     median offset vs the d12 median: -6.34%  (range -27.16% to +0.42%)
+
+d16: outside the d12 five-seed range at 20/20 checkpoints (100%); above 0, below 20, inside 0
+     median offset vs the d12 median: -12.92%  (range -35.34% to -3.35%)
+
+both d14 and d16 outside at the same checkpoint: 16/20
+d12 five-seed RANGE relative to the d12 median: median 3.69%, min 1.25%, max 9.88%
+d12 five-seed SD relative to the d12 median:    median 1.46%, min 0.50%, max 4.00%
+
+  -> d14 outside at 16/20 (need >10 for supported, inside 4 need >10 for refuted)
+  -> d16 outside at 20/20 (inside 0)
+  -> verdict under the STRICT parse of 'consistent direction' (zero excursions the other way), reading [B] in verdict.txt: SUPPORTED
+  -> verdict under the COUNT parse (excursions sharing one direction > half), reading [A] in verdict.txt, d14 16/20 and d16 20/20 below: SUPPORTED
+     (verdict.txt applies the rule in full and reports [A].)
+
+######################################################################
+# per-run summary statistic across matrices: GMEAN   (robustness)
+######################################################################
+ progress  d12_lo  d12_hi  d12_med  d12_range_rel  d12_sd_rel     d14     d16  d14_out  d16_out d14_dir d16_dir  d14_rel  d16_rel
+  0.05000 0.05750 0.06404  0.06323        0.10343     0.04313 0.04616 0.04060     True     True   below   below -0.26996 -0.35790
+  0.10000 0.04810 0.05169  0.05034        0.07127     0.02742 0.04392 0.04376     True     True   below   below -0.12763 -0.13074
+  0.15000 0.04837 0.04933  0.04861        0.01988     0.00852 0.04905 0.04611    False     True      in   below  0.00897 -0.05137
+  0.20000 0.05410 0.05560  0.05428        0.02776     0.01125 0.05202 0.04572     True     True   below   below -0.04164 -0.15777
+  0.25000 0.05598 0.05705  0.05689        0.01894     0.00928 0.05143 0.04718     True     True   below   below -0.09599 -0.17079
+  0.30000 0.05691 0.05730  0.05701        0.00691     0.00316 0.05076 0.04613     True     True   below   below -0.10965 -0.19092
+  0.35000 0.05435 0.05658  0.05575        0.04005     0.01557 0.04890 0.04424     True     True   below   below -0.12275 -0.20637
+  0.40000 0.05257 0.05370  0.05318        0.02125     0.00867 0.04802 0.04297     True     True   below   below -0.09704 -0.19195
+  0.45000 0.04924 0.05119  0.04975        0.03920     0.01554 0.04506 0.04113     True     True   below   below -0.09433 -0.17323
+  0.50000 0.04524 0.04709  0.04690        0.03952     0.01626 0.04225 0.03941     True     True   below   below -0.09923 -0.15982
+  0.55000 0.04315 0.04434  0.04380        0.02726     0.01023 0.04027 0.03754     True     True   below   below -0.08056 -0.14287
+  0.60000 0.04021 0.04111  0.04063        0.02198     0.00939 0.03843 0.03594     True     True   below   below -0.05407 -0.11544
+  0.65000 0.03801 0.03932  0.03892        0.03373     0.01587 0.03688 0.03457     True     True   below   below -0.05224 -0.11176
+  0.70000 0.03703 0.03758  0.03726        0.01463     0.00584 0.03600 0.03405     True     True   below   below -0.03380 -0.08610
+  0.75000 0.03592 0.03617  0.03606        0.00695     0.00326 0.03459 0.03283     True     True   below   below -0.04083 -0.08947
+  0.80000 0.03491 0.03531  0.03518        0.01136     0.00414 0.03352 0.03240     True     True   below   below -0.04722 -0.07894
+  0.85000 0.03362 0.03462  0.03415        0.02913     0.01108 0.03368 0.03281    False     True      in   below -0.01383 -0.03925
+  0.90000 0.03375 0.03416  0.03404        0.01213     0.00559 0.03368 0.03218     True     True   below   below -0.01050 -0.05457
+  0.95000 0.03314 0.03403  0.03386        0.02629     0.01281 0.03281 0.03230     True     True   below   below -0.03114 -0.04625
+  1.00000 0.03360 0.03422  0.03401        0.01818     0.00680 0.03360 0.03259     True     True   below   below -0.01201 -0.04176
+
+d14: outside the d12 five-seed range at 18/20 checkpoints (90%); above 0, below 18, inside 2
+     median offset vs the d12 median: -5.32%  (range -27.00% to +0.90%)
+
+d16: outside the d12 five-seed range at 20/20 checkpoints (100%); above 0, below 20, inside 0
+     median offset vs the d12 median: -12.31%  (range -35.79% to -3.93%)
+
+both d14 and d16 outside at the same checkpoint: 18/20
+d12 five-seed RANGE relative to the d12 median: median 2.41%, min 0.69%, max 10.34%
+d12 five-seed SD relative to the d12 median:    median 0.98%, min 0.32%, max 4.31%
+
+  -> d14 outside at 18/20 (need >10 for supported, inside 2 need >10 for refuted)
+  -> d16 outside at 20/20 (inside 0)
+  -> verdict under the STRICT parse of 'consistent direction' (zero excursions the other way), reading [B] in verdict.txt: SUPPORTED
+  -> verdict under the COUNT parse (excursions sharing one direction > half), reading [A] in verdict.txt, d14 18/20 and d16 20/20 below: SUPPORTED
+     (verdict.txt applies the rule in full and reports [A].)
+
+==============================================================================
+SEED REFERENCE (I0001/conclusion.md)
+==============================================================================
+I0001 reports muon/replay_update_relerr at 3.5% sd-relative and ~8%
+range-relative across the five d12 seeds. The per-checkpoint figures
+printed above are the same quantity recomputed on the matched tail.

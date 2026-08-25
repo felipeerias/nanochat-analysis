@@ -1,0 +1,5 @@
+model,slope_positive,crossing_depth,max_abs_residual
+"raw-linear, all 3 depths",False,,9.4723646706273999e-08
+"log-linear, all 3 depths",False,,9.8072228564841816e-08
+"raw-linear, d14-d16",False,,8.4703294725430034e-22
+"log-linear, d14-d16",False,,2.3293406049493259e-21
