@@ -1,0 +1,92 @@
+{
+  "base_family_count": 268,
+  "base_family_count_by_tier": {
+    "continuous": 32,
+    "periodic": 118,
+    "sparse": 118
+  },
+  "early_cutoff_normalized_progress": 0.15873015873015872,
+  "families_with_vector_length_mismatch": 0,
+  "noisy_rule": "typical >= 0.50 or nonfinite, or >=50% infinite relative spreads",
+  "pass_counts": {
+    "d12-s10": {
+      "native": {
+        "gradient": 0,
+        "random": 0,
+        "update": 0
+      },
+      "shadow_fp32": {
+        "gradient": 26,
+        "random": 0,
+        "update": 0
+      }
+    },
+    "d12-s11": {
+      "native": {
+        "gradient": 0,
+        "random": 0,
+        "update": 0
+      },
+      "shadow_fp32": {
+        "gradient": 26,
+        "random": 0,
+        "update": 0
+      }
+    },
+    "d12-s7": {
+      "native": {
+        "gradient": 0,
+        "random": 0,
+        "update": 0
+      },
+      "shadow_fp32": {
+        "gradient": 26,
+        "random": 0,
+        "update": 0
+      }
+    },
+    "d12-s8": {
+      "native": {
+        "gradient": 0,
+        "random": 0,
+        "update": 0
+      },
+      "shadow_fp32": {
+        "gradient": 26,
+        "random": 0,
+        "update": 0
+      }
+    },
+    "d12-s9": {
+      "native": {
+        "gradient": 0,
+        "random": 0,
+        "update": 0
+      },
+      "shadow_fp32": {
+        "gradient": 25,
+        "random": 0,
+        "update": 0
+      }
+    }
+  },
+  "passing_direction_family_count": 88,
+  "probe_sampled_family_count": 271,
+  "relative_zero_convention": "0/0 -> 0; positive/0 -> inf",
+  "reported_arm_specific_family_count": 366,
+  "runs": [
+    "d12-s7",
+    "d12-s8",
+    "d12-s9",
+    "d12-s10",
+    "d12-s11"
+  ],
+  "tight_rule": "typical, early, late <= 0.05 and worst <= 0.20",
+  "uncertified_native_family_count": 99,
+  "utility_band_counts": {
+    "intermediate": 111,
+    "noisy": 95,
+    "tight": 96,
+    "unavailable": 64
+  }
+}
