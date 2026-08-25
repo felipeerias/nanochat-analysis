@@ -66,6 +66,26 @@ why the reference does not apply. Without it, no claim has an error bar.
 
 I0001 measures d12 only. Its spread may not apply to d14 or d16.
 
+## Results so far
+
+Each folder holds a frozen protocol, two independent blind analyses, and a
+conclusion. Read the conclusion first.
+
+| | investigation | outcome |
+|---|---|---|
+| I0001 | seed variation (the reference) | closed; spreads span five orders of magnitude; loss 0.06%, decoherence 3.5%, curvature 25-29% |
+| I0002 | bf16 vs fp32 curvature | closed; bf16 does not corrupt curvature values (0.3%, unbiased) but destroys the error bars |
+| I0003 | decoherence vs depth | supported; falls about 11% at d16, confounded with width; caveated by I0006 |
+| I0004 | acceptance vs depth | refuted; no degradation, d18/d20 will certify |
+| I0005 | certified curvature trajectory | closed; sharpening is real and locked to the learning-rate warmdown |
+| I0006 | warmup confound | closed; the alignment axis is the confound; 160 of 248 families unsafe for depth claims |
+| I0007 | zero-init wake-up | closed; two tiers, everything active by update 1, depth cannot change it |
+| I0008 | adaptive batching feasibility | unavailable as posed; corrected the dataset card |
+
+Corrections these produced, now applied: the seed varies **initialization
+only** (one data ordering, shared probes), and cross-depth claims are far more
+limited than the seed floor alone suggests.
+
 ## Backlog
 
 Ideas with no folder yet. Make a folder when you start one.
