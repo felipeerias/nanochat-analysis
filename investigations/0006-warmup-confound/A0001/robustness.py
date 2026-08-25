@@ -46,14 +46,14 @@ for lo, hi, lab in ((0, 400, "step <= 400"), (401, 2520, "401 < step <= 2520")):
     st = np.arange(lo, hi + 1)
     y16 = raw["d16-s7"].reindex(st).to_numpy()
     M = np.vstack([raw[r].reindex(st).to_numpy() for r in D12])
-    rel_abs = (y16 - np.median(M, 0)) / np.median(M, 0)
+    rel_abs = (y16 - np.nanmedian(M, 0)) / np.nanmedian(M, 0)
     # progress alignment: d12 evaluated at step * N12/N16
     st12 = st * (N12 / N16)
     Mp = np.vstack([np.interp(st12, raw[r].index.to_numpy(), raw[r].to_numpy())
                     for r in D12])
-    rel_prog = (y16 - np.median(Mp, 0)) / np.median(Mp, 0)
-    p(f"  {lab:20s} median rel diff  abs {100*np.median(rel_abs):+7.3f}%   "
-      f"prog {100*np.median(rel_prog):+7.3f}%")
+    rel_prog = (y16 - np.nanmedian(Mp, 0)) / np.nanmedian(Mp, 0)
+    p(f"  {lab:20s} median rel diff  abs {100*np.nanmedian(rel_abs):+7.3f}%   "
+      f"prog {100*np.nanmedian(rel_prog):+7.3f}%")
 p("  (compare per_family_region.csv: warmup -2.77 / -18.37, post -1.08 / -7.97)")
 sub = F[F.metric == "loss/train_mean"].iloc[0]
 p(f"  pipeline values:      warmup abs {100*sub.w_medrel_abs:+.3f}% "
@@ -74,11 +74,15 @@ cmp = pd.DataFrame({"med": g.median(), "mean": g.mean()}).reset_index()
 with np.errstate(divide="ignore", invalid="ignore"):
     rr = np.abs(cmp["mean"] - cmp["med"]) / np.abs(cmp["med"])
 p(f"  |mean - median| / |median| across those rows: median "
-  f"{np.nanmedian(rr):.3f}, p90 {np.nanquantile(rr, .9):.3f}")
-p("  -> the aggregation choice moves per-parameter families materially; it is a")
-p("     disclosed choice, applied identically to every run, so it cancels in the")
-p("     d16-vs-d12 comparison only to the extent that the parameter populations")
-p("     are comparable - and they are NOT (d16 has 16 blocks, d12 has 12).")
+  f"{np.nanmedian(rr):.4f}, p90 {np.nanquantile(rr, .9):.4f}, "
+  f"p99 {np.nanquantile(rr, .99):.4f}, max {np.nanmax(rr):.4f}")
+worst = cmp.assign(r=rr).groupby("metric")["r"].median().nlargest(5)
+p("  families most sensitive to the choice (median |mean-med|/|med|):")
+for k, v in worst.items():
+    p(f"    {k}: {v:.3f}")
+p("  -> for most families the choice is immaterial; it is disclosed because for")
+p("     per-parameter families the aggregated populations are NOT comparable")
+p("     across depths (d16 has 16 blocks, d12 has 12).")
 
 p("")
 p("## (b) threshold sensitivity, dynamics families testable under both alignments")

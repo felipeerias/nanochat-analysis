@@ -1,16 +1,21 @@
 ## (d) independent recomputation of the loss/train_mean headline
   step <= 400          median rel diff  abs  -2.772%   prog -18.371%
-  401 < step <= 2520   median rel diff  abs    +nan%   prog  -8.661%
+  401 < step <= 2520   median rel diff  abs  -1.077%   prog  -8.661%
   (compare per_family_region.csv: warmup -2.77 / -18.37, post -1.08 / -7.97)
   pipeline values:      warmup abs -2.772% prog -18.371% | post abs -1.077% prog -7.970%
 
 ## (a) median vs mean across parameter rows
   55 of 77 sparse families have >1 row per step (max rows/step 113)
-  |mean - median| / |median| across those rows: median 0.000, p90 0.000
-  -> the aggregation choice moves per-parameter families materially; it is a
-     disclosed choice, applied identically to every run, so it cancels in the
-     d16-vs-d12 comparison only to the extent that the parameter populations
-     are comparable - and they are NOT (d16 has 16 blocks, d12 has 12).
+  |mean - median| / |median| across those rows: median 0.0000, p90 0.0000, p99 6.2788, max inf
+  families most sensitive to the choice (median |mean-med|/|med|):
+    sketch/probe_grad_sq_norm: 6.315
+    muon/replay_update_relerr: 0.166
+    curvature/Hg_norm: 0.000
+    curvature/arith_eps: 0.000
+    curvature/c_fd_gradient: 0.000
+  -> for most families the choice is immaterial; it is disclosed because for
+     per-parameter families the aggregated populations are NOT comparable
+     across depths (d16 has 16 blocks, d12 has 12).
 
 ## (b) threshold sensitivity, dynamics families testable under both alignments
   z>=2.0: clears the band inside the window on the STEP axis  35, on the PROGRESS axis  66; alignment gap itself >= z for  44 of 119 families

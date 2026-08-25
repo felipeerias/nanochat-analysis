@@ -1,7 +1,7 @@
 ---
 id: I0005
 kind: question
-status: open
+status: closed
 data: sweep; the five d12 segments (d14/d16 may be described but not pooled)
 selection: shadow_fp32 arm ONLY; gradient direction ONLY; only checkpoints
   where curvature/verdict_code_gradient == 0 (passed). I0001 established that

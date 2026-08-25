@@ -69,6 +69,7 @@ from loader.telemetry_load import defined, load_segment  # noqa: E402
 WARMUP_END = 400
 D12_STEPS = 2520
 D16_STEPS = 5376
+D12_WARMDOWN_START = 882
 PROGRESS_TOL = 0.5 * (1.0 / D12_STEPS + 1.0 / D16_STEPS)
 MIN_WINDOW_POINTS = 2
 SEED_MULTIPLE = 3.0
@@ -103,6 +104,8 @@ def load_curves() -> tuple[pd.DataFrame, dict[str, dict], list[str]]:
         depth_label, depth, seed = segment_identity(segment)
         loaded = load_segment(str(DATA_ROOT), segment)
         provenance[segment] = loaded["provenance"]
+        if depth == 12 and loaded["provenance"]["deep_schedule_landmarks"][-1] != D12_WARMDOWN_START:
+            raise AssertionError("unexpected d12 warmdown landmark")
         run_parts: list[pd.DataFrame] = []
 
         for tier, raw in loaded["tiers"].items():
@@ -322,6 +325,20 @@ def window_stats(frame: pd.DataFrame, window: str, value_col: str = "difference"
     }
 
 
+def interval_stats(
+    frame: pd.DataFrame,
+    lower_exclusive: int,
+    upper_inclusive: int,
+    value_col: str = "difference",
+) -> dict[str, float]:
+    q = frame[
+        (frame["recipe_step"] > lower_exclusive)
+        & (frame["recipe_step"] <= upper_inclusive)
+    ].copy()
+    q["window"] = "interval"
+    return window_stats(q, "interval", value_col=value_col)
+
+
 def magnitude(stats: dict[str, float]) -> float:
     return stats["effect_rel"] if np.isfinite(stats["effect_rel"]) else stats["effect"]
 
@@ -389,8 +406,20 @@ def analyze_family(family: str, frame: pd.DataFrame) -> tuple[dict, dict[str, pd
     )
     disagreement_class, disagreement_dom = classify(dw, dp)
 
+    # Sensitivity: the frozen post window includes the recipe's normalized
+    # warmdown, which begins at d12 step 882.  Comparing warmup only with the
+    # post-ramp/pre-warmdown interval (400, 882] isolates the stable plateau.
+    am = interval_stats(absolute, WARMUP_END, D12_WARMDOWN_START)
+    pm = interval_stats(progress, WARMUP_END, D12_WARMDOWN_START)
+    dm = interval_stats(common, WARMUP_END, D12_WARMDOWN_START, value_col="alignment_difference")
+    abs_mid_class, abs_mid_dom = classify(aw, am)
+    prog_mid_class, prog_mid_dom = classify(pw, pm)
+    disagreement_mid_class, disagreement_mid_dom = classify(dw, dm)
+
     unsafe = abs_class == "warmup-dominated" or prog_class == "warmup-dominated"
     schedule_supported = unsafe and disagreement_class == "warmup-dominated"
+    prewarmdown_unsafe = abs_mid_class == "warmup-dominated" or prog_mid_class == "warmup-dominated"
+    prewarmdown_supported = prewarmdown_unsafe and disagreement_mid_class == "warmup-dominated"
 
     result = {
         "family": family,
@@ -406,6 +435,14 @@ def analyze_family(family: str, frame: pd.DataFrame) -> tuple[dict, dict[str, pd
         "alignment_dominance": disagreement_dom,
         "unsafe_for_depth_claims": bool(unsafe),
         "alignment_supports_schedule_attribution": bool(schedule_supported),
+        "absolute_prewarmdown_class": abs_mid_class,
+        "absolute_prewarmdown_dominance": abs_mid_dom,
+        "progress_prewarmdown_class": prog_mid_class,
+        "progress_prewarmdown_dominance": prog_mid_dom,
+        "alignment_prewarmdown_class": disagreement_mid_class,
+        "alignment_prewarmdown_dominance": disagreement_mid_dom,
+        "prewarmdown_unsafe": bool(prewarmdown_unsafe),
+        "prewarmdown_alignment_support": bool(prewarmdown_supported),
     }
     result.update(prefixed(aw, "absolute_warm"))
     result.update(prefixed(ap, "absolute_post"))
@@ -413,6 +450,9 @@ def analyze_family(family: str, frame: pd.DataFrame) -> tuple[dict, dict[str, pd
     result.update(prefixed(pp, "progress_post"))
     result.update(prefixed(dw, "alignment_warm"))
     result.update(prefixed(dp, "alignment_post"))
+    result.update(prefixed(am, "absolute_prewarmdown"))
+    result.update(prefixed(pm, "progress_prewarmdown"))
+    result.update(prefixed(dm, "alignment_prewarmdown"))
     return result, {"absolute": absolute, "progress": progress, "disagreement": common}
 
 
@@ -605,6 +645,12 @@ def main() -> None:
         "alignment_supported_families": table.loc[
             table["alignment_supports_schedule_attribution"], "family"
         ].tolist(),
+        "prewarmdown_sensitivity": {
+            "d12_interval": f"({WARMUP_END}, {D12_WARMDOWN_START}]",
+            "n_unsafe": int(table["prewarmdown_unsafe"].sum()),
+            "n_alignment_supported": int(table["prewarmdown_alignment_support"].sum()),
+            "unsafe_families": table.loc[table["prewarmdown_unsafe"], "family"].tolist(),
+        },
         "progress_tolerance": PROGRESS_TOL,
         "sparse_matches": {
             phase: {
