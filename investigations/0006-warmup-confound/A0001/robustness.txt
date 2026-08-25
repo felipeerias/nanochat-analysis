@@ -1,0 +1,35 @@
+## (d) independent recomputation of the loss/train_mean headline
+  step <= 400          median rel diff  abs  -2.772%   prog -18.371%
+  401 < step <= 2520   median rel diff  abs    +nan%   prog  -8.661%
+  (compare per_family_region.csv: warmup -2.77 / -18.37, post -1.08 / -7.97)
+  pipeline values:      warmup abs -2.772% prog -18.371% | post abs -1.077% prog -7.970%
+
+## (a) median vs mean across parameter rows
+  55 of 77 sparse families have >1 row per step (max rows/step 113)
+  |mean - median| / |median| across those rows: median 0.000, p90 0.000
+  -> the aggregation choice moves per-parameter families materially; it is a
+     disclosed choice, applied identically to every run, so it cancels in the
+     d16-vs-d12 comparison only to the extent that the parameter populations
+     are comparable - and they are NOT (d16 has 16 blocks, d12 has 12).
+
+## (b) threshold sensitivity, dynamics families testable under both alignments
+  z>=2.0: clears the band inside the window on the STEP axis  35, on the PROGRESS axis  66; alignment gap itself >= z for  44 of 119 families
+  z>=3.0: clears the band inside the window on the STEP axis  18, on the PROGRESS axis  49; alignment gap itself >= z for  29 of 119 families
+  z>=4.0: clears the band inside the window on the STEP axis  11, on the PROGRESS axis  42; alignment gap itself >= z for  20 of 119 families
+
+## (c) d14 consistency on the headline channels (out of the declared design)
+  loss/train_mean
+      d14 abs: w  -1.25% p  +0.30%
+      d14 prog: w  -8.61% p  -4.42%
+      d16 abs: w  -2.77% p  -1.08%
+      d16 prog: w -18.37% p  -7.97%
+  update/loss_before
+      d14 abs: w  -0.75% p  -1.68%
+      d14 prog: w -11.13% p -10.33%
+      d16 abs: w  -1.54% p  -2.58%
+      d16 prog: w -20.76% p -17.62%
+  muon/replay_update_relerr
+      d14 abs: w  -7.15% p  +9.43%
+      d14 prog: w  -8.71% p  -6.60%
+      d16 abs: w  -7.66% p +14.86%
+      d16 prog: w -17.53% p -12.65%

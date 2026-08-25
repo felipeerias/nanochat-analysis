@@ -1,7 +1,7 @@
 ---
 id: I0007
 kind: question
-status: open
+status: closed
 data: sweep; all seven schema-v3 segments
 selection: muon/replay_update_relerr and the Muon stage families at the early
   deep checkpoints; per matrix (parameter_name)

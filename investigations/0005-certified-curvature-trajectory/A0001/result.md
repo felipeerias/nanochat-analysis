@@ -126,10 +126,11 @@ The recipe's warmdown begins at step 882/2520 at d12 — `normalized_progress`
 | `update/direction_norm` (support) | +0.26 … +0.45 | −1.00 … −1.00 | 5/5 falling | 0.570x (0.562 – 0.572) | 0.7% |
 
 **gHg is flat while the learning rate is flat, and rises about 15-fold during
-warmdown.** Through the constant-LR body (p < 0.35, 12–13 certified points) no
+warmdown.** Through the constant-LR body (p < 0.35, 11–12 certified points) no
 seed shows a consistent direction: three of five have a positive rank
 correlation with progress, two negative, all weak. From the warmdown boundary
-onward all five rise, with rank correlations +0.62 to +0.95. Seed-to-seed rank
+onward all five rise over the remaining 14 certified points, with rank
+correlations +0.62 to +0.95. Seed-to-seed rank
 concordance of the whole gHg trajectory is high — median pairwise Spearman
 **0.90** (0.85–0.93) — so the five runs trace the same curve, not five
 different ones.
@@ -151,7 +152,8 @@ not multiplicative). Fig 2, left.
 **eta\* is the exact reciprocal of vhv_gradient** (the identity
 `eta_star == gg/gHg` holds to 1.2e-15), so it carries no independent
 information: it falls 4.8x, from an across-seed median of 0.53 before warmdown
-to **0.087** in the tail. Its full certified range is 0.061 to 1.44. Reporting both is reporting one channel twice.
+to **0.087** in the tail; its full certified range is 0.061 to 1.44.
+Reporting both is reporting one channel twice.
 
 **dhd falls, but almost entirely because the update shrinks.** dhd is curvature
 along the *actual applied update*, not along the gradient, and it is the most
@@ -161,7 +163,8 @@ final checkpoint. But `update/direction_norm` drops 33x over the same span, and
 `dhd / ||delta||^2` — which equals `curvature/vhv_update` to 2.4e-7 — falls only
 about 2x from its pre-warmdown median to its warmdown median (0.48–0.62 per
 run), and about 5x from the first checkpoint common to all five runs to the
-last. So the dhd trajectory is dominated by the warmdown shrinking the step, and says little about the curvature the optimizer actually moves through.
+last. So the dhd trajectory is dominated by the warmdown shrinking the step,
+and says little about the curvature the optimizer actually moves through.
 That decomposition is descriptive only: `vhv_update` is **uncertified**.
 
 **The instrument does not drift.** `e_curv_gradient` is the acceptance suite's
@@ -243,9 +246,9 @@ per run that certify:
   eigenvalue, or the edge of stability. The random and update directions —
   which is where "is the model at the edge of stability" would actually be
   tested — never certify, so that question is not answerable from this dataset.
-- Five of 30 checkpoints per run are missing, and they are the five that matter
-  most for the earliest dynamics (p <= 0.0036). Nothing here describes the first
-  0.4% of training.
+- Four of 30 checkpoints per run are missing (five in `d12-s9`), and they are
+  exactly the ones that matter most for the earliest dynamics (p <= 0.0036).
+  Nothing here describes the first 0.4% of training.
 
 ## Limitations
 
