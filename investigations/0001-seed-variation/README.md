@@ -1,7 +1,7 @@
 ---
 id: I0001
 kind: question
-status: open
+status: closed
 data: sweep-d12-d16-v1; segments d12-s7, d12-s8, d12-s9, d12-s10, d12-s11
 selection: defined rows only; matched normalized_progress; both acceptance arms
   reported separately; curvature restricted to per-direction passing verdicts
