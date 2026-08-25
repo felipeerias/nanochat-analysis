@@ -32,4 +32,4 @@ print('\nvalid_targets constant?', {k: (out[k]['batch/valid_targets'].nunique())
 print('bos_count describe (d12-s7):'); print(out['d12-s7']['batch/bos_count'].describe())
 print('mean_segment_length describe (d12-s7):'); print(out['d12-s7']['batch/mean_segment_length'].describe())
 import pickle
-pickle.dump(out, open('/tmp/claude-1000/-home-felipe-Igalia-nanochat-nanochat/7b7044b9-04da-4203-ac58-6157ccf23646/scratchpad/d12_cont.pkl','wb'))
+pickle.dump(out, open('/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl','wb'))

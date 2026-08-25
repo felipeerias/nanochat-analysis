@@ -12,7 +12,7 @@ sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
 import numpy as np, pandas as pd, telemetry_load as T
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 OUT = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
-SP = '/tmp/claude-1000/-home-felipe-Igalia-nanochat-nanochat/7b7044b9-04da-4203-ac58-6157ccf23646/scratchpad/d12_cont.pkl'
+SP = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
 out = pickle.load(open(SP, 'rb'))
 runs = sorted(out)
 W = 51
@@ -78,3 +78,11 @@ ax[1].axhline(0, color='k', lw=.5); ax[1].set_xlabel('lag (steps)')
 ax[1].legend(fontsize=7); ax[1].set_title('no persistence beyond lag 0')
 fig.tight_layout(); fig.savefig(f'{OUT}/fig/batch_effect.png', dpi=130)
 print('\nwrote fig/batch_effect.png')
+
+print('\n=== cross-check against the I0001 seed reference ===')
+lvl = float(L.loc[R.index].values.mean())
+print(f'  mean loss level over the window        : {lvl:.4f} nats')
+print(f'  seed-idiosyncratic sd                  : {np.sqrt(var_idio):.5f} nats = {100*np.sqrt(var_idio)/lvl:.3f}% of level')
+print(f'  I0001 reference for loss/train_mean    : 0.06% (sd-relative, five d12 seeds)')
+print(f'  batch-attributable sd                  : {np.sqrt(var_shared):.5f} nats = {100*np.sqrt(var_shared)/lvl:.3f}% of level')
+print(f'  ratio batch effect / seed noise        : {np.sqrt(var_shared/var_idio):.1f}x')

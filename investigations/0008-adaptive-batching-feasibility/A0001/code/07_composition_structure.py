@@ -5,7 +5,7 @@ sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
 import numpy as np, pandas as pd, telemetry_load as T
 ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
 OUT = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
-SP = '/tmp/claude-1000/-home-felipe-Igalia-nanochat-nanochat/7b7044b9-04da-4203-ac58-6157ccf23646/scratchpad/d12_cont.pkl'
+SP = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
 out = pickle.load(open(SP,'rb'))
 c = out['d12-s7']
 print('=== is the batch stream stationary?  (loader is deterministic: no RNG, shard order) ===')

@@ -108,3 +108,28 @@ which dispersion statistic they used.
 The reference is **d12 only**. Caveats 1 and 3 in `DATASET.md` apply: depth
 covaries with width, batch size and learning rate, and warmup is a fixed step
 count, so this spread should not be assumed to transfer to d14 or d16.
+
+## Correction after I0008 (2026-08-25)
+
+The protocol for this investigation stated that the five runs differ by "a
+different initialization, a different data order, a different frozen probe,
+and the platform's own non-determinism". **Two of those three are wrong.**
+
+I0008 established, and I verified independently, that the loader contains no
+RNG: the batch stream is bitwise identical across all five seeds at every one
+of the 2,520 steps, and the three frozen probes have identical ids in all five
+runs. The seed changes **initialization only**.
+
+Two consequences:
+
+1. The limitation recorded above — that probe-based families carry probe
+   sampling variance — is **incorrect**. Probes are shared. That makes the
+   reference cleaner than advertised, not dirtier.
+2. The reference is **narrower** than advertised. It bounds initialization
+   noise, not run-to-run noise in general. I0008 measures the
+   batch-selection contribution to step-to-step loss variance at roughly 10x
+   the figure here. Any future experiment that changes data order, batching or
+   packing must establish its own floor; this one does not cover it.
+
+The spreads themselves are unaffected and remain the reference for
+initialization variance.

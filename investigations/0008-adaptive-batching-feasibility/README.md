@@ -1,7 +1,7 @@
 ---
 id: I0008
 kind: question
-status: open
+status: closed
 data: sweep; all seven schema-v3 segments
 selection: as required by the assessment; state what you used
 universe: the full metric inventory is in scope; the deliverable is a mapping,
