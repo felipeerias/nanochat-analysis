@@ -146,13 +146,23 @@ def summarize(df, mask, label):
         r[f"frac_zero_sd_{a}"] = float((dd[f"sd12_{a}"] == 0).mean()) if len(dd) else np.nan
         r[f"frac_exact_eq_{a}"] = float(
             (dd["y16"] == dd[f"med12_{a}"]).mean()) if len(dd) else np.nan
-    # alignment disagreement, evaluated only where both alignments are defined
+    # Alignment disagreement. Because both alignments compare the SAME d16
+    # sample, (y16 - med12_abs) - (y16 - med12_prog) = med12_prog - med12_abs:
+    # the disagreement is entirely a property of the d12 reference series, i.e.
+    # how far apart d12-at-the-same-step and d12-at-the-same-progress are.
+    # Expressed in pooled d12 seed sigmas.
     if len(d_both):
-        dz = d_both["z_abs"] - d_both["z_prog"]
-        dr = d_both["rel_abs"] - d_both["rel_prog"]
+        gap = d_both["med12_prog"] - d_both["med12_abs"]
+        pooled = np.sqrt((d_both["sd12_abs"] ** 2 + d_both["sd12_prog"] ** 2) / 2)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            dz = np.where(pooled > 0, np.abs(gap) / pooled,
+                          np.where(np.abs(gap) > 0, np.inf, 0.0))
+            dr = np.where(np.abs(d_both["med12_abs"]) > 1e-12,
+                          gap / np.abs(d_both["med12_abs"]), np.nan)
         fin = np.isfinite(dz)
-        r["align_dz"] = float(np.nanmedian(np.abs(dz[fin]))) if fin.any() else np.nan
-        r["align_dz_max"] = float(np.nanmax(np.abs(dz[fin]))) if fin.any() else np.nan
+        r["align_dz"] = float(np.nanmedian(dz[fin])) if fin.any() else np.nan
+        r["align_dz_max"] = float(np.nanmax(dz[fin])) if fin.any() else np.nan
+        r["align_dz_ninf"] = int((~fin).sum())
         r["align_drel"] = float(np.nanmedian(np.abs(dr)))
         # sign flip: does the direction of the d16-d12 difference change?
         sa, sp = np.sign(d_both["rel_abs"]), np.sign(d_both["rel_prog"])
@@ -160,7 +170,7 @@ def summarize(df, mask, label):
         r["sign_flip_frac"] = float((sa[m] != sp[m]).mean()) if m.any() else np.nan
     else:
         r.update(align_dz=np.nan, align_dz_max=np.nan, align_drel=np.nan,
-                 sign_flip_frac=np.nan)
+                 align_dz_ninf=0, sign_flip_frac=np.nan)
     return r
 
 

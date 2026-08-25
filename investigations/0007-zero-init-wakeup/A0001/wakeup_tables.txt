@@ -68,6 +68,12 @@ between the two modes; there are no small-but-nonzero values to confuse
 with zero.  Ratio (smallest nonzero) / (largest zero) is infinite because
 the zero mode is literally 0.
 
+over all 18044 cells in all seven runs and all 30-33 checkpoints:
+   exactly zero: 405
+   smallest nonzero value anywhere: 3.229737e-03
+   the nonzero population never approaches zero, so no tolerance choice
+   could turn a nonzero cell into a zero one or vice versa.
+
 exact-zero decoherence cells, by update index, over ALL checkpoints:
    d12-s10   exact-zero cells:   54 at update indices [np.int64(0)]   honest-undefined cells: 0
    d12-s11   exact-zero cells:   54 at update indices [np.int64(0)]   honest-undefined cells: 0
@@ -175,49 +181,141 @@ update).  Tier B = exactly zero at index 0, awake at index 1.
    d14-s7    tier A roles = ['attn_out', 'mlp_out']   tier B roles = ['attn_k', 'attn_q', 'attn_v', 'mlp_in', 've_gate']
    d16-s7    tier A roles = ['attn_out', 'mlp_out']   tier B roles = ['attn_k', 'attn_q', 'attn_v', 'mlp_in', 've_gate']
 
+Tier A tested against the model's own initializer: gpt.py init_weights()
+calls zeros_() on block.attn.c_proj.weight and block.mlp.c_proj.weight and
+on nothing else in the Muon parameter set.  Is tier A exactly that set?
+   d12-s10   tier A == zero-init set: True   (|tier A| = 24, |zero-init| = 24)
+   d12-s11   tier A == zero-init set: True   (|tier A| = 24, |zero-init| = 24)
+   d12-s7    tier A == zero-init set: True   (|tier A| = 24, |zero-init| = 24)
+   d12-s8    tier A == zero-init set: True   (|tier A| = 24, |zero-init| = 24)
+   d12-s9    tier A == zero-init set: True   (|tier A| = 24, |zero-init| = 24)
+   d14-s7    tier A == zero-init set: True   (|tier A| = 28, |zero-init| = 28)
+   d16-s7    tier A == zero-init set: True   (|tier A| = 32, |zero-init| = 32)
+
 --------------------------------------------------------------------------
 4. INDEPENDENT CORROBORATION AT UPDATE INDEX 0 (periodic tier, step 0)
 --------------------------------------------------------------------------
 periodic grad/* rows are keyed by (param_role, layer), not
 parameter_name; muon/* periodic rows do carry parameter_name.
 
-   d12-s10    grad/norm: 54/78 exact (MATCH)  grad/zero_fraction: 0/0 exact (MISMATCH)
+   d12-s10    grad/norm: 54/78 exactly 0 (MATCH)  grad/rms: 54/78 exactly 0 (MATCH)
+      role-level gradient aggregates at step 0 (pre_update):
+      metric      grad/max_abs  grad/zero_fraction  zero_frac_is_exactly_1  max_abs_is_exactly_0
+      param_role                                                                                
+      attn_k          0.000000            1.000000                    True                  True
+      attn_out        0.000029            0.000013                   False                 False
+      attn_q          0.000000            1.000000                    True                  True
+      attn_v          0.000000            1.000000                    True                  True
+      mlp_in          0.000000            1.000000                    True                  True
+      mlp_out         0.000019            0.000006                   False                 False
+      ve_gate         0.000000            1.000000                    True                  True
       muon/data_norm                   exactly 0 for  54/ 78  MATCH-asleep
       muon/u_final_norm_observed       exactly 0 for  54/ 78  MATCH-asleep
       muon/decay_norm                  exactly 0 for  24/ 78  = tier A (the zero-init projections themselves)
       muon/cos_raw_final               undefined for  54/ 78 MATCH  reason=['degenerate_or_zero']
-   d12-s11    grad/norm: 54/78 exact (MATCH)  grad/zero_fraction: 0/0 exact (MISMATCH)
+   d12-s11    grad/norm: 54/78 exactly 0 (MATCH)  grad/rms: 54/78 exactly 0 (MATCH)
+      role-level gradient aggregates at step 0 (pre_update):
+      metric      grad/max_abs  grad/zero_fraction  zero_frac_is_exactly_1  max_abs_is_exactly_0
+      param_role                                                                                
+      attn_k          0.000000            1.000000                    True                  True
+      attn_out        0.000033            0.000014                   False                 False
+      attn_q          0.000000            1.000000                    True                  True
+      attn_v          0.000000            1.000000                    True                  True
+      mlp_in          0.000000            1.000000                    True                  True
+      mlp_out         0.000025            0.000007                   False                 False
+      ve_gate         0.000000            1.000000                    True                  True
       muon/data_norm                   exactly 0 for  54/ 78  MATCH-asleep
       muon/u_final_norm_observed       exactly 0 for  54/ 78  MATCH-asleep
       muon/decay_norm                  exactly 0 for  24/ 78  = tier A (the zero-init projections themselves)
       muon/cos_raw_final               undefined for  54/ 78 MATCH  reason=['degenerate_or_zero']
-   d12-s7     grad/norm: 54/78 exact (MATCH)  grad/zero_fraction: 0/0 exact (MISMATCH)
+   d12-s7     grad/norm: 54/78 exactly 0 (MATCH)  grad/rms: 54/78 exactly 0 (MATCH)
+      role-level gradient aggregates at step 0 (pre_update):
+      metric      grad/max_abs  grad/zero_fraction  zero_frac_is_exactly_1  max_abs_is_exactly_0
+      param_role                                                                                
+      attn_k          0.000000            1.000000                    True                  True
+      attn_out        0.000035            0.000015                   False                 False
+      attn_q          0.000000            1.000000                    True                  True
+      attn_v          0.000000            1.000000                    True                  True
+      mlp_in          0.000000            1.000000                    True                  True
+      mlp_out         0.000024            0.000007                   False                 False
+      ve_gate         0.000000            1.000000                    True                  True
       muon/data_norm                   exactly 0 for  54/ 78  MATCH-asleep
       muon/u_final_norm_observed       exactly 0 for  54/ 78  MATCH-asleep
       muon/decay_norm                  exactly 0 for  24/ 78  = tier A (the zero-init projections themselves)
       muon/cos_raw_final               undefined for  54/ 78 MATCH  reason=['degenerate_or_zero']
-   d12-s8     grad/norm: 54/78 exact (MATCH)  grad/zero_fraction: 0/0 exact (MISMATCH)
+   d12-s8     grad/norm: 54/78 exactly 0 (MATCH)  grad/rms: 54/78 exactly 0 (MATCH)
+      role-level gradient aggregates at step 0 (pre_update):
+      metric      grad/max_abs  grad/zero_fraction  zero_frac_is_exactly_1  max_abs_is_exactly_0
+      param_role                                                                                
+      attn_k          0.000000            1.000000                    True                  True
+      attn_out        0.000026            0.000014                   False                 False
+      attn_q          0.000000            1.000000                    True                  True
+      attn_v          0.000000            1.000000                    True                  True
+      mlp_in          0.000000            1.000000                    True                  True
+      mlp_out         0.000021            0.000007                   False                 False
+      ve_gate         0.000000            1.000000                    True                  True
       muon/data_norm                   exactly 0 for  54/ 78  MATCH-asleep
       muon/u_final_norm_observed       exactly 0 for  54/ 78  MATCH-asleep
       muon/decay_norm                  exactly 0 for  24/ 78  = tier A (the zero-init projections themselves)
       muon/cos_raw_final               undefined for  54/ 78 MATCH  reason=['degenerate_or_zero']
-   d12-s9     grad/norm: 54/78 exact (MATCH)  grad/zero_fraction: 0/0 exact (MISMATCH)
+   d12-s9     grad/norm: 54/78 exactly 0 (MATCH)  grad/rms: 54/78 exactly 0 (MATCH)
+      role-level gradient aggregates at step 0 (pre_update):
+      metric      grad/max_abs  grad/zero_fraction  zero_frac_is_exactly_1  max_abs_is_exactly_0
+      param_role                                                                                
+      attn_k          0.000000            1.000000                    True                  True
+      attn_out        0.000025            0.000015                   False                 False
+      attn_q          0.000000            1.000000                    True                  True
+      attn_v          0.000000            1.000000                    True                  True
+      mlp_in          0.000000            1.000000                    True                  True
+      mlp_out         0.000025            0.000005                   False                 False
+      ve_gate         0.000000            1.000000                    True                  True
       muon/data_norm                   exactly 0 for  54/ 78  MATCH-asleep
       muon/u_final_norm_observed       exactly 0 for  54/ 78  MATCH-asleep
       muon/decay_norm                  exactly 0 for  24/ 78  = tier A (the zero-init projections themselves)
       muon/cos_raw_final               undefined for  54/ 78 MATCH  reason=['degenerate_or_zero']
-   d14-s7     grad/norm: 63/91 exact (MATCH)  grad/zero_fraction: 0/0 exact (MISMATCH)
+   d14-s7     grad/norm: 63/91 exactly 0 (MATCH)  grad/rms: 63/91 exactly 0 (MATCH)
+      role-level gradient aggregates at step 0 (pre_update):
+      metric      grad/max_abs  grad/zero_fraction  zero_frac_is_exactly_1  max_abs_is_exactly_0
+      param_role                                                                                
+      attn_k          0.000000            1.000000                    True                  True
+      attn_out        0.000028            0.000014                   False                 False
+      attn_q          0.000000            1.000000                    True                  True
+      attn_v          0.000000            1.000000                    True                  True
+      mlp_in          0.000000            1.000000                    True                  True
+      mlp_out         0.000028            0.000006                   False                 False
+      ve_gate         0.000000            1.000000                    True                  True
       muon/data_norm                   exactly 0 for  63/ 91  MATCH-asleep
       muon/u_final_norm_observed       exactly 0 for  63/ 91  MATCH-asleep
       muon/decay_norm                  exactly 0 for  28/ 91  = tier A (the zero-init projections themselves)
       muon/cos_raw_final               undefined for  63/ 91 MATCH  reason=['degenerate_or_zero']
-   d16-s7     grad/norm: 72/104 exact (MATCH)  grad/zero_fraction: 0/0 exact (MISMATCH)
+   d16-s7     grad/norm: 72/104 exactly 0 (MATCH)  grad/rms: 72/104 exactly 0 (MATCH)
+      role-level gradient aggregates at step 0 (pre_update):
+      metric      grad/max_abs  grad/zero_fraction  zero_frac_is_exactly_1  max_abs_is_exactly_0
+      param_role                                                                                
+      attn_k          0.000000            1.000000                    True                  True
+      attn_out        0.000030            0.000015                   False                 False
+      attn_q          0.000000            1.000000                    True                  True
+      attn_v          0.000000            1.000000                    True                  True
+      mlp_in          0.000000            1.000000                    True                  True
+      mlp_out         0.000024            0.000007                   False                 False
+      ve_gate         0.000000            1.000000                    True                  True
       muon/data_norm                   exactly 0 for  72/104  MATCH-asleep
       muon/u_final_norm_observed       exactly 0 for  72/104  MATCH-asleep
       muon/decay_norm                  exactly 0 for  32/104  = tier A (the zero-init projections themselves)
       muon/cos_raw_final               undefined for  72/104 MATCH  reason=['degenerate_or_zero']
 
-Cadence limit on the gradient-norm half of the test: grad/* lives in the
+The gradient-norm half of the test at full resolution, by inference from
+the instrument's own reference decomposition (nanochat/telemetry.py,
+muon_stages): at update 0 the momentum buffer is zero and the gradient is
+exactly zero for every tier-B matrix, so momentum_buffer.lerp_(g, 1-mu)
+leaves it exactly zero.  At update 1 the Newton-Schulz input is therefore
+proportional to g_1 alone.  A nonzero decoherence at update 1 requires a
+nonzero Newton-Schulz input, hence g_1 != 0.  Every tier-B matrix has
+nonzero decoherence at update 1, so every tier-B gradient is nonzero at
+update 1: the gradient-norm wake-up index equals the decoherence wake-up
+index, 1, for all of them.
+
+Cadence limit on the direct gradient measurement: grad/* lives in the
 periodic tier, emitted at pre_update steps 0, ceil(N/25), 2*ceil(N/25)...
    d12-s10   grad/norm steps: [np.int64(0), np.int64(101), np.int64(202), np.int64(303)] ...  (no grad row between update 0 and update 101)
    d12-s11   grad/norm steps: [np.int64(0), np.int64(101), np.int64(202), np.int64(303)] ...  (no grad row between update 0 and update 101)
@@ -278,6 +376,38 @@ mlp_in      0.007088  0.005758  0.014093
 mlp_out     0.149273  0.136395  0.156008
 ve_gate     0.004020  0.003230  0.005700
 
+   Most of that rho is role separation (role medians span ~45x).  After
+   removing the per-role median within each seed, the residual per-matrix
+   ordering is:
+   within-role residual rho: min 0.637 median 0.703 max 0.756  -> reproducible
+   within-role correlation of decoherence with layer index (per seed,
+   pooled over roles after median-centering):
+      d12-s10   rho(res, layer) = -0.478
+      d12-s11   rho(res, layer) = -0.538
+      d12-s7    rho(res, layer) = -0.414
+      d12-s8    rho(res, layer) = -0.507
+      d12-s9    rho(res, layer) = -0.447
+
+CONTEXT (outside the declared universe): the same exact-zero state at
+step 0 also affects non-Muon parameters, from grad/norm keyed by role:
+                 sum  count
+param_role                 
+attn_k            12     12
+attn_out           0     12
+attn_q            12     12
+attn_v            12     12
+backout_scalar     0      1
+mlp_in            12     12
+mlp_out            0     12
+resid_scalar       0     12
+smear_gate         1      1
+smear_scalar       0      1
+token_embedding    0      1
+unembedding        0      1
+value_embedding    6      6
+ve_gate            6      6
+x0_scalar          0     12
+
 --------------------------------------------------------------------------
 6. ACROSS DEPTHS  (d12-s7, d14-s7, d16-s7; seed 7 throughout)
 --------------------------------------------------------------------------
@@ -289,9 +419,9 @@ rho_L = layer / (n_layer - 1) in [0, 1].  Steps are not comparable either
 update index and as normalized_progress = update_index / num_iterations.
 
 run         L matrices  tierA  tierB  tierB%  wake idx    wake np  iters
-d12-s7     12       78     24     54   69.2% [np.int64(0), np.int64(1)]   3.97e-04   2520
-d14-s7     14       91     28     63   69.2% [np.int64(0), np.int64(1)]   2.66e-04   3759
-d16-s7     16      104     32     72   69.2% [np.int64(0), np.int64(1)]   1.86e-04   5376
+d12-s7     12       78     24     54   69.2%     {0,1}   3.97e-04   2520
+d14-s7     14       91     28     63   69.2%     {0,1}   2.66e-04   3759
+d16-s7     16      104     32     72   69.2%     {0,1}   1.86e-04   5376
 
 wake index by relative depth rho_L (all depths; every matrix listed as a
 (rho_L, role) -> wake index cell; a single wake index per column means
@@ -318,3 +448,15 @@ attn_v      0.022694  0.019552  0.019313
 mlp_in      0.007248  0.006545  0.006307
 mlp_out     0.150839  0.144400  0.138112
 ve_gate     0.004539  0.004473  0.004566
+
+The one graded structure that survives: within a role, decoherence at the
+wake-up checkpoint falls with position in the stack.  rho_L and the raw
+layer index are monotone transforms of one another inside a run, so the
+within-run rho is the same either way; what the normalization buys is the
+right to compare the three numbers with each other.
+   d12 five-seed values of rho(residual, rho_L): s10 -0.478, s11 -0.538, s7 -0.414, s8 -0.507, s9 -0.447
+   d12 five-seed range: [-0.538, -0.414]
+   d14-s7    rho = -0.472  -> INSIDE the d12 five-seed range
+   d16-s7    rho = -0.515  -> INSIDE the d12 five-seed range
+   So the depth gradient of decoherence at wake-up is present at every
+   depth and is not distinguishable across depths at n=5 seeds.

@@ -13,6 +13,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from stats import spearman  # noqa: E402
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
 D12 = ["d12-s7", "d12-s8", "d12-s9", "d12-s10", "d12-s11"]
@@ -23,33 +25,6 @@ SUPPORT = ["curvature/gg", "curvature/Hg_norm", "curvature/eta_star_rho",
            "update/direction_norm", "curvature/curv_snr_gradient",
            "curvature/e_fd_gradient", "curvature/e_sym_gradient",
            "curvature/e_lin_gradient"]
-
-
-def rank(a):
-    """Average-tie ranks (rankdata equivalent, no scipy)."""
-    a = np.asarray(a, float)
-    order = np.argsort(a, kind="mergesort")
-    r = np.empty(len(a), float)
-    r[order] = np.arange(1, len(a) + 1)
-    # average ties
-    s = np.sort(a)
-    i = 0
-    while i < len(s):
-        j = i
-        while j + 1 < len(s) and s[j + 1] == s[i]:
-            j += 1
-        if j > i:
-            m = (i + j + 2) / 2.0
-            r[np.isin(a, s[i])] = m
-        i = j + 1
-    return r
-
-
-def spearman(x, y):
-    rx, ry = rank(x), rank(y)
-    rx = rx - rx.mean(); ry = ry - ry.mean()
-    d = np.sqrt((rx ** 2).sum() * (ry ** 2).sum())
-    return float((rx * ry).sum() / d) if d > 0 else np.nan
 
 
 def main():

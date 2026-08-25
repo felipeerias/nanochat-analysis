@@ -1,0 +1,110 @@
+## 1. the recipe is a hybrid schedule: partly absolute, partly proportional
+  optim/lr: peak value 0.02
+    d16 minus d12, max |difference| in each phase
+      STEP axis  LR warmup      step   0- 40: 0.0000e+00
+      STEP axis  Muon ramp      step  41-400: 0.0000e+00
+      STEP axis  plateau        step 401-882: 0.0000e+00
+      STEP axis  d12 warmdown   step 883-2520: 1.5524e-02
+      PROG axis  p < 0.0159 (d12 still in LR warmup) : 1.0359e-02
+      PROG axis  0.0159 <= p < 0.1587 (d12 in ramp): 0.0000e+00
+      PROG axis  0.1587 <= p < 0.35   (both plateau): 0.0000e+00
+      PROG axis  p >= 0.35            (both warmdown): 2.1749e-06
+  optim/momentum: peak value 0.97
+    d16 minus d12, max |difference| in each phase
+      STEP axis  LR warmup      step   0- 40: 0.0000e+00
+      STEP axis  Muon ramp      step  41-400: 0.0000e+00
+      STEP axis  plateau        step 401-882: 0.0000e+00
+      STEP axis  d12 warmdown   step 883-2520: 5.7195e-02
+      PROG axis  p < 0.0159 (d12 still in LR warmup) : 1.3547e-02
+      PROG axis  0.0159 <= p < 0.1587 (d12 in ramp): 6.3750e-02
+      PROG axis  0.1587 <= p < 0.35   (both plateau): 0.0000e+00
+      PROG axis  p >= 0.35            (both warmdown): 8.0128e-06
+  optim/weight_decay: peak value 0.03
+    d16 minus d12, max |difference| in each phase
+      STEP axis  LR warmup      step   0- 40: 0.0000e+00
+      STEP axis  Muon ramp      step  41-400: 0.0000e+00
+      STEP axis  plateau        step 401-882: 0.0000e+00
+      STEP axis  d12 warmdown   step 883-2520: 3.0000e-02
+      PROG axis  p < 0.0159 (d12 still in LR warmup) : 0.0000e+00
+      PROG axis  0.0159 <= p < 0.1587 (d12 in ramp): 0.0000e+00
+      PROG axis  0.1587 <= p < 0.35   (both plateau): 0.0000e+00
+      PROG axis  p >= 0.35            (both warmdown): 1.3274e-02
+  -> LR warmup (40) and Muon momentum ramp (400) are ABSOLUTE;
+     the warmdown onset is PROPORTIONAL (progress 0.350 at every depth:
+       d12-s7: landmarks [40, 400, 882] of N=2520 -> warmdown at p=0.3500)
+       d14-s7: landmarks [40, 400, 1316] of N=3759 -> warmdown at p=0.3501)
+       d16-s7: landmarks [40, 400, 1882] of N=5376 -> warmdown at p=0.3501)
+
+## 2. the token stream is identical across all seven runs
+  batch/bos_count: identical at every common step across all 7 runs: True (2520 steps compared)
+  batch/valid_targets: identical at every common step across all 7 runs: True (2520 steps compared)
+  batch/mean_segment_length: identical at every common step across all 7 runs: True (2520 steps compared)
+  batch/segments_per_row_mean: identical at every common step across all 7 runs: True (2520 steps compared)
+  batch/segments_per_row_max: identical at every common step across all 7 runs: True (2520 steps compared)
+  total_batch_size: [524288] (one value for every depth) -> tokens_seen == step * 524288 in all runs
+  CONSEQUENCE: aligning on absolute step also holds the DATA fixed; aligning
+  on normalized progress compares d16 after 2.133x as many tokens as d12.
+
+## 3. matchability of the measurement grids (d12 vs d16)
+  continuous : d16 samples inside the window (step<=400): 401; common absolute steps there: 401
+  periodic   : d16 samples inside the window (step<=400): 4; common absolute steps there: 2
+  sparse     : d16 samples inside the window (step<=400): 23; common absolute steps there: 17
+  sparse deep checkpoints inside the window share the step-defined geometric
+  prefix {0,1,2,4,8,16,32,40,64} and the step-400 landmark, but the earliest
+  progress value both depths sample is p=0.05 (d12 step 126, d16 step 269):
+  BELOW p=0.05 the deep-checkpoint schedule offers NO cross-depth match on
+  normalized progress at all, only interpolation across the geometric gaps.
+  Under absolute-step alignment the comparison also stops at d12's horizon:
+  d16 steps 2521..5375 (53.1% of its training) have no d12 counterpart.
+
+## 4. headline channels
+family                                     tier        n_w  |z|w_abs  |z|w_prog  rel_w_abs  rel_w_prog  |z|p_abs  |z|p_prog  rel_p_abs  rel_p_prog  seedsd_w
+loss/train_mean|none                       continuous  401      3.64      16.52     -2.77%     -18.37%     28.59     133.50     -1.08%      -7.97%    0.506%
+update/loss_before|native                  sparse       12      2.91      53.55     -1.56%     -20.78%      2.51      12.57     -2.52%     -17.64%    0.289%
+update/loss_before|shadow_fp32             sparse       12      2.89      53.95     -1.54%     -20.76%      2.51      13.12     -2.58%     -17.62%    0.296%
+update/loss_after|native                   sparse       12      2.16      23.35     -2.07%     -22.04%      2.41      10.79     -0.78%     -17.38%    0.981%
+update/loss_after|shadow_fp32              sparse       12      2.19      23.73     -2.11%     -22.06%      2.44      10.85     -0.84%     -17.43%    0.976%
+muon/replay_update_relerr|none             sparse       12      2.46      12.50     -7.66%     -17.53%     27.48       7.44     14.86%     -12.65%    2.452%
+update/direction_norm|native               sparse       12      2.68      39.83      4.57%      69.38%    250.88      20.83     64.08%       9.19%    2.467%
+update/direction_norm|shadow_fp32          sparse       12      2.68      39.83      4.57%      69.38%    250.88      20.83     64.08%       9.19%    2.467%
+update/p2|native                           sparse       12      2.13       8.70    -14.08%     -67.87%      2.92       0.94    -84.75%      38.87%   24.052%
+update/p2|shadow_fp32                      sparse       12      2.16       8.69    -14.47%     -67.97%      2.91       0.94    -84.96%      38.35%   23.964%
+curvature/dhd|native                       sparse       12      1.02       5.38      7.77%       7.65%      5.52       3.63     27.95%     -45.88%   14.059%
+curvature/dhd|shadow_fp32                  sparse       12      0.79       5.40      6.79%       7.13%      5.51       3.65     28.40%     -45.92%   13.699%
+curvature/gHg|native                       sparse       12      2.70       2.21     62.90%      -1.98%      1.89       4.43    -50.77%     138.35%   26.367%
+curvature/gHg|shadow_fp32                  sparse       12      2.50       2.22     61.18%       1.36%      1.86       4.87    -50.52%     135.66%   26.039%
+curvature/eta_star|native                  sparse        7      1.80       3.15    -15.19%       8.47%      2.40       1.83     42.75%     -39.74%   19.988%
+curvature/eta_star|shadow_fp32             sparse        8      1.36       2.05    -19.33%       5.73%      2.26       1.82     41.22%     -39.94%   23.006%
+probe/loss|none                            periodic      2     11.42      16.54     -1.56%     -21.88%     14.18      57.13     -1.30%      -7.72%    0.306%
+param/norm|none                            periodic      2     38.92      27.15     16.49%      25.11%    181.99     220.11     65.58%      67.69%    0.212%
+noise/s2|none                              periodic      2    203.58     205.61     11.18%      53.78%      2.35       4.58    -31.40%      51.00%    3.811%
+noise/b_noise|none                         periodic      2      1.21       1.16      0.81%      -0.60%      1.60       1.56    -37.72%       4.69%   16.942%
+muon/cos_raw_final|none                    periodic      2      2.54       3.30     -4.16%       4.24%      8.00       2.67    -28.17%      -6.77%    3.705%
+
+## 5. loss/train_mean in detail (the best detector in the dataset, I0001)
+  LR warmup, step 0-40         n_abs=  41 n_prog=  41 | abs: rel=  -0.67% |z|=     2.6 | prog: rel= -14.67% |z|=    25.4
+  Muon ramp, step 41-400       n_abs= 360 n_prog= 360 | abs: rel=  -2.82% |z|=     4.1 | prog: rel= -18.57% |z|=    16.1
+  post-ramp, pre-warmdown      n_abs= 482 n_prog= 482 | abs: rel=  -3.34% |z|=    28.2 | prog: rel= -10.91% |z|=    30.4
+  d12 in warmdown, d16 not     n_abs=1637 n_prog=1638 | abs: rel=   0.05% |z|=    28.7 | prog: rel=  -8.25% |z|=    87.3
+  beyond d12's horizon         n_abs=   0 n_prog=2853 | abs: rel=    nan% |z|=     nan | prog: rel=  -7.61% |z|=   170.8
+  sign of the d16-d12 loss difference disagrees between the two alignments at 32.6% of the 2520 shared comparison points (all of them at step > 1667)
+  d12 seed sd/median on loss/train_mean: window 0.506%, after 0.056% (I0001 whole-run figure: 0.06% sd-relative)
+
+## 6. how far apart are the two candidate d12 references?
+  median |d12(step s) - d12(progress s/5376)| in pooled d12 seed sigmas
+  dynamics  n=192 window: median=  1.39 p90=   6.07 max=     36.0 | after: median=  1.58 p90=  11.10 max=34101351.3
+  resource  n= 31 window: median=  0.02 p90=   0.47 max=      5.5 | after: median=  0.05 p90=   0.54 max=      3.2
+  config    n= 25 window: median=  0.00 p90=   4.26 max=      6.3 | after: median=  0.00 p90=   4.44 max=     19.5
+
+## 7. verdict stability
+  157 families are testable under both alignments; 51 (32%) change verdict
+  warmup-dominated count: 2 under absolute-step alignment vs 20 under progress alignment
+verdict_prog                         identical (deterministic)  not different  post-dominated  post-dominated (deterministic)  uniformly different  uniformly different (deterministic)  warmup-dominated
+verdict                                                                                                                                                                                                  
+identical (deterministic)                                   25              0               0                               0                    0                                    4                 0
+not different                                                0             47               1                               0                   13                                    0                14
+post-dominated                                               0              0               2                               0                    8                                    0                 0
+post-dominated (deterministic)                               0              0               0                               1                    0                                    3                 0
+uniformly different                                          0              0               0                               0                   23                                    0                 6
+uniformly different (deterministic)                          0              0               0                               0                    0                                    8                 0
+warmup-dominated                                             0              2               0                               0                    0                                    0                 0

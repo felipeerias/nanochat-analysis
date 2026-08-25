@@ -45,8 +45,12 @@ def main():
                              defined=bool(r["is_defined"]),
                              reason=r["undefined_reason"]))
     df = pd.DataFrame(rows)
-    w = df.pivot_table(index=["run", "step", "p"], columns="metric",
-                       values="val", dropna=False).reset_index()
+    # index on the (run, step) pairs that actually exist; pivot_table would
+    # otherwise build the full run x step cross product
+    w = (df.set_index(["run", "step", "metric"])["val"].unstack("metric")
+         .reset_index())
+    pmap = df.drop_duplicates(["run", "step"]).set_index(["run", "step"])["p"]
+    w["p"] = [pmap.loc[(r, s)] for r, s in zip(w.run, w.step)]
     why = (df[df.metric == "curvature/eta_star"]
            .set_index(["run", "step"])["reason"])
     w["eta_reason"] = [why.get((r, s)) for r, s in zip(w.run, w.step)]

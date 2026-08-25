@@ -176,6 +176,14 @@ say("the zero mode is literally 0.")
 
 # every exact zero anywhere in the dataset
 say("")
+allv = np.concatenate([DATA[run]["r"]["v"].to_numpy() for run in sorted(SEGMENTS)])
+allz = np.concatenate([DATA[run]["r"]["zero"].to_numpy() for run in sorted(SEGMENTS)])
+say(f"over all {len(allv)} cells in all seven runs and all 30-33 checkpoints:")
+say(f"   exactly zero: {int(allz.sum())}")
+say(f"   smallest nonzero value anywhere: {allv[~allz].min():.6e}")
+say(f"   the nonzero population never approaches zero, so no tolerance choice")
+say(f"   could turn a nonzero cell into a zero one or vice versa.")
+say("")
 say("exact-zero decoherence cells, by update index, over ALL checkpoints:")
 for run in sorted(SEGMENTS):
     r = DATA[run]["r"]
@@ -210,6 +218,17 @@ for run in sorted(SEGMENTS):
     a = set(w.loc[w["wake"] == 0, "param_role"])
     b = set(w.loc[w["wake"] == 1, "param_role"])
     say(f"   {run:9s} tier A roles = {sorted(a)}   tier B roles = {sorted(b)}")
+say("")
+say("Tier A tested against the model's own initializer: gpt.py init_weights()")
+say("calls zeros_() on block.attn.c_proj.weight and block.mlp.c_proj.weight and")
+say("on nothing else in the Muon parameter set.  Is tier A exactly that set?")
+for run in sorted(SEGMENTS):
+    w = DATA[run]["wake"]
+    zero_init = {n for n in w["parameter_name"]
+                 if n.endswith("attn.c_proj.weight") or n.endswith("mlp.c_proj.weight")}
+    tierA = set(w.loc[w["wake"] == 0, "parameter_name"])
+    say(f"   {run:9s} tier A == zero-init set: {tierA == zero_init}   "
+        f"(|tier A| = {len(tierA)}, |zero-init| = {len(zero_init)})")
 
 # --------------------------------------------------------------------------
 say("")
@@ -226,8 +245,8 @@ for run in sorted(SEGMENTS):
                         w.loc[w["wake"] > 0, "layer"]))
     key_all = set(zip(w["param_role"], w["layer"]))
     line = [f"{run:9s}"]
-    # grad/norm and grad/zero_fraction, restricted to the Muon matrices
-    for met, want in (("grad/norm", 0.0), ("grad/zero_fraction", 1.0)):
+    # grad/norm and grad/rms are keyed per (role, layer) -> one Muon matrix
+    for met in ("grad/norm", "grad/rms"):
         g = per[(per["metric"] == met) & (per["step"] == 0)
                 & (per["phase"] == "pre_update")].copy()
         keys = [(rr, int(ll)) if pd.notna(ll) else (rr, -1)
@@ -236,11 +255,21 @@ for run in sorted(SEGMENTS):
         g = g.iloc[keep]
         keys = [keys[i] for i in keep]
         v = g["value_scalar"].astype("float64").to_numpy()
-        hit = is_exact_zero(v) if want == 0.0 else (v == 1.0)
+        hit = is_exact_zero(v)
         got = {k for k, h in zip(keys, hit) if h}
-        line.append(f"{met}: {int(hit.sum())}/{len(v)} exact "
+        line.append(f"{met}: {int(hit.sum())}/{len(v)} exactly 0 "
                     f"({'MATCH' if got == key_sleep else 'MISMATCH'})")
     say("   " + "  ".join(line))
+    # grad/max_abs, grad/zero_fraction are role-level aggregates (layer is NaN)
+    agg = per[(per["metric"].isin(["grad/zero_fraction", "grad/max_abs"]))
+              & (per["step"] == 0)].pivot_table(
+        index="param_role", columns="metric", values="value_scalar")
+    agg = agg.loc[[r for r in agg.index if r in set(w["param_role"])]]
+    agg["zero_frac_is_exactly_1"] = agg["grad/zero_fraction"] == 1.0
+    agg["max_abs_is_exactly_0"] = is_exact_zero(
+        agg["grad/max_abs"].to_numpy(dtype="float64"))
+    say("      role-level gradient aggregates at step 0 (pre_update):")
+    say("      " + agg.to_string().replace("\n", "\n      "))
     # muon stage families, keyed by parameter_name
     sleep_names = set(w.loc[w["wake"] > 0, "parameter_name"])
     for met in ("muon/data_norm", "muon/u_final_norm_observed",
@@ -263,7 +292,18 @@ for run in sorted(SEGMENTS):
             say(f"      {met:32s} exactly 0 for {int(z.sum()):3d}/{len(v):3d}  {tag}")
 
 say("")
-say("Cadence limit on the gradient-norm half of the test: grad/* lives in the")
+say("The gradient-norm half of the test at full resolution, by inference from")
+say("the instrument's own reference decomposition (nanochat/telemetry.py,")
+say("muon_stages): at update 0 the momentum buffer is zero and the gradient is")
+say("exactly zero for every tier-B matrix, so momentum_buffer.lerp_(g, 1-mu)")
+say("leaves it exactly zero.  At update 1 the Newton-Schulz input is therefore")
+say("proportional to g_1 alone.  A nonzero decoherence at update 1 requires a")
+say("nonzero Newton-Schulz input, hence g_1 != 0.  Every tier-B matrix has")
+say("nonzero decoherence at update 1, so every tier-B gradient is nonzero at")
+say("update 1: the gradient-norm wake-up index equals the decoherence wake-up")
+say("index, 1, for all of them.")
+say("")
+say("Cadence limit on the direct gradient measurement: grad/* lives in the")
 say("periodic tier, emitted at pre_update steps 0, ceil(N/25), 2*ceil(N/25)...")
 for run in sorted(SEGMENTS):
     per = DATA[run]["per"]
@@ -344,6 +384,34 @@ say("   role-median decoherence at update index 1 (d12, across seeds):")
 mm = pd.concat([DATA[run]["r"].query("update_index == 1").assign(run=run)
                 for run in runs])
 say(mm.groupby("param_role")["v"].agg(["median", "min", "max"]).to_string())
+say("")
+say("   Most of that rho is role separation (role medians span ~45x).  After")
+say("   removing the per-role median within each seed, the residual per-matrix")
+say("   ordering is:")
+res = {}
+for run in runs:
+    g = DATA[run]["r"].query("update_index == 1").copy()
+    g["res"] = g["v"] - g.groupby("param_role")["v"].transform("median")
+    res[run] = g.set_index("parameter_name")["res"]
+res = pd.DataFrame(res)
+rr = [spearman(res[runs[i]], res[runs[j]])
+      for i in range(len(runs)) for j in range(i + 1, len(runs))]
+say(f"   within-role residual rho: min {min(rr):.3f} median {np.median(rr):.3f}"
+    f" max {max(rr):.3f}  -> {'reproducible' if np.median(rr) > 0.5 else 'seed noise'}")
+say("   within-role correlation of decoherence with layer index (per seed,")
+say("   pooled over roles after median-centering):")
+for run in runs:
+    g = DATA[run]["r"].query("update_index == 1").copy()
+    g["res"] = g["v"] - g.groupby("param_role")["v"].transform("median")
+    say(f"      {run:9s} rho(res, layer) = {spearman(g['res'], g['layer']):+.3f}")
+
+say("")
+say("CONTEXT (outside the declared universe): the same exact-zero state at")
+say("step 0 also affects non-Muon parameters, from grad/norm keyed by role:")
+per = DATA["d12-s7"]["per"]
+g = per[(per["metric"] == "grad/norm") & (per["step"] == 0)].copy()
+g["exact0"] = is_exact_zero(g["value_scalar"].to_numpy(dtype="float64"))
+say(g.groupby("param_role")["exact0"].agg(["sum", "count"]).to_string())
 
 # --------------------------------------------------------------------------
 say("")
@@ -365,8 +433,9 @@ for run in DEPTHS:
     nA = int((w["wake"] == 0).sum())
     nB = int((w["wake"] == 1).sum())
     ni = d["prov"]["num_iterations"]
+    idxs = "{" + ",".join(str(int(x)) for x in sorted(w["wake"].unique())) + "}"
     say(f"{run:9s} {d['depth']:3d} {len(w):8d} {nA:6d} {nB:6d} "
-        f"{nB / len(w) * 100:6.1f}% {sorted(w['wake'].unique())!s:>9s} "
+        f"{nB / len(w) * 100:6.1f}% {idxs:>9s} "
         f"{1 / ni:10.2e} {ni:6d}")
 say("")
 say("wake index by relative depth rho_L (all depths; every matrix listed as a")
@@ -405,6 +474,33 @@ for run in DEPTHS:
 allm = pd.concat(rows)
 say(allm.pivot_table(index="param_role", columns="run", values="v",
                      aggfunc="median").to_string())
+say("")
+say("The one graded structure that survives: within a role, decoherence at the")
+say("wake-up checkpoint falls with position in the stack.  rho_L and the raw")
+say("layer index are monotone transforms of one another inside a run, so the")
+say("within-run rho is the same either way; what the normalization buys is the")
+say("right to compare the three numbers with each other.")
+
+
+def depth_slope(run):
+    g = DATA[run]["r"].query("update_index == 1").copy()
+    L = DATA[run]["depth"]
+    g["rho_L"] = g["layer"] / (L - 1)
+    g["res"] = g["v"] - g.groupby("param_role")["v"].transform("median")
+    return spearman(g["res"], g["rho_L"])
+
+
+d12_slopes = {run: depth_slope(run) for run in sorted(D12)}
+say("   d12 five-seed values of rho(residual, rho_L): " +
+    ", ".join(f"{k.split('-')[1]} {v:+.3f}" for k, v in d12_slopes.items()))
+lo, hi = min(d12_slopes.values()), max(d12_slopes.values())
+say(f"   d12 five-seed range: [{lo:+.3f}, {hi:+.3f}]")
+for run in DEPTHS[1:]:
+    s = depth_slope(run)
+    say(f"   {run:9s} rho = {s:+.3f}  -> "
+        f"{'INSIDE' if lo <= s <= hi else 'OUTSIDE'} the d12 five-seed range")
+say("   So the depth gradient of decoherence at wake-up is present at every")
+say("   depth and is not distinguishable across depths at n=5 seeds.")
 
 # --------------------------------------------------------------------------
 # figures
@@ -424,47 +520,62 @@ for ax, run in zip(axes, DEPTHS):
         g = w[w["param_role"] == role]
         if not len(g):
             continue
-        ax.scatter(g["wake"], g["layer"] / (L - 1) + 0.0,
-                   s=46, marker="os^Dv<>"[k], label=role, alpha=0.85)
+        dodge = (k - 3) * 0.055  # one sub-column per role, so nothing hides
+        ax.scatter(g["wake"] + dodge, g["layer"] / (L - 1),
+                   s=34, marker="os^Dv<>"[k], label=role, alpha=0.9)
+    ax.axvspan(-0.35, 0.35, color="0.85", alpha=0.5, zorder=0)
+    ax.axvspan(0.65, 1.35, color="0.92", alpha=0.5, zorder=0)
     ax.set_xlim(-0.6, 2.6)
     ax.set_xticks([0, 1, 2])
     ax.set_xlabel("first deep checkpoint with nonzero decoherence\n(update index)")
     ax.set_ylabel(r"relative depth  $\rho_L=\ell/(L-1)$")
     ax.set_title(f"{run}   (L={L}, {len(w)} Muon matrices)")
     ax.grid(alpha=0.25)
-axes[0].legend(fontsize=7, loc="center right")
-fig.suptitle("Zero-init wake-up: every Muon matrix is awake by update index 1, "
-             "at every depth", fontsize=11)
+axes[0].legend(fontsize=7, loc="center right", framealpha=0.95)
+fig.suptitle("Zero-init wake-up: tier A (the two zero-init projections) at update 0, "
+             "everything else at update 1, at every depth", fontsize=11)
 fig.savefig(os.path.join(OUT, "fig_wakeup.png"), dpi=140)
 plt.close(fig)
 
-fig, axes = plt.subplots(1, 2, figsize=(12, 4.6), constrained_layout=True)
+fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.8), constrained_layout=True)
 ax = axes[0]
-for run in sorted(D12):
+for k, run in enumerate(sorted(SEGMENTS)):
     r = DATA[run]["r"]
     frac = r.groupby("update_index")["zero"].mean()
     frac = frac[frac.index <= 64]
-    ax.plot(frac.index, frac * 100, marker="o", label=run, alpha=0.8)
+    ax.plot(frac.index, frac * 100, marker="o", ms=9 - k, label=run, alpha=0.8,
+            lw=3.5 - 0.4 * k)
 ax.set_xscale("symlog", linthresh=1)
 ax.set_xlabel("deep checkpoint (update index)")
 ax.set_ylabel("% of Muon matrices with EXACTLY zero decoherence")
-ax.set_title("five d12 seeds")
-ax.legend(fontsize=8)
+ax.set_title("all seven v3 runs; the curves coincide exactly\n"
+             "(69.2% at update 0, 0.0% from update 1 on)", fontsize=10)
+ax.legend(fontsize=7)
 ax.grid(alpha=0.25)
+
 ax = axes[1]
+mk = dict(zip(DEPTHS, "os^"))
+cmap = plt.get_cmap("tab10")
 for run in DEPTHS:
-    r = DATA[run]["r"]
-    frac = r.groupby("update_index")["zero"].mean()
-    frac = frac[frac.index <= 64]
-    ax.plot(frac.index, frac * 100, marker="s", label=f"{run} (L={DATA[run]['depth']})",
-            alpha=0.8)
-ax.set_xscale("symlog", linthresh=1)
-ax.set_xlabel("deep checkpoint (update index)")
-ax.set_ylabel("% exactly zero")
-ax.set_title("three depths, seed 7")
-ax.legend(fontsize=8)
+    g = DATA[run]["r"].query("update_index == 1").copy()
+    L = DATA[run]["depth"]
+    g["rho_L"] = g["layer"] / (L - 1)
+    for k, role in enumerate(ROLES):
+        q = g[g["param_role"] == role]
+        if not len(q):
+            continue
+        ax.plot(q["rho_L"], q["v"], marker=mk[run], ms=4, lw=0.9,
+                color=cmap(k), alpha=0.85,
+                label=role if run == "d12-s7" else None)
+ax.set_yscale("log")
+ax.set_xlabel(r"relative depth  $\rho_L=\ell/(L-1)$")
+ax.set_ylabel("decoherence at update index 1")
+ax.set_title("magnitude at the wake-up checkpoint\n"
+             "(marker = depth: o d12, s d14, ^ d16)", fontsize=10)
+ax.legend(fontsize=7, ncol=2)
 ax.grid(alpha=0.25)
-fig.suptitle("Exactly-zero decoherence is confined to update index 0", fontsize=11)
+fig.suptitle("Exactly-zero decoherence is confined to update index 0; the only "
+             "graded structure is in the magnitude", fontsize=11)
 fig.savefig(os.path.join(OUT, "fig_magnitude.png"), dpi=140)
 plt.close(fig)
 

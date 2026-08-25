@@ -1,0 +1,161 @@
+{
+  "segments": [
+    "d12-s10-s0-0ffeb05742bb4154a3f1afc202dc3955",
+    "d12-s11-s0-5fd1bf807f764954b30658872fc3e2ad",
+    "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
+    "d12-s8-s0-2b2e72e4395440029b92226213d137bb",
+    "d12-s9-s0-b872e698e81b4a8fa0cd08512f43c2c2",
+    "d14-s7-s0-b72acf7ac59942dab902e26fa0b2c80d",
+    "d16-s7-s0-8e0a39fc8f164343bd01ef6b915e849f"
+  ],
+  "n_families": 263,
+  "class_counts_absolute": {
+    "not different": 34,
+    "uniformly different": 63,
+    "not estimable": 156,
+    "warmup-dominated": 10
+  },
+  "class_counts_progress": {
+    "not different": 95,
+    "uniformly different": 114,
+    "warmup-dominated": 36,
+    "not estimable": 18
+  },
+  "class_counts_alignment": {
+    "not different": 42,
+    "uniformly different": 39,
+    "not estimable": 156,
+    "warmup-dominated": 26
+  },
+  "n_unsafe": 42,
+  "unsafe_families": [
+    "calib/grad_norm",
+    "curvature/e_lin_gradient [shadow_fp32]",
+    "curvature/e_lin_update [native]",
+    "curvature/e_sym_gradient [native]",
+    "curvature/e_sym_gradient [shadow_fp32]",
+    "curvature/e_sym_random [native]",
+    "curvature/e_sym_update [shadow_fp32]",
+    "curvature/fd_snr_random [native]",
+    "curvature/fd_snr_random [shadow_fp32]",
+    "curvature/fd_snr_update [native]",
+    "curvature/shadow_verdict_code [shadow_fp32]",
+    "curvature/verdict_code_gradient [shadow_fp32]",
+    "curvature/vhv_random [native]",
+    "curvature/vhv_random [shadow_fp32]",
+    "curvature/vhv_update [native]",
+    "curvature/vhv_update [shadow_fp32]",
+    "grad/zero_fraction",
+    "muon/cautious_mask_fraction",
+    "muon/cos_data_decay",
+    "muon/cos_nesterov_final",
+    "muon/cos_raw_final",
+    "muon/factored_scale_dispersion",
+    "muon/norm_degenerate",
+    "muon/polar_residual",
+    "muon/replay_update_relerr",
+    "optim/lr",
+    "optim/lr_eff",
+    "optim/momentum",
+    "overhead/muon_reference",
+    "probe/attn_residual_ratio",
+    "probe/logit_entropy_mean",
+    "probe/logit_lse_mean",
+    "probe/logit_margin_mean",
+    "probe/logit_max_postcap",
+    "probe/logit_max_precap",
+    "probe/logit_saturation_fraction",
+    "probe/logit_z_loss",
+    "probe/loss",
+    "probe/mlp_residual_ratio",
+    "probe/relu2_sparsity",
+    "scalars/smear_lambda",
+    "sketch/probe_grad_cosine_prev"
+  ],
+  "n_alignment_supported": 14,
+  "alignment_supported_families": [
+    "muon/cautious_mask_fraction",
+    "muon/cos_nesterov_final",
+    "muon/norm_degenerate",
+    "muon/polar_residual",
+    "probe/attn_residual_ratio",
+    "probe/logit_entropy_mean",
+    "probe/logit_lse_mean",
+    "probe/logit_margin_mean",
+    "probe/logit_max_postcap",
+    "probe/logit_max_precap",
+    "probe/logit_z_loss",
+    "probe/loss",
+    "probe/mlp_residual_ratio",
+    "probe/relu2_sparsity"
+  ],
+  "progress_tolerance": 0.0002914186507936508,
+  "sparse_matches": {
+    "post_update": {
+      "all": 22,
+      "warm": 5,
+      "post": 17
+    },
+    "pre_update": {
+      "all": 22,
+      "warm": 8,
+      "post": 14
+    }
+  },
+  "parameters": {
+    "warmup_end": 400,
+    "seed_multiple": 3.0,
+    "dominance_ratio": 2.0,
+    "minimum_points_per_window": 2
+  },
+  "sensitivity": [
+    {
+      "seed_multiple": 2.0,
+      "dominance_ratio": 1.5,
+      "absolute_warmup_dominated": 14,
+      "progress_warmup_dominated": 48,
+      "unsafe_union": 56,
+      "alignment_supported": 22
+    },
+    {
+      "seed_multiple": 2.0,
+      "dominance_ratio": 2.0,
+      "absolute_warmup_dominated": 10,
+      "progress_warmup_dominated": 38,
+      "unsafe_union": 44,
+      "alignment_supported": 14
+    },
+    {
+      "seed_multiple": 2.0,
+      "dominance_ratio": 3.0,
+      "absolute_warmup_dominated": 7,
+      "progress_warmup_dominated": 24,
+      "unsafe_union": 29,
+      "alignment_supported": 8
+    },
+    {
+      "seed_multiple": 3.0,
+      "dominance_ratio": 1.5,
+      "absolute_warmup_dominated": 14,
+      "progress_warmup_dominated": 46,
+      "unsafe_union": 54,
+      "alignment_supported": 21
+    },
+    {
+      "seed_multiple": 3.0,
+      "dominance_ratio": 2.0,
+      "absolute_warmup_dominated": 10,
+      "progress_warmup_dominated": 36,
+      "unsafe_union": 42,
+      "alignment_supported": 14
+    },
+    {
+      "seed_multiple": 3.0,
+      "dominance_ratio": 3.0,
+      "absolute_warmup_dominated": 7,
+      "progress_warmup_dominated": 23,
+      "unsafe_union": 28,
+      "alignment_supported": 8
+    }
+  ]
+}

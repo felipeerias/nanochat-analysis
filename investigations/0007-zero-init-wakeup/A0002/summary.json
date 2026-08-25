@@ -1,0 +1,205 @@
+{
+  "all_depth_role_groups_have_constant_wake_across_layers": true,
+  "all_run_matrix_channels_inspected_including_gradient": 9360,
+  "checkpoint_resolved_wake_channels": 1170,
+  "d12_seed_kendall_tau_b_min": 1.0,
+  "d12_seed_matrix_exact_agreement_min": 1.0,
+  "d12_seed_ordered_untied_pairs_compared_per_channel": 12960,
+  "d12_seed_pair_comparisons_per_channel": 10,
+  "d12_seed_pair_relation_agreement_min": 1.0,
+  "d12_seed_pair_relations_compared_per_channel": 30030,
+  "exact_zero_test": "defined finite value_scalar == 0.0; no tolerance/isclose/rounding",
+  "first_periodic_steps_by_run": {
+    "d12-s10": [
+      0,
+      101,
+      202
+    ],
+    "d12-s11": [
+      0,
+      101,
+      202
+    ],
+    "d12-s7": [
+      0,
+      101,
+      202
+    ],
+    "d12-s8": [
+      0,
+      101,
+      202
+    ],
+    "d12-s9": [
+      0,
+      101,
+      202
+    ],
+    "d14-s7": [
+      0,
+      151,
+      302
+    ],
+    "d16-s7": [
+      0,
+      216,
+      432
+    ]
+  },
+  "layer_normalization": "layer / (depth - 1)",
+  "muon_metric_families": 15,
+  "negative_signed_zero_count": 0,
+  "normalized_update1_progress": {
+    "d12": 0.0003968253968253968,
+    "d14": 0.00026602819898909286,
+    "d16": 0.00018601190476190475
+  },
+  "periodic_muon_stage_families": 14,
+  "periodic_stage_run_matrix_channels_audited": 8190,
+  "post_wake_exact_zero_rows": 0,
+  "run_matrix_instances": 585,
+  "run_summary": [
+    {
+      "awake_at_update0": 24,
+      "awake_by_update1": 78,
+      "depth": 12,
+      "exact_zero_at_update0": 54,
+      "exact_zero_fraction_at_update0": 0.6923076923076923,
+      "horizon": 2520,
+      "matrices": 78,
+      "run_id": "d12-s10",
+      "seed": 10
+    },
+    {
+      "awake_at_update0": 24,
+      "awake_by_update1": 78,
+      "depth": 12,
+      "exact_zero_at_update0": 54,
+      "exact_zero_fraction_at_update0": 0.6923076923076923,
+      "horizon": 2520,
+      "matrices": 78,
+      "run_id": "d12-s11",
+      "seed": 11
+    },
+    {
+      "awake_at_update0": 24,
+      "awake_by_update1": 78,
+      "depth": 12,
+      "exact_zero_at_update0": 54,
+      "exact_zero_fraction_at_update0": 0.6923076923076923,
+      "horizon": 2520,
+      "matrices": 78,
+      "run_id": "d12-s7",
+      "seed": 7
+    },
+    {
+      "awake_at_update0": 24,
+      "awake_by_update1": 78,
+      "depth": 12,
+      "exact_zero_at_update0": 54,
+      "exact_zero_fraction_at_update0": 0.6923076923076923,
+      "horizon": 2520,
+      "matrices": 78,
+      "run_id": "d12-s8",
+      "seed": 8
+    },
+    {
+      "awake_at_update0": 24,
+      "awake_by_update1": 78,
+      "depth": 12,
+      "exact_zero_at_update0": 54,
+      "exact_zero_fraction_at_update0": 0.6923076923076923,
+      "horizon": 2520,
+      "matrices": 78,
+      "run_id": "d12-s9",
+      "seed": 9
+    },
+    {
+      "awake_at_update0": 28,
+      "awake_by_update1": 91,
+      "depth": 14,
+      "exact_zero_at_update0": 63,
+      "exact_zero_fraction_at_update0": 0.6923076923076923,
+      "horizon": 3759,
+      "matrices": 91,
+      "run_id": "d14-s7",
+      "seed": 7
+    },
+    {
+      "awake_at_update0": 32,
+      "awake_by_update1": 104,
+      "depth": 16,
+      "exact_zero_at_update0": 72,
+      "exact_zero_fraction_at_update0": 0.6923076923076923,
+      "horizon": 5376,
+      "matrices": 104,
+      "run_id": "d16-s7",
+      "seed": 7
+    }
+  ],
+  "seed7_cross_depth_matrices": 273,
+  "seed7_role_rule_accuracy_both_channels": 1.0,
+  "segments": [
+    "d12-s10-s0-0ffeb05742bb4154a3f1afc202dc3955",
+    "d12-s11-s0-5fd1bf807f764954b30658872fc3e2ad",
+    "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
+    "d12-s8-s0-2b2e72e4395440029b92226213d137bb",
+    "d12-s9-s0-b872e698e81b4a8fa0cd08512f43c2c2",
+    "d14-s7-s0-b72acf7ac59942dab902e26fa0b2c80d",
+    "d16-s7-s0-8e0a39fc8f164343bd01ef6b915e849f"
+  ],
+  "smallest_nonzero_decoherence_at_update0": 0.10804435610771179,
+  "smallest_nonzero_decoherence_at_update1": 0.0032297370489686728,
+  "smallest_nonzero_gradient_sq_norm_at_update0": 3.3297403660981217e-06,
+  "smallest_nonzero_gradient_sq_norm_at_update1": 1.758236084888627e-17,
+  "sparse_scalar_rows_tested": 36088,
+  "stage_early_deep_overlap": [
+    "0"
+  ],
+  "stage_family_names": [
+    "muon/cautious_mask_fraction",
+    "muon/cos_data_decay",
+    "muon/cos_nesterov_final",
+    "muon/cos_raw_final",
+    "muon/cos_raw_momentum",
+    "muon/cos_raw_nesterov",
+    "muon/data_norm",
+    "muon/decay_norm",
+    "muon/factored_scale_dispersion",
+    "muon/norm_degenerate",
+    "muon/norm_deviation",
+    "muon/polar_residual",
+    "muon/u_final_norm_analytic",
+    "muon/u_final_norm_observed"
+  ],
+  "undefined_relevant_rows": {
+    "d12-s10": {
+      "decoherence": 0,
+      "gradient_sq_norm_all_roles": 0
+    },
+    "d12-s11": {
+      "decoherence": 0,
+      "gradient_sq_norm_all_roles": 0
+    },
+    "d12-s7": {
+      "decoherence": 0,
+      "gradient_sq_norm_all_roles": 0
+    },
+    "d12-s8": {
+      "decoherence": 0,
+      "gradient_sq_norm_all_roles": 0
+    },
+    "d12-s9": {
+      "decoherence": 0,
+      "gradient_sq_norm_all_roles": 0
+    },
+    "d14-s7": {
+      "decoherence": 0,
+      "gradient_sq_norm_all_roles": 0
+    },
+    "d16-s7": {
+      "decoherence": 0,
+      "gradient_sq_norm_all_roles": 0
+    }
+  }
+}

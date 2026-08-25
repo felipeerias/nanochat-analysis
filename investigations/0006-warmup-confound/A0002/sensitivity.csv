@@ -1,0 +1,7 @@
+seed_multiple,dominance_ratio,absolute_warmup_dominated,progress_warmup_dominated,unsafe_union,alignment_supported
+2,1.5,14,48,56,22
+2,2,10,38,44,14
+2,3,7,24,29,8
+3,1.5,14,46,54,21
+3,2,10,36,42,14
+3,3,7,23,28,8

@@ -16,6 +16,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from stats import spearman  # noqa: E402
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
 D12 = ["d12-s7", "d12-s8", "d12-s9", "d12-s10", "d12-s11"]
@@ -24,21 +26,6 @@ RAMP_END = 0.16
 METRICS = ["curvature/gHg", "curvature/eta_star", "curvature/dhd",
            "curvature/vhv_gradient", "curvature/e_curv_gradient",
            "curvature/gg", "curvature/Hg_norm", "update/direction_norm"]
-
-
-def rank(a):
-    a = np.asarray(a, float)
-    order = np.argsort(a, kind="mergesort")
-    r = np.empty(len(a), float)
-    r[order] = np.arange(1, len(a) + 1)
-    return r
-
-
-def spearman(x, y):
-    rx, ry = rank(x), rank(y)
-    rx = rx - rx.mean(); ry = ry - ry.mean()
-    d = np.sqrt((rx ** 2).sum() * (ry ** 2).sum())
-    return float((rx * ry).sum() / d) if d > 0 else np.nan
 
 
 def main():
