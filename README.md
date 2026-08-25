@@ -3,7 +3,7 @@
 The data is in `../telemetry-data/sweep/`. Read its `DATASET.md` first.
 The measuring code is in `../nanochat/` (branch `telemetry`). Do not change it.
 
-- `loader/` — shared code to read the data correctly, plus reference values.
+- `loader/` — shared code to read the data correctly.
 - `profiles/` — what each run looks like. Descriptive. No claims.
 - `investigations/` — one folder per question or hypothesis. Claims live here.
 
