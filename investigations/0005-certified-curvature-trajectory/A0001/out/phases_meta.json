@@ -1,0 +1,9 @@
+{
+  "warmdown_p": 0.35,
+  "ramp_end_p": 0.16,
+  "landmarks_steps_d12": [
+    40,
+    400,
+    882
+  ]
+}

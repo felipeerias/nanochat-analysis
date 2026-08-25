@@ -10,9 +10,9 @@ saw: |
   its filtering semantics; the analysis reads the parquet directly with pyarrow);
   investigations/0001-seed-variation/conclusion.md@4ac11f3;
   provenance.json of the eight sweep segments; the sparse tier of the seven
-  schema-v3 segments. Did NOT read: the sibling A0001-blind partner directory
+  schema-v3 segments. Did NOT read: the sibling blind analyst's directory
   (A0002/), any conclusion.md in this investigation, any other investigation's
-  results, or profiles/ (not needed; deliberately skipped to keep the run clean).
+  results, or profiles/ (permitted, but not needed; skipped deliberately).
 data: |
   sweep; the seven schema-v3 segments —
   d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45,
@@ -83,9 +83,12 @@ magnitude large:
 | quadratic (the curvature values) | 9 | 1,906 | −0.004 % | **0.34 %** | 0 % |
 | update (update effectiveness) | 9 | 1,935 | 0.00 % | **0.54 %** | 5.3 % |
 | snr (probe signal-to-noise) | 6 | 1,290 | **−99.8 %** | 99.8 % | 0.9 % |
-| floor (arithmetic floors / epsilons) | 14 | 3,010 | **+654×** | 654× | 0 % |
-| error (symmetry / linearity residuals) | 9 | 1,935 | **+9,281×** | 10,013× | 12 % |
+| floor (arithmetic floors / epsilons) | 14 | 3,010 | **+654.7** | 654.7 | 0 % |
+| error (symmetry / linearity residuals) | 9 | 1,935 | **+9,281** | 10,013 | 12 % |
 | flag (booleans and verdict codes) | 6 | 1,290 | ordinal — see below | | 34 % |
+
+(`median rel` is `(native − shadow)/|shadow|`, so +654.7 means native ≈ 656×
+shadow, and +9,281 means native ≈ 9,282× shadow.)
 
 That is the whole story in one line: **the measurement survives bf16 to about
 0.3 %; the evidence that the measurement is valid does not survive at all.**
@@ -93,7 +96,7 @@ That is the whole story in one line: **the measurement survives bf16 to about
 65,535 (a ratio of exactly 65,536 = 2¹⁶ = bf16 eps / fp32 eps) at every one of
 the 215 checkpoints — those channels are set *by* the arm's arithmetic and are
 definitional, not measurements. The symmetry and linearity residuals
-(`e_sym_*`, `e_lin_*`) are ~7,000–14,000× larger in bf16, and the probe SNRs
+(`e_sym_*`, `e_lin_*`) are roughly 6,800–14,500× larger in bf16, and the probe SNRs
 collapse by ~99.8 % (a ~500× loss). This is the mechanism behind DATASET.md's
 caveat 4: the native arm fails everywhere because its *error bars* explode, not
 because its *values* are wrong.
@@ -108,8 +111,9 @@ at **215 of 215**. `curvature/fd_conclusive_gradient` is 0 in bf16 and 1 in fp32
 at every checkpoint; `curvature/verdict_code_*` is 2 (failed) in bf16 at
 215/215 in all three directions, while the shadow gradient direction passes at
 186/215. `curvature/eta_star` is a milder case: fp32 loses 14 checkpoints
-(`gHg_not_positive`), bf16 loses those 14 plus 15 more (`sign_below_noise`) —
-a 7 % availability loss on the optimal-step-size channel. So for a third of the
+(`gHg_not_positive`), bf16 loses those same 14 plus 15 more
+(`sign_below_noise`) — 201/215 defined in fp32 against 186/215 in bf16, an
+incremental 7 % availability loss on the optimal-step-size channel. So for a third of the
 paired families the honest answer to "how much does bf16 distort this?" is not a
 percentage; it is **"bf16 cannot produce a value at all."**
 
@@ -137,7 +141,7 @@ permutation p < 0.01, 10k shuffles.)
   absolute error stays flat at ~9e-4. Catastrophic cancellation, not a curvature
   effect. The practical consequence: **at 7 of 215 checkpoints (3.3 %) the two
   arms disagree about the SIGN of the achieved loss decrease**, and six of those
-  seven are at `normalized_progress ≥ 0.30`, three at ≥ 0.95. bf16 can report
+  seven are at `normalized_progress ≥ 0.30`, four at ≥ 0.95. bf16 can report
   that a step made the loss go up when fp32 says it went down.
 
 **Does the distortion change with depth? Inconclusive.** Pooled quadratic

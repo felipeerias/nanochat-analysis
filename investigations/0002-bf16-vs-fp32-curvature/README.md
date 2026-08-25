@@ -1,7 +1,7 @@
 ---
 id: I0002
 kind: question
-status: open
+status: closed
 data: sweep; all seven schema-v3 segments (d12-s7..s11, d14-s7, d16-s7)
 selection: deep checkpoints where BOTH arms have a defined value for the same
   metric at the same step in the same run; paired by (segment, step, metric)

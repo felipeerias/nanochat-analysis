@@ -1,0 +1,86 @@
+[
+  {
+    "run": "d12-s7",
+    "segment": "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
+    "depth": null,
+    "seed": 7,
+    "num_iterations": 2520,
+    "schema_version": 3,
+    "n_deep": 30,
+    "n_certified": 26,
+    "telemetry_config_hash": "9b30087fafa40f37f87938d42a88013fd6e83f5096757f307806a6e4504eba1b",
+    "estimator_id": "hvp-shadow-fp32-ieee-v1"
+  },
+  {
+    "run": "d12-s8",
+    "segment": "d12-s8-s0-2b2e72e4395440029b92226213d137bb",
+    "depth": null,
+    "seed": 8,
+    "num_iterations": 2520,
+    "schema_version": 3,
+    "n_deep": 30,
+    "n_certified": 26,
+    "telemetry_config_hash": "9b30087fafa40f37f87938d42a88013fd6e83f5096757f307806a6e4504eba1b",
+    "estimator_id": "hvp-shadow-fp32-ieee-v1"
+  },
+  {
+    "run": "d12-s9",
+    "segment": "d12-s9-s0-b872e698e81b4a8fa0cd08512f43c2c2",
+    "depth": null,
+    "seed": 9,
+    "num_iterations": 2520,
+    "schema_version": 3,
+    "n_deep": 30,
+    "n_certified": 25,
+    "telemetry_config_hash": "9b30087fafa40f37f87938d42a88013fd6e83f5096757f307806a6e4504eba1b",
+    "estimator_id": "hvp-shadow-fp32-ieee-v1"
+  },
+  {
+    "run": "d12-s10",
+    "segment": "d12-s10-s0-0ffeb05742bb4154a3f1afc202dc3955",
+    "depth": null,
+    "seed": 10,
+    "num_iterations": 2520,
+    "schema_version": 3,
+    "n_deep": 30,
+    "n_certified": 26,
+    "telemetry_config_hash": "9b30087fafa40f37f87938d42a88013fd6e83f5096757f307806a6e4504eba1b",
+    "estimator_id": "hvp-shadow-fp32-ieee-v1"
+  },
+  {
+    "run": "d12-s11",
+    "segment": "d12-s11-s0-5fd1bf807f764954b30658872fc3e2ad",
+    "depth": null,
+    "seed": 11,
+    "num_iterations": 2520,
+    "schema_version": 3,
+    "n_deep": 30,
+    "n_certified": 26,
+    "telemetry_config_hash": "9b30087fafa40f37f87938d42a88013fd6e83f5096757f307806a6e4504eba1b",
+    "estimator_id": "hvp-shadow-fp32-ieee-v1"
+  },
+  {
+    "run": "d14-s7",
+    "segment": "d14-s7-s0-b72acf7ac59942dab902e26fa0b2c80d",
+    "depth": null,
+    "seed": 7,
+    "num_iterations": 3759,
+    "schema_version": 3,
+    "n_deep": 32,
+    "n_certified": 28,
+    "telemetry_config_hash": "9b30087fafa40f37f87938d42a88013fd6e83f5096757f307806a6e4504eba1b",
+    "estimator_id": "hvp-shadow-fp32-ieee-v1"
+  },
+  {
+    "run": "d16-s7",
+    "segment": "d16-s7-s0-8e0a39fc8f164343bd01ef6b915e849f",
+    "depth": null,
+    "seed": 7,
+    "num_iterations": 5376,
+    "schema_version": 3,
+    "n_deep": 33,
+    "n_certified": 29,
+    "telemetry_config_hash": "9b30087fafa40f37f87938d42a88013fd6e83f5096757f307806a6e4504eba1b",
+    "estimator_id": "hvp-shadow-fp32-ieee-v1"
+  }
+]

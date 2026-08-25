@@ -1,0 +1,36 @@
+# run horizons
+  d12-s10  depth=12 seed=10 N= 2520 lr_warmup_frac=1.5873% muon_ramp_frac=15.8730% periodic_every=101
+  d12-s11  depth=12 seed=11 N= 2520 lr_warmup_frac=1.5873% muon_ramp_frac=15.8730% periodic_every=101
+  d12-s7   depth=12 seed= 7 N= 2520 lr_warmup_frac=1.5873% muon_ramp_frac=15.8730% periodic_every=101
+  d12-s8   depth=12 seed= 8 N= 2520 lr_warmup_frac=1.5873% muon_ramp_frac=15.8730% periodic_every=101
+  d12-s9   depth=12 seed= 9 N= 2520 lr_warmup_frac=1.5873% muon_ramp_frac=15.8730% periodic_every=101
+  d14-s7   depth=14 seed= 7 N= 3759 lr_warmup_frac=1.0641% muon_ramp_frac=10.6411% periodic_every=151
+  d16-s7   depth=16 seed= 7 N= 5376 lr_warmup_frac=0.7440% muon_ramp_frac=7.4405% periodic_every=216
+
+# phase-mismatch zones on the normalized-progress axis (d12 vs d16)
+  lr_warmup_end=40: d16 reaches it at p=0.00744, d12 at p=0.01587; progress-aligned comparisons in p in [0.00744,0.01587] (0.84% of training) compare unequal schedule phases
+  muon_ramp_end=400: d16 reaches it at p=0.07440, d12 at p=0.15873; progress-aligned comparisons in p in [0.07440,0.15873] (8.43% of training) compare unequal schedule phases
+  conversely, an absolute-step comparison at step s puts d12 at progress 2.133x that of d16 (2520 vs 5376 steps)
+
+# per-tier x-grid matchability, d12-s7 vs d16-s7
+  continuous  d12 n= 2521 d16 n= 5377 | common ABSOLUTE steps n= 2521 (of which <=400: 401) | progress matches within tol=9.30e-05: 2521/2521
+  periodic    d12 n=   50 d16 n=   50 | common ABSOLUTE steps n=    2 (of which <=400: 2) | progress matches within tol=9.30e-05: 4/50
+    d12 periodic steps <=400: [0, 1, 101, 102, 202, 203, 303, 304]
+    d16 periodic steps <=400: [0, 1, 216, 217]
+    d12 periodic progress (first 6): [np.float64(0.0), np.float64(0.0004), np.float64(0.04008), np.float64(0.04048), np.float64(0.08016), np.float64(0.08056)]
+    d16 periodic progress (first 6): [np.float64(0.0), np.float64(0.00019), np.float64(0.04018), np.float64(0.04036), np.float64(0.08036), np.float64(0.08054)]
+  sparse      d12 n=   58 d16 n=   63 | common ABSOLUTE steps n=   18 (of which <=400: 17) | progress matches within tol=9.30e-05: 25/58
+    d12 deep steps <=400: [0, 1, 2, 3, 4, 5, 8, 9, 16, 17, 32, 33, 40, 41, 64, 65, 126, 127, 252, 253, 378, 379, 400]
+    d16 deep steps <=400: [0, 1, 2, 3, 4, 5, 8, 9, 16, 17, 32, 33, 40, 41, 64, 65, 128, 129, 256, 257, 269, 270, 400]
+    common deep steps <=400: [0, 1, 2, 3, 4, 5, 8, 9, 16, 17, 32, 33, 40, 41, 64, 65, 400]
+    d12 deep progress <=0.16: [np.float64(0.0), np.float64(0.0004), np.float64(0.00079), np.float64(0.00119), np.float64(0.00159), np.float64(0.00198), np.float64(0.00317), np.float64(0.00357), np.float64(0.00635), np.float64(0.00675), np.float64(0.0127), np.float64(0.0131), np.float64(0.01587), np.float64(0.01627), np.float64(0.0254), np.float64(0.02579), np.float64(0.05), np.float64(0.0504), np.float64(0.1), np.float64(0.1004), np.float64(0.15), np.float64(0.1504), np.float64(0.15873)]
+    d16 deep progress <=0.16: [np.float64(0.0), np.float64(0.00019), np.float64(0.00037), np.float64(0.00056), np.float64(0.00074), np.float64(0.00093), np.float64(0.00149), np.float64(0.00167), np.float64(0.00298), np.float64(0.00316), np.float64(0.00595), np.float64(0.00614), np.float64(0.00744), np.float64(0.00763), np.float64(0.0119), np.float64(0.01209), np.float64(0.02381), np.float64(0.024), np.float64(0.04762), np.float64(0.04781), np.float64(0.05004), np.float64(0.05022), np.float64(0.0744)]
+
+# how many measurement points fall inside the absolute warmup window (step<=400)
+  d12-s7   continuous=401/2521  periodic=8/50  sparse=23/58
+  d12-s8   continuous=401/2521  periodic=8/50  sparse=23/58
+  d12-s9   continuous=401/2521  periodic=8/50  sparse=23/58
+  d12-s10  continuous=401/2521  periodic=8/50  sparse=23/58
+  d12-s11  continuous=401/2521  periodic=8/50  sparse=23/58
+  d14-s7   continuous=401/3760  periodic=6/50  sparse=23/61
+  d16-s7   continuous=401/5377  periodic=4/50  sparse=23/63
