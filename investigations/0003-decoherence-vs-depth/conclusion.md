@@ -95,3 +95,22 @@ The effect is real, reproducible and modest, and it is confounded with width
 by construction. If it matters, the experiment that resolves it is a
 fixed-depth width sweep at d12 — which is cheap, and which the d12
 configuration is already characterized for.
+
+## Caveat added after I0006 (2026-08-25)
+
+I0006 found that `muon/*` families are unsafe for depth claims: the choice
+between absolute-step and normalized-progress alignment changes cross-depth
+differences substantially, and `muon/replay_update_relerr` shows about 92%
+alignment disagreement inside the warmup window against 13% after it.
+
+This investigation's matched range began at progress 0.05, which lies inside
+the warmup window at d12 (step 400 is progress 0.159 there). A0001 did check
+that dropping the two earliest matched points preserves the verdict at a
+similar effect size (d14 −5.0%, d16 −11.2%), so the finding is likely to
+survive.
+
+It should nevertheless now be quoted as the weaker claim: decoherence appears
+to fall as the recipe scales up, measured on the progress axis, over a range
+that partially overlaps the warmup window, with width and depth confounded.
+Settling it properly needs the fixed-depth width sweep suggested above, run on
+the alignment rule I0006 sets out.

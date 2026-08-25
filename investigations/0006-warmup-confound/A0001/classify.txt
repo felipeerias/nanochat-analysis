@@ -1,0 +1,122 @@
+=== universe ===
+scalar families keyed (metric, acceptance_arm): 248
+group
+config       25
+dynamics    192
+resource     31
+
+=== verdicts under ABSOLUTE-STEP alignment ===
+group                                config  dynamics  resource
+verdict                                                        
+identical (deterministic)                12        15         2
+not different                             0        73         2
+post-dominated                            0        10         0
+post-dominated (deterministic)            4         0         0
+underpowered                              9        73         9
+uniformly different                       0        19        10
+uniformly different (deterministic)       0         0         8
+warmup-dominated                          0         2         0
+
+=== verdicts under NORMALIZED-PROGRESS alignment ===
+group                                config  dynamics  resource
+verdict_prog                                                   
+identical (deterministic)                 8        15         2
+not different                             0        47         2
+post-dominated                            0         3         0
+post-dominated (deterministic)            1         0         0
+underpowered                              9        73         9
+uniformly different                       0        34        10
+uniformly different (deterministic)       7         0         8
+warmup-dominated                          0        20         0
+
+=== verdict flips (abs -> prog), families testable under both ===
+51 of 157 testable families change verdict
+verdict_prog                         identical (deterministic)  not different  post-dominated  post-dominated (deterministic)  uniformly different  uniformly different (deterministic)  warmup-dominated
+verdict                                                                                                                                                                                                  
+identical (deterministic)                                   25              0               0                               0                    0                                    4                 0
+not different                                                0             47               1                               0                   13                                    0                14
+post-dominated                                               0              0               2                               0                    8                                    0                 0
+post-dominated (deterministic)                               0              0               0                               1                    0                                    3                 0
+uniformly different                                          0              0               0                               0                   23                                    0                 6
+uniformly different (deterministic)                          0              0               0                               0                    0                                    8                 0
+warmup-dominated                                             0              2               0                               0                    0                                    0                 0
+
+=== alignment disagreement, median |d12(step) - d12(progress)| in pooled seed sigmas ===
+  dynamics  warmup median=1.39 p90=6.07 | post median=1.58 p90=11.10
+  resource  warmup median=0.02 p90=0.47 | post median=0.05 p90=0.54
+  config    warmup median=0.00 p90=4.26 | post median=0.00 p90=4.44
+
+=== UNSAFE for depth claims ===
+160 of 248 families flagged
+verdict   identical (deterministic)  not different  post-dominated  post-dominated (deterministic)  underpowered  uniformly different  warmup-dominated
+group                                                                                                                                                  
+config                            4              0               0                               3             9                    0                 0
+dynamics                          0             35              10                               0            73                   15                 2
+resource                          0              0               0                               0             9                    0                 0
+
+reason counts:
+  window untestable (<5 pts): 91
+  alignment-unstable after window: 85
+  alignment-unstable in window: 54
+  verdict flips with alignment: 51
+  warmup-dominated: 2
+
+=== SAFE families (dynamics group) ===
+57 of 192 dynamics families
+  curvature/arith_eps|native      sparse     identical (deterministic)
+  curvature/arith_eps|shadow_fp32 sparse     identical (deterministic)
+  curvature/eta_star_rho_threshold|native      sparse     identical (deterministic)
+  curvature/eta_star_rho_threshold|shadow_fp32 sparse     identical (deterministic)
+  curvature/fd_conclusive_gradient|native      sparse     identical (deterministic)
+  curvature/fd_conclusive_gradient|shadow_fp32 sparse     identical (deterministic)
+  curvature/fd_conclusive_random|native      sparse     identical (deterministic)
+  curvature/fd_conclusive_update|native      sparse     identical (deterministic)
+  curvature/fd_eps_gradient|native      sparse     identical (deterministic)
+  curvature/fd_eps_random|shadow_fp32 sparse     identical (deterministic)
+  curvature/fd_eps_update|shadow_fp32 sparse     identical (deterministic)
+  curvature/native_verdict_code|native      sparse     identical (deterministic)
+  curvature/verdict_code_gradient|native      sparse     identical (deterministic)
+  curvature/verdict_code_random|native      sparse     identical (deterministic)
+  curvature/verdict_code_update|native      sparse     identical (deterministic)
+  curvature/c_fd_random|native      sparse     not different
+  curvature/c_fd_random|shadow_fp32 sparse     not different
+  curvature/c_fd_update|native      sparse     not different
+  curvature/c_fd_update|shadow_fp32 sparse     not different
+  curvature/curv_eps_gradient|native      sparse     not different
+  curvature/curv_eps_random|native      sparse     not different
+  curvature/curv_eps_random|shadow_fp32 sparse     not different
+  curvature/curv_eps_update|native      sparse     not different
+  curvature/curv_eps_update|shadow_fp32 sparse     not different
+  curvature/curv_floor_random|native      sparse     not different
+  curvature/curv_floor_random|shadow_fp32 sparse     not different
+  curvature/curv_floor_update|native      sparse     not different
+  curvature/curv_floor_update|shadow_fp32 sparse     not different
+  curvature/curv_snr_gradient|shadow_fp32 sparse     not different
+  curvature/curv_snr_random|shadow_fp32 sparse     not different
+  curvature/curv_snr_update|native      sparse     not different
+  curvature/curv_snr_update|shadow_fp32 sparse     not different
+  curvature/e_curv_gradient|shadow_fp32 sparse     not different
+  curvature/e_lin_gradient|native      sparse     not different
+  curvature/e_sym_gradient|shadow_fp32 sparse     not different
+  curvature/e_sym_random|native      sparse     not different
+  curvature/e_sym_random|shadow_fp32 sparse     not different
+  curvature/e_sym_update|native      sparse     not different
+  curvature/e_sym_update|shadow_fp32 sparse     not different
+  curvature/eta_star|shadow_fp32 sparse     not different
+  curvature/fd_conclusive_random|shadow_fp32 sparse     not different
+  curvature/fd_conclusive_update|shadow_fp32 sparse     not different
+  curvature/fd_eps_random|native      sparse     not different
+  curvature/fd_eps_update|native      sparse     not different
+  curvature/fd_floor_update|native      sparse     not different
+  curvature/shadow_verdict_code|shadow_fp32 sparse     not different
+  curvature/verdict_code_gradient|shadow_fp32 sparse     not different
+  curvature/verdict_code_random|shadow_fp32 sparse     not different
+  curvature/verdict_code_update|shadow_fp32 sparse     not different
+  update/normalized_residual|native      sparse     not different
+  update/normalized_residual|shadow_fp32 sparse     not different
+  update/residual_p2|native      sparse     not different
+  update/residual_p2|shadow_fp32 sparse     not different
+  curvature/e_lin_random|native      sparse     uniformly different
+  curvature/e_lin_random|shadow_fp32 sparse     uniformly different
+  curvature/e_lin_update|native      sparse     uniformly different
+  curvature/e_lin_update|shadow_fp32 sparse     uniformly different

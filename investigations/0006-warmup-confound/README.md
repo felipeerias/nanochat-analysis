@@ -1,7 +1,7 @@
 ---
 id: I0006
 kind: question
-status: open
+status: closed
 data: sweep; all seven schema-v3 segments
 selection: all tiers; defined rows only; scalar families
 universe: every scalar family present in all three depths; report all

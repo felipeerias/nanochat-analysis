@@ -28,7 +28,7 @@ for seg in SEGS:
     pcv = {int(r['step']): (np.asarray(r['value_vector'], float) if bool(r['is_defined']) else None)
            for _, r in T.metric(per, 'noise/pairwise_cosines').iterrows()}
     npg = T.metric(per, 'noise/pairwise_cosines')
-    K = int(npg['sample_count'].iloc[0]) if 'sample_count' in npg.columns else 8
+    K = int(prov['telemetry_config']['noise_K'])
     prog = {int(r['step']): float(r['normalized_progress'])
             for _, r in T.metric(per, 'noise/s2').iterrows()}
     b = B // K
