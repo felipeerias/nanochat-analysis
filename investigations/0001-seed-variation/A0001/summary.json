@@ -1,0 +1,283 @@
+{
+  "runs": {
+    "d12-s7": {
+      "segment": "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
+      "seed": 7,
+      "iters": 2520
+    },
+    "d12-s8": {
+      "segment": "d12-s8-s0-2b2e72e4395440029b92226213d137bb",
+      "seed": 8,
+      "iters": 2520
+    },
+    "d12-s9": {
+      "segment": "d12-s9-s0-b872e698e81b4a8fa0cd08512f43c2c2",
+      "seed": 9,
+      "iters": 2520
+    },
+    "d12-s10": {
+      "segment": "d12-s10-s0-0ffeb05742bb4154a3f1afc202dc3955",
+      "seed": 10,
+      "iters": 2520
+    },
+    "d12-s11": {
+      "segment": "d12-s11-s0-5fd1bf807f764954b30658872fc3e2ad",
+      "seed": 11,
+      "iters": 2520
+    }
+  },
+  "identical_step_grids": true,
+  "vector_families_not_analysed": [
+    "attn/per_head_mean_distance",
+    "attn/per_head_mean_distance/b0",
+    "attn/per_head_mean_distance/b1",
+    "attn/per_head_mean_distance/b2",
+    "attn/per_head_mean_distance/b3",
+    "attn/per_head_median_distance",
+    "attn/per_head_median_distance/b0",
+    "attn/per_head_median_distance/b1",
+    "attn/per_head_median_distance/b2",
+    "attn/per_head_median_distance/b3",
+    "attn/per_head_norm_entropy",
+    "attn/per_head_norm_entropy/b0",
+    "attn/per_head_norm_entropy/b1",
+    "attn/per_head_norm_entropy/b2",
+    "attn/per_head_norm_entropy/b3",
+    "curvature/fd_sweep_conclusive_gradient",
+    "curvature/fd_sweep_conclusive_random",
+    "curvature/fd_sweep_conclusive_update",
+    "curvature/fd_sweep_cos_gradient",
+    "curvature/fd_sweep_cos_random",
+    "curvature/fd_sweep_cos_update",
+    "curvature/fd_sweep_cos_valid_gradient",
+    "curvature/fd_sweep_cos_valid_random",
+    "curvature/fd_sweep_cos_valid_update",
+    "curvature/fd_sweep_e_fd_gradient",
+    "curvature/fd_sweep_e_fd_random",
+    "curvature/fd_sweep_e_fd_update",
+    "curvature/fd_sweep_eps_gradient",
+    "curvature/fd_sweep_eps_random",
+    "curvature/fd_sweep_eps_update",
+    "curvature/fd_sweep_floor_gradient",
+    "curvature/fd_sweep_floor_random",
+    "curvature/fd_sweep_floor_update",
+    "curvature/fd_sweep_snr_gradient",
+    "curvature/fd_sweep_snr_random",
+    "curvature/fd_sweep_snr_update",
+    "curvature/sweep_c_fd_gradient",
+    "curvature/sweep_c_fd_random",
+    "curvature/sweep_c_fd_update",
+    "curvature/sweep_e_curv_gradient",
+    "curvature/sweep_e_curv_random",
+    "curvature/sweep_e_curv_update",
+    "curvature/sweep_eps_gradient",
+    "curvature/sweep_eps_random",
+    "curvature/sweep_eps_update",
+    "curvature/sweep_floor_gradient",
+    "curvature/sweep_floor_random",
+    "curvature/sweep_floor_update",
+    "curvature/sweep_snr_gradient",
+    "curvature/sweep_snr_random",
+    "curvature/sweep_snr_update",
+    "noise/pairwise_cosines",
+    "noise/per_sub_sq_norm",
+    "probe/attn_out_stats_quantiles",
+    "probe/block_in_stats_quantiles",
+    "probe/c_proj_in_stats_quantiles",
+    "probe/content_loss_sums",
+    "probe/mlp_out_stats_quantiles",
+    "probe/n_segments",
+    "probe/per_row_loss",
+    "probe/per_token_loss",
+    "probe/relu2_tail_quantiles",
+    "probe/segment_lengths",
+    "probe/transition_loss_sum",
+    "probe/ve_gate_quantiles",
+    "scalars/resid_lambdas",
+    "scalars/x0_lambdas",
+    "sketch/grad",
+    "sketch/probe_grad"
+  ],
+  "channels": 3392,
+  "families": 250,
+  "families_with_defined_spread": 239,
+  "tightest": [
+    {
+      "tier": "continuous",
+      "metric": "batch/bos_count",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "batch/mean_segment_length",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "batch/micro_batches",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "batch/segments_per_row_max",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "batch/segments_per_row_mean",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "batch/valid_targets",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "grad/finite",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "loss/finite",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "mem/alloc_end_bytes",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "mem/alloc_start_bytes",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "mem/cuda_peak_absolute",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 1
+    },
+    {
+      "tier": "continuous",
+      "metric": "optim/beta1",
+      "acceptance_arm": -1,
+      "rel_median": 0.0,
+      "channels": 6
+    }
+  ],
+  "noisiest": [
+    {
+      "tier": "periodic",
+      "metric": "probe/attn_out_stats_mean",
+      "acceptance_arm": -1,
+      "rel_median": 3.4642299240270185,
+      "channels": 24
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/fd_floor_random",
+      "acceptance_arm": "native",
+      "rel_median": 4.155319204025673,
+      "channels": 1
+    },
+    {
+      "tier": "periodic",
+      "metric": "probe/mlp_out_stats_mean",
+      "acceptance_arm": -1,
+      "rel_median": 4.217867757911442,
+      "channels": 24
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/curv_floor_update",
+      "acceptance_arm": "native",
+      "rel_median": 4.644764258179423,
+      "channels": 1
+    },
+    {
+      "tier": "periodic",
+      "metric": "probe/block_in_stats_mean",
+      "acceptance_arm": -1,
+      "rel_median": 4.662784020914238,
+      "channels": 24
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/curv_floor_random",
+      "acceptance_arm": "shadow_fp32",
+      "rel_median": 5.1095656296869105,
+      "channels": 1
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/curv_floor_update",
+      "acceptance_arm": "shadow_fp32",
+      "rel_median": 5.901065549263215,
+      "channels": 1
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/c_fd_update",
+      "acceptance_arm": "shadow_fp32",
+      "rel_median": 29.415982050579238,
+      "channels": 1
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/c_fd_update",
+      "acceptance_arm": "native",
+      "rel_median": 35.82364990073868,
+      "channels": 1
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/curv_floor_random",
+      "acceptance_arm": "native",
+      "rel_median": 42.78713462151697,
+      "channels": 1
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/c_fd_random",
+      "acceptance_arm": "shadow_fp32",
+      "rel_median": 58.72990854501279,
+      "channels": 1
+    },
+    {
+      "tier": "sparse",
+      "metric": "curvature/c_fd_random",
+      "acceptance_arm": "native",
+      "rel_median": 107.8374849103944,
+      "channels": 1
+    }
+  ],
+  "median_family_spread": 0.060064612201587694,
+  "families_under_1pct": 72,
+  "families_over_50pct": 42,
+  "early_vs_late": {
+    "median_rel_early": 0.07526365409489179,
+    "median_rel_late": 0.06232736307695338
+  }
+}
