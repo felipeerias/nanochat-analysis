@@ -112,12 +112,7 @@ self_stop() {
     if [ -z "${RUNPOD_POD_ID:-}" ]; then
         outcome="[telemetry_run] not on a Runpod pod; nothing to stop"
     elif [ "${STOP_POD:-0}" != "1" ]; then
-        outcome="##############################################################
-# THE POD IS STILL RUNNING AND STILL BILLING.               #
-# Stop it when you are done (console or:                    #
-#   runpodctl stop pod $RUNPOD_POD_ID).                     #
-# Pass STOP_POD=1 to have a run stop it for you.            #
-##############################################################"
+        outcome="[telemetry_run] pod $RUNPOD_POD_ID left running"
     elif ! command -v runpodctl &> /dev/null || [ -z "${RUNPOD_API_KEY:-}" ] \
             || ! timeout 60 runpodctl stop pod "$RUNPOD_POD_ID"; then
         outcome="##############################################################
