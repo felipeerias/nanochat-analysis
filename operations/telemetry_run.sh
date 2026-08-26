@@ -53,140 +53,6 @@ fi
 # single source of truth). The row is VALIDATED in python - types, allowed
 # keys, allowed values - and transferred as tab-separated values, never
 # through shell interpolation.
-ROW=$("$PY" - "$MANIFEST" "$RUN_ID" <<'PYEOF'
-import json
-import re
-import sys
-
-
-def die(msg):
-    raise SystemExit(f"manifest validation failed: {msg}")
-
-
-def strict_int(v, name):
-    # strict JSON integers only: no booleans, no coercible strings
-    if isinstance(v, bool) or not isinstance(v, int):
-        die(f"{name} must be a JSON integer, got {v!r}")
-    return v
-
-
-m = json.load(open(sys.argv[1]))
-rid = sys.argv[2]
-top_allowed = {"manifest_version", "telemetry_schema", "nanochat_commit",
-               "defaults", "runs"}
-if set(m) - top_allowed:
-    die(f"unknown top-level keys: {sorted(set(m) - top_allowed)}")
-if not isinstance(m.get("manifest_version"), str) or not m["manifest_version"]:
-    die("manifest_version must be a nonempty string")
-if int(m.get("telemetry_schema", 0)) != 3:
-    die(f"telemetry_schema must be 3, got {m.get('telemetry_schema')!r}")
-# The manifest pins the training code; the runner enforces it. Required, so a
-# new manifest cannot silently produce a run nobody can reproduce.
-if not re.fullmatch(r"[0-9a-f]{40}", str(m.get("nanochat_commit", ""))):
-    die("nanochat_commit must be a full 40-character commit id")
-if not re.fullmatch(r"[A-Za-z0-9_-]{1,48}", rid):
-    die(f"invalid run_id {rid!r}")
-if rid not in (m.get("runs") or {}):
-    die(f"run_id {rid!r} not in manifest run table")
-row = dict(m.get("defaults") or {})
-row.update(m["runs"][rid])
-allowed = {"depth", "seed", "shadow", "periodic_points", "checkpoints",
-           "deep_schedule", "head_dim", "recipe"}
-if set(row) - allowed:
-    die(f"unknown row keys for {rid}: {sorted(set(row) - allowed)}")
-
-# The recipe: upstream base_train flags a run may set. Every one already
-# exists in nanochat; nothing here adds a knob to the training code. A flag
-# NOT in this table cannot be set from a manifest at all - put the change on
-# an experiment branch instead, where the commit identifies it.
-RECIPE = {
-    "aspect_ratio":            ("int",   8, 512),
-    "window_pattern":          ("pat",   r"[SL]{1,32}", None),
-    "max_seq_len":             ("int",   128, 8192),
-    "warmup_steps":            ("int",   0, 100000),
-    "warmdown_ratio":          ("float", 0.0, 1.0),
-    "final_lr_frac":           ("float", 0.0, 1.0),
-    "embedding_lr":            ("float", 0.0, 10.0),
-    "unembedding_lr":          ("float", 0.0, 10.0),
-    "matrix_lr":               ("float", 0.0, 10.0),
-    "scalar_lr":               ("float", 0.0, 10.0),
-    "weight_decay":            ("float", 0.0, 10.0),
-    "device_batch_size":       ("int",   1, 1024),
-    "total_batch_size":        ("int",   1, 1 << 24),
-    "num_iterations":          ("int",   1, 10**6),
-    "target_param_data_ratio": ("float", 0.1, 1000.0),
-}
-# defaults' recipe overlaid by the row's, so an arm states only what differs
-recipe = dict((m.get("defaults") or {}).get("recipe") or {})
-recipe.update((m["runs"][rid].get("recipe")) or {})
-if not isinstance(recipe, dict):
-    die("recipe must be an object")
-unknown = sorted(set(recipe) - set(RECIPE))
-if unknown:
-    die(f"recipe keys not permitted from a manifest: {unknown}")
-for k in sorted(recipe):
-    kind, lo, hi = RECIPE[k]
-    v = recipe[k]
-    if kind == "int":
-        v = strict_int(v, f"recipe.{k}")
-        if not (lo <= v <= hi):
-            die(f"recipe.{k}={v} outside [{lo}, {hi}]")
-    elif kind == "float":
-        if isinstance(v, bool) or not isinstance(v, (int, float)):
-            die(f"recipe.{k} must be a JSON number, got {v!r}")
-        if not (lo <= float(v) <= hi):
-            die(f"recipe.{k}={v} outside [{lo}, {hi}]")
-    else:
-        if not isinstance(v, str) or not re.fullmatch(lo, v):
-            die(f"recipe.{k}={v!r} does not match {lo}")
-depth = strict_int(row["depth"], "depth")
-seed = strict_int(row["seed"], "seed")
-pp = strict_int(row.get("periodic_points", 25), "periodic_points")
-ck = strict_int(row.get("checkpoints", 0), "checkpoints")
-hd = strict_int(row.get("head_dim", 128), "head_dim")
-shadow = row.get("shadow", "fp32")
-sched = row.get("deep_schedule", "pythia")
-if shadow not in ("off", "fp32"):
-    die(f"shadow must be off|fp32, got {shadow!r}")
-if sched != "pythia":
-    die("official manifest rows must use deep_schedule=pythia ('every' is "
-        "development-only via scripts.base_train directly)")
-if not (1 <= depth <= 64 and 0 <= seed < 10**6 and 0 < pp <= 10**4):
-    die(f"out-of-range depth/seed/periodic_points: {depth}/{seed}/{pp}")
-if not (0 <= ck <= 100):
-    die(f"out-of-range checkpoints: {ck}")
-if hd != 128:
-    die(f"this sweep requires head_dim=128 (upstream default), got {hd}")
-# Width is NOT derived here. base_train owns that rule; the controller
-# asserts the inputs it asked for and lets the verifier, which lives beside
-# base_train, check that the built model is consistent with them.
-fixed = [depth, seed, shadow, pp, ck, sched, hd, m["nanochat_commit"]]
-print("\t".join(str(x) for x in fixed))
-for k in sorted(recipe):
-    v = recipe[k]
-    # a float flag given as JSON 1 must be emitted as 1.0, or the recorded
-    # user_config value will not string-compare against what was passed
-    if RECIPE[k][0] == "float":
-        v = float(v)
-    print(f"{k}={v}")
-PYEOF
-)
-# First line is the fixed tuple; any remaining lines are recipe key=value.
-# Each becomes both a base_train flag and an assertion that the flag was
-# actually received, checked against user_config in the run's provenance.
-RECIPE_ARGS=()
-RECIPE_EXPECTS=()
-{
-    IFS=$'\t' read -r DEPTH SEED SHADOW PERIODIC_POINTS CHECKPOINTS \
-        DEEP_SCHEDULE HEAD_DIM NANOCHAT_COMMIT
-    while IFS= read -r _line; do
-        [ -z "$_line" ] && continue
-        _k=${_line%%=*}
-        _v=${_line#*=}
-        RECIPE_ARGS+=("--${_k//_/-}=$_v")
-        RECIPE_EXPECTS+=(--expect "user_config.$_k=$_v")
-    done
-} <<< "$ROW"
 
 DIRTY=0
 if [ -n "$(git -C "$NANOCHAT_CHECKOUT" status --porcelain)" ]; then
@@ -196,14 +62,9 @@ if [ -n "$(git -C "$NANOCHAT_CHECKOUT" status --porcelain)" ]; then
     DIRTY=1
 fi
 
-# The manifest pins the training code and this enforces it. Without this the
-# same manifest could be run against any checkout and the run would still look
-# well formed.
+# HEAD is read here because the gate key needs it; comparing it against what
+# the manifest pins is run_manifest.py's job, below.
 HEAD_SHA=$(git -C "$NANOCHAT_CHECKOUT" rev-parse HEAD)
-if [ "$HEAD_SHA" != "$NANOCHAT_COMMIT" ]; then
-    echo "FATAL: manifest pins nanochat $NANOCHAT_COMMIT but HEAD is $HEAD_SHA."
-    exit 1
-fi
 
 # Controller identity, taken from wherever this script lives so it keeps
 # working once operations move to their own repository. The committed tree oid
@@ -222,16 +83,14 @@ if [ -n "$(git -C "$CTRL_DIR" status --porcelain -- "$CTRL_DIR" 2>/dev/null)" ];
 fi
 echo "[controller] $CTRL_COMMIT tree=$CTRL_TREE dir=$CTRL_DIR"
 
+RESOLVE=("$PY" "$CTRL_DIR/run_manifest.py" "$MANIFEST" "$RUN_ID"
+         --checkout "$NANOCHAT_CHECKOUT" --head "$HEAD_SHA"
+         --expect-backend "${EXPECT_BACKEND:-fa3}"
+         --controller-commit "$CTRL_COMMIT" --controller-tree "$CTRL_TREE")
+"${RESOLVE[@]}" --check-only
+
 if [ "${CHECK_ONLY:-0}" = "1" ]; then
-    echo "[check] manifest $MANIFEST row $RUN_ID"
-    echo "[check] depth=$DEPTH seed=$SEED shadow=$SHADOW points=$PERIODIC_POINTS ckpt=$CHECKPOINTS"
-    if [ "${#RECIPE_ARGS[@]}" -gt 0 ]; then
-        echo "[check] recipe: ${RECIPE_ARGS[*]}"
-    else
-        echo "[check] recipe: none (upstream defaults)"
-    fi
-    echo "[check] nanochat $HEAD_SHA matches the manifest pin"
-    echo "[check] CHECK_ONLY=1 - configuration is valid, nothing was started"
+    echo "[telemetry_run] CHECK_ONLY=1 - nothing was started"
     exit 0
 fi
 
@@ -326,7 +185,7 @@ touch "$LOG"
 exec 3>&1 4>&2
 exec > >(tee -a "$LOG") 2>&1
 TEE_PID=$!
-echo "[telemetry_run] manifest=$MANIFEST run=$RUN_ID depth=$DEPTH seed=$SEED shadow=$SHADOW"
+echo "[telemetry_run] manifest=$MANIFEST run=$RUN_ID"
 echo "[telemetry_run] log: $LOG"
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 
@@ -398,30 +257,9 @@ fi
 
 # ----------------------------------------------------------------------------
 # The instrumented run: exactly the recipe plus the manifest row.
-echo "[run] starting $RUN_ID (depth=$DEPTH seed=$SEED head_dim=$HEAD_DIM)"
-if [ "${#RECIPE_ARGS[@]}" -gt 0 ]; then
-    echo "[run] recipe: ${RECIPE_ARGS[*]}"
-fi
-python -m scripts.base_train \
-    --depth="$DEPTH" --seed="$SEED" --model-tag="$RUN_ID" --run=dummy \
-    --telemetry-dir="$TELEMETRY_DIR" \
-    --telemetry-periodic-points="$PERIODIC_POINTS" \
-    --telemetry-deep-schedule="$DEEP_SCHEDULE" \
-    --telemetry-shadow="$SHADOW" \
-    --telemetry-checkpoints="$CHECKPOINTS" \
-    --telemetry-manifest="$MANIFEST" \
-    --telemetry-manifest-run="$RUN_ID" \
-    --telemetry-controller-commit="$CTRL_COMMIT" \
-    --telemetry-controller-tree="$CTRL_TREE" \
-    ${RECIPE_ARGS[@]+"${RECIPE_ARGS[@]}"}
-
-python runs/verify_telemetry_run.py "$TELEMETRY_DIR" --tag "$RUN_ID" \
-    --expect "attention_backend=$EXPECT_BACKEND" \
-    --expect "compute_dtype=torch.bfloat16" \
-    --expect "telemetry_config.shadow_arm=$SHADOW" \
-    --expect "model_config.n_layer=$DEPTH" \
-    --expect "user_config.depth=$DEPTH" \
-    --expect "user_config.head_dim=$HEAD_DIM" \
-    --expect "seed=$SEED" \
+# Resolving the row, building the argument list and verifying what came out
+# all belong to one program, which does them without a text round trip.
+echo "[run] starting $RUN_ID"
+"${RESOLVE[@]}" --telemetry-dir "$TELEMETRY_DIR"
     ${RECIPE_EXPECTS[@]+"${RECIPE_EXPECTS[@]}"}
 echo "[telemetry_run] done; data in $TELEMETRY_DIR (network volume - survives pod stop)"
