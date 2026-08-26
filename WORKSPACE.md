@@ -51,10 +51,10 @@ smoke data, `NANOCHAT_BASE_DIR`), `nanochat_agent_key.txt` (Runpod API key).
 - A manifest pins the training code with `nanochat_commit`. The runner refuses
   to start without it, or against a different HEAD. Every segment embeds its
   own copy, so the external file may change afterwards.
-- A manifest row may carry a `recipe` of `base_train` flags. Which flags exist
-  is read from the pinned checkout, not listed anywhere, so it cannot drift.
-  Changing the trainer itself still goes on an experiment branch, identified
-  by its commit.
+- A manifest row is flat: it is the arguments for that run. Valid names are
+  read from the pinned checkout's own parsers, so no list exists here to
+  drift. Changing the trainer itself still goes on an experiment branch,
+  identified by its commit.
 - Never edit `uv.lock`. Always use `uv sync --frozen`.
 - Never commit `nanochat_agent_key.txt`. Never copy it to the GPU volume.
 - The `telemetry` branch is not for upstream. It stays a research branch.

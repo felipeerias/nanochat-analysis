@@ -26,31 +26,29 @@ B=$(pin manifests/sweep-d12-seeds-v1.json)
 git -C "$CHECKOUT" worktree add -q --detach "$TMP/wt-a" "$A"
 git -C "$CHECKOUT" worktree add -q --detach "$TMP/wt-b" "$B"
 
-# variants of the shipped manifest that must be rejected
+# variants of the shipped manifest. A row is flat: any flag either parser
+# declares, nothing the runner owns, nothing that does not exist.
 "${PY:-python3}" - "$TMP" <<'PYEOF'
 import json, sys, os
 tmp = sys.argv[1]
 base = json.load(open("manifests/sweep-d12-d16-v1.json"))
-m = json.loads(json.dumps(base)); del m["nanochat_commit"]
-json.dump(m, open(os.path.join(tmp, "unpinned.json"), "w"))
-m = json.loads(json.dumps(base)); m["runs"]["d14-s7"]["depth"] = 999
-json.dump(m, open(os.path.join(tmp, "badrange.json"), "w"))
-m = json.loads(json.dumps(base)); m["runs"]["d14-s7"]["aspect_ratio"] = 48
-json.dump(m, open(os.path.join(tmp, "badkey.json"), "w"))
 
-# recipe variants: a manifest may set any flag base_train declares, but
-# not one the runner owns, and not one that does not exist
-def recipe(name, r):
+def variant(name, mutate):
     m = json.loads(json.dumps(base))
-    m["runs"]["d14-s7"]["recipe"] = r
+    mutate(m)
     json.dump(m, open(os.path.join(tmp, name), "w"))
 
-recipe("r-width.json",   {"aspect_ratio": 48})
-recipe("r-sched.json",   {"warmdown_ratio": 0.35, "final_lr_frac": 1.0})
-recipe("r-owned.json",   {"depth": 20})
-recipe("r-cadence.json", {"eval_every": -1, "sample_every": -1})
-recipe("r-unknown.json", {"softcap": 10})
-recipe("r-type.json",    {"warmdown_ratio": "0.35"})
+def row(name, extra):
+    variant(name, lambda m: m["runs"]["d14-s7"].update(extra))
+
+variant("unpinned.json", lambda m: m.pop("nanochat_commit"))
+row("badkey.json",   {"softcap": 10})
+row("r-width.json",  {"aspect_ratio": 48})
+row("r-sched.json",  {"warmdown_ratio": 0.35, "final_lr_frac": 1})
+row("r-owned.json",  {"model_tag": "mine"})
+row("r-mixed.json",  {"eval_every": -1, "telemetry_periodic_points": 4})
+row("r-type.json",   {"warmdown_ratio": "0.35"})
+row("r-nested.json", {"recipe": {"aspect_ratio": 48}})
 PYEOF
 
 # static first: the gate and run sections only execute on a GPU, so nothing
@@ -82,15 +80,14 @@ check "manifest crossed with wrong worktree"  1 run "$TMP/wt-a" manifests/sweep-
 check "unknown run id"                        1 run "$TMP/wt-a" manifests/sweep-d12-d16-v1.json d99-s1
 check "checkout is not a git repo"            1 run /tmp        manifests/sweep-d12-d16-v1.json d14-s7
 check "manifest without nanochat_commit"      1 run "$TMP/wt-a" "$TMP/unpinned.json" d14-s7
-check "depth out of range"                    1 run "$TMP/wt-a" "$TMP/badrange.json" d14-s7
-check "unknown row key (aspect_ratio)"        1 run "$TMP/wt-a" "$TMP/badkey.json" d14-s7
 
-check "recipe sets width (E03 shape)"         0 run "$TMP/wt-a" "$TMP/r-width.json" d14-s7
-check "recipe sets the schedule (E02 shape)"  0 run "$TMP/wt-a" "$TMP/r-sched.json" d14-s7
-check "recipe sets a flag the runner owns"    1 run "$TMP/wt-a" "$TMP/r-owned.json" d14-s7
-check "cadence flags (were wrongly refused)"  0 run "$TMP/wt-a" "$TMP/r-cadence.json" d14-s7
-check "recipe key is not a base_train flag"   1 run "$TMP/wt-a" "$TMP/r-unknown.json" d14-s7
-check "recipe value of the wrong type"        1 run "$TMP/wt-a" "$TMP/r-type.json" d14-s7
+check "row sets width (E03 shape)"            0 run "$TMP/wt-a" "$TMP/r-width.json" d14-s7
+check "row sets the schedule (E02 shape)"     0 run "$TMP/wt-a" "$TMP/r-sched.json" d14-s7
+check "base_train and telemetry flags mix"    0 run "$TMP/wt-a" "$TMP/r-mixed.json" d14-s7
+check "key no parser declares"                1 run "$TMP/wt-a" "$TMP/badkey.json" d14-s7
+check "key the runner owns"                   1 run "$TMP/wt-a" "$TMP/r-owned.json" d14-s7
+check "value of the wrong type"               1 run "$TMP/wt-a" "$TMP/r-type.json" d14-s7
+check "a nested recipe block is refused"      1 run "$TMP/wt-a" "$TMP/r-nested.json" d14-s7
 
 if [ -n "$(git -C "$OPS" status --porcelain -- "$OPS")" ]; then
     check "dirty controller tree refused"     1 strict "$TMP/wt-a" manifests/sweep-d12-d16-v1.json d14-s7
