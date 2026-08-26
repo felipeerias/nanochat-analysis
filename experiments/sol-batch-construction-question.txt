@@ -1,0 +1,121 @@
+Analyze the existing instrumented nanoChat training runs to test the following mathematical hypothesis.
+
+## Hypothesis
+
+For data group (k), define:
+
+[
+g_k(t)=\nabla_\theta L_k(\theta(t))
+]
+
+as the gradient produced by that group at training time (t).
+
+In the optimal-control model, the future value of training on group (k) at time (t) is
+
+[
+s_k(t)=\lambda(t)^T g_k(t),
+]
+
+where (\lambda(t)) is a costate/adjoint representing how a change to the model parameters at time (t) affects the final training objective.
+
+The ideal adaptive batching policy would then assign probabilities approximately as
+
+[
+q_k(t)\propto p_k e^{\beta s_k(t)},
+]
+
+where:
+
+* (p_k) is the nominal corpus proportion of group (k);
+* (q_k(t)) is the adaptive sampling probability;
+* (\beta) controls how aggressively sampling deviates from (p_k).
+
+For two groups (i,j), changes in their relative value are predicted by the quadratic model to be related to the noncommutativity of their gradient fields:
+
+[
+\frac{d}{dt}(s_i-s_j)
+\propto
+\lambda^T[v_i,v_j],
+]
+
+where
+
+[
+v_k=-g_k
+]
+
+and locally
+
+[
+[v_i,v_j]\approx H_jg_i-H_ig_j,
+]
+
+with
+
+[
+H_k=\nabla_\theta^2L_k
+]
+
+the local Hessian/curvature associated with group (k).
+
+The dataset probably does **not** contain (H_k), (\lambda), (s_k), or the Lie brackets directly. Treat these as theoretical quantities and determine which recorded measurements can estimate or proxy them.
+
+## Questions to answer
+
+1. **Does the relative usefulness of different data groups change during training?**
+
+   Look for persistent, reproducible changes in signals indicating that one group's gradient is more useful than another's at different stages.
+
+2. **Can we retrospectively estimate the future usefulness of a group's gradient?**
+
+   In other words, can the available data tell us whether emphasizing (g_k(t)) at a particular point would have moved training in a direction beneficial to later or final loss?
+
+3. **Which recorded local quantities best predict that future usefulness?**
+
+   In particular examine whatever equivalents are available for:
+
+   [
+   |g_k|,
+   \qquad
+   g_i^Tg_j,
+   \qquad
+   g_k^Tg_{\mathrm{nominal}},
+   ]
+
+   curvature-related quantities, and proxies for
+
+   [
+   H_jg_i-H_ig_j.
+   ]
+
+4. **Is there evidence for the noncommutativity hypothesis?**
+
+   Do measurements corresponding to
+
+   [
+   H_jg_i-H_ig_j
+   ]
+
+   predict changes in the relative usefulness of groups better than ordinary gradient norms or gradient alignment alone?
+
+5. **What is the smallest set of telemetry that appears sufficient to predict the preferred data mixture?**
+
+The practical model we are trying to derive is:
+
+[
+\text{current training telemetry}
+\longrightarrow
+\hat s_k(t)
+\longrightarrow
+q_k(t)\propto p_k e^{\beta\hat s_k(t)}.
+]
+
+The central question is therefore:
+
+[
+\boxed{
+\text{Can cheap measurements of current training geometry predict which data groups are most valuable to train on now?}
+}
+]
+
+Use the project's existing analysis tools and the available instrumentation. The goal at this stage is to determine what the data supports and what quantities could plausibly drive an adaptive batching implementation.

@@ -7,7 +7,7 @@ selection: defined rows only; matched normalized_progress; both acceptance arms
   reported separately; curvature restricted to per-direction passing verdicts
 universe: every metric family present in the continuous, periodic and sparse
   tiers of these five runs; all are reported, none are selected out
-allowed inputs: ../../../telemetry-data/sweep/DATASET.md; the five d12
+allowed inputs: ../../DATASET.md; the five d12
   segments; ../../loader/; profiles/ of these five runs (cite the commit)
 ---
 

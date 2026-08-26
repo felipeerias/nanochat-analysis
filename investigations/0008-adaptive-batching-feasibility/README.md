@@ -10,8 +10,8 @@ universe: the full metric inventory is in scope; the deliverable is a mapping,
 allowed inputs: DATASET.md; the seven v3 segments; ../../loader/;
   ../../profiles/; ../0001-seed-variation/conclusion.md;
   ../../../nanochat/nanochat/telemetry.py (to see what is measured and how);
-  ../../../telemetry-spec.md; and the question document in
-  ../../../nanochat/tmp/sol-batch-construction-question.txt
+  ../../../nanochat/docs/telemetry-spec.md; and the question document in
+  ../../experiments/sol-batch-construction-question.txt
 ---
 
 ## Question

@@ -1,13 +1,18 @@
 # Analysis
 
-The data is in `../telemetry-data/sweep/`. Read its `DATASET.md` first.
-The measuring code is in `../nanochat/` (branch `telemetry`). Do not change it.
+The parquet data is in `../telemetry-data/sweep/`. Read `DATASET.md` here
+first. The instrument is in `../nanochat/` (branch `telemetry`); change it only
+for a strong reason, and change it on a branch that a manifest then pins.
 
 - `loader/` — shared code to read the data correctly.
 - `profiles/` — what each run looks like. Descriptive. No claims.
-- `investigations/` — one folder per question or hypothesis. Claims live here.
+- `investigations/` — one folder per question. Claims live here, and only here.
+- `exploratory/` — models and quick checks. Single-author, not citable.
+- `experiments/` — designs for data we do not have yet.
+- `operations/` — the runner, the pod setup and the sweep manifests.
+- `DATASET.md` — the canonical dataset card. Nine caveats. They matter.
 
-This folder is a git repository. Findings cite commits, so commit your work.
+This is a git repository and findings cite commits, so commit your work.
 
 ## Profiles
 
