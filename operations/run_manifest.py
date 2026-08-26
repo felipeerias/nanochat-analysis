@@ -23,29 +23,36 @@ import re
 import subprocess
 import sys
 
-# base_train flags a manifest may set. Every one already exists upstream; this
-# adds no knob to the trainer. A flag NOT here cannot be set from a manifest at
-# all - that change belongs on an experiment branch, where the commit
-# identifies it and the manifest pins it. That boundary is the reason this
-# table exists; the ranges are just cheap protection against paying for a pod
-# to discover a typo.
-RECIPE = {
-    "aspect_ratio":            ("int",   8, 512),
-    "window_pattern":          ("pat",   r"[SL]{1,32}", None),
-    "max_seq_len":             ("int",   128, 8192),
-    "warmup_steps":            ("int",   0, 100_000),
-    "warmdown_ratio":          ("float", 0.0, 1.0),
-    "final_lr_frac":           ("float", 0.0, 1.0),
-    "embedding_lr":            ("float", 0.0, 10.0),
-    "unembedding_lr":          ("float", 0.0, 10.0),
-    "matrix_lr":               ("float", 0.0, 10.0),
-    "scalar_lr":               ("float", 0.0, 10.0),
-    "weight_decay":            ("float", 0.0, 10.0),
-    "device_batch_size":       ("int",   1, 1024),
-    "total_batch_size":        ("int",   1, 1 << 24),
-    "num_iterations":          ("int",   1, 10**6),
-    "target_param_data_ratio": ("float", 0.1, 1000.0),
-}
+# The flags a manifest may set are base_train's own, read out of the checkout
+# the manifest pins. Not a hand-maintained copy: a copy drifts, and the one
+# that lived here was missing seven flags the controller itself already used.
+# Reading them from source also means an experiment branch that adds a flag
+# can use it from a manifest immediately, with no change here.
+#
+# The runner owns these, so a manifest must not also set them.
+RUNNER_OWNED = {"run", "model_tag", "depth", "seed", "head_dim",
+                "resume_from_step"}
+ARG_RE = re.compile(
+    r'add_argument\(\s*"--([a-z0-9-]+)"\s*(?:,\s*type=(\w+))?[^)]*?'
+    r'(?:,\s*(action)="store_true")?', re.S)
+
+
+def upstream_flags(checkout):
+    """{flag_name: python type name} declared by base_train in this checkout."""
+    path = os.path.join(checkout, "scripts", "base_train.py")
+    try:
+        with open(path, encoding="utf-8") as f:
+            src = f.read()
+    except OSError as exc:
+        die(f"cannot read {path}: {exc}")
+    out = {}
+    for m in ARG_RE.finditer(src):
+        name, typ, action = m.group(1).replace("-", "_"), m.group(2), m.group(3)
+        out[name] = "bool" if action else (typ or "str")
+    if not out:
+        die(f"no arguments found in {path}; has base_train changed shape?")
+    return out
+
 
 TOP_KEYS = {"manifest_version", "telemetry_schema", "nanochat_commit",
             "defaults", "runs"}
@@ -65,7 +72,7 @@ def strict_int(v, name):
     return v
 
 
-def resolve(path, run_id, head):
+def resolve(path, run_id, head, checkout):
     with open(path, "rb") as f:
         raw = f.read()
     try:
@@ -128,29 +135,36 @@ def resolve(path, run_id, head):
     if not isinstance(override, dict):
         die("recipe must be an object")
     recipe.update(override)
-    unknown = sorted(set(recipe) - set(RECIPE))
+    known = upstream_flags(checkout)
+    unknown = sorted(k for k in recipe if k not in known)
     if unknown:
-        die(f"recipe keys not permitted from a manifest: {unknown}")
+        die(f"not base_train flags in this checkout: {unknown}")
+    clash = sorted(set(recipe) & RUNNER_OWNED)
+    if clash:
+        die(f"the runner sets these; a recipe must not: {clash}")
 
     flags = {}
     for key in sorted(recipe):
-        kind, lo, hi = RECIPE[key]
         value = recipe[key]
-        if kind == "int":
-            value = strict_int(value, f"recipe.{key}")
-            if not lo <= value <= hi:
-                die(f"recipe.{key}={value} outside [{lo}, {hi}]")
-        elif kind == "float":
-            if isinstance(value, bool) or not isinstance(value, (int, float)):
-                die(f"recipe.{key} must be a JSON number, got {value!r}")
-            # a float flag given as JSON 1 must become 1.0, or the recorded
-            # user_config value will not compare against what was passed
+        kind = known[key]
+        if isinstance(value, bool) and kind != "bool":
+            die(f"recipe.{key} must not be a JSON boolean")
+        # format per the type base_train declares, so that what we pass and
+        # what argparse records string-compare: a float flag given as 1 has
+        # to become 1.0 or the verification assertion fails on formatting
+        if kind == "float":
+            if not isinstance(value, (int, float)):
+                die(f"recipe.{key} must be a number, got {value!r}")
             value = float(value)
-            if not lo <= value <= hi:
-                die(f"recipe.{key}={value} outside [{lo}, {hi}]")
-        else:
-            if not isinstance(value, str) or not re.fullmatch(lo, value):
-                die(f"recipe.{key}={value!r} does not match {lo}")
+        elif kind == "int":
+            if isinstance(value, float) and value != int(value):
+                die(f"recipe.{key}={value} is not an integer")
+            if not isinstance(value, (int, float)):
+                die(f"recipe.{key} must be an integer, got {value!r}")
+            value = int(value)
+        elif kind == "bool":
+            if not isinstance(value, bool):
+                die(f"recipe.{key} is a flag; use true or false")
         flags[key] = value
 
     return dict(manifest_version=m["manifest_version"], pin=pin, depth=depth,
@@ -174,7 +188,13 @@ def train_argv(run, args):
     if args.controller_tree:
         argv.append(f"--telemetry-controller-tree={args.controller_tree}")
     for key, value in run["recipe"].items():
-        argv.append(f"--{key.replace('_', '-')}={value}")
+        flag = f"--{key.replace('_', '-')}"
+        # store_true flags take no value: present means true, absent false
+        if isinstance(value, bool):
+            if value:
+                argv.append(flag)
+        else:
+            argv.append(f"{flag}={value}")
     return argv
 
 
@@ -210,7 +230,7 @@ def main():
     args = p.parse_args()
     args.manifest = os.path.abspath(args.manifest)
 
-    run = resolve(args.manifest, args.run_id, args.head)
+    run = resolve(args.manifest, args.run_id, args.head, args.checkout)
 
     print(f"[check] {os.path.basename(args.manifest)} "
           f"({run['manifest_version']}) row {args.run_id}")

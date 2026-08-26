@@ -38,8 +38,8 @@ json.dump(m, open(os.path.join(tmp, "badrange.json"), "w"))
 m = json.loads(json.dumps(base)); m["runs"]["d14-s7"]["aspect_ratio"] = 48
 json.dump(m, open(os.path.join(tmp, "badkey.json"), "w"))
 
-# recipe variants: a manifest may set upstream base_train flags, but only
-# the ones in the runner's table, only in range, and only with right types
+# recipe variants: a manifest may set any flag base_train declares, but
+# not one the runner owns, and not one that does not exist
 def recipe(name, r):
     m = json.loads(json.dumps(base))
     m["runs"]["d14-s7"]["recipe"] = r
@@ -47,7 +47,8 @@ def recipe(name, r):
 
 recipe("r-width.json",   {"aspect_ratio": 48})
 recipe("r-sched.json",   {"warmdown_ratio": 0.35, "final_lr_frac": 1.0})
-recipe("r-range.json",   {"aspect_ratio": 99999})
+recipe("r-owned.json",   {"depth": 20})
+recipe("r-cadence.json", {"eval_every": -1, "sample_every": -1})
 recipe("r-unknown.json", {"softcap": 10})
 recipe("r-type.json",    {"warmdown_ratio": "0.35"})
 PYEOF
@@ -81,8 +82,9 @@ check "unknown row key (aspect_ratio)"        1 run "$TMP/wt-a" "$TMP/badkey.jso
 
 check "recipe sets width (E03 shape)"         0 run "$TMP/wt-a" "$TMP/r-width.json" d14-s7
 check "recipe sets the schedule (E02 shape)"  0 run "$TMP/wt-a" "$TMP/r-sched.json" d14-s7
-check "recipe value out of range"             1 run "$TMP/wt-a" "$TMP/r-range.json" d14-s7
-check "recipe key not in the table (softcap)" 1 run "$TMP/wt-a" "$TMP/r-unknown.json" d14-s7
+check "recipe sets a flag the runner owns"    1 run "$TMP/wt-a" "$TMP/r-owned.json" d14-s7
+check "cadence flags (were wrongly refused)"  0 run "$TMP/wt-a" "$TMP/r-cadence.json" d14-s7
+check "recipe key is not a base_train flag"   1 run "$TMP/wt-a" "$TMP/r-unknown.json" d14-s7
 check "recipe value of the wrong type"        1 run "$TMP/wt-a" "$TMP/r-type.json" d14-s7
 
 if [ -n "$(git -C "$OPS" status --porcelain -- "$OPS")" ]; then
