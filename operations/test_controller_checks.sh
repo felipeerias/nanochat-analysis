@@ -53,6 +53,11 @@ recipe("r-unknown.json", {"softcap": 10})
 recipe("r-type.json",    {"warmdown_ratio": "0.35"})
 PYEOF
 
+# static first: the gate and run sections only execute on a GPU, so nothing
+# below reaches them
+"${PY:-python3}" "$OPS/check_shell_vars.py" "$OPS/telemetry_run.sh" \
+    "$OPS/telemetry_pod_setup.sh" || exit 1
+
 pass=0; fail=0
 check() {
     local name="$1" want="$2"; shift 2

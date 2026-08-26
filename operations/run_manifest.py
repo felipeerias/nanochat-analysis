@@ -225,12 +225,21 @@ def main():
     p.add_argument("--expect-backend", default="fa3")
     p.add_argument("--controller-commit", default="")
     p.add_argument("--controller-tree", default="")
+    p.add_argument("--print", dest="print_key", default="",
+                   help="print one resolved value and exit; the shell needs "
+                        "the acceptance arm for its own gate key")
     p.add_argument("--check-only", action="store_true",
                    help="resolve and report, start nothing")
     args = p.parse_args()
     args.manifest = os.path.abspath(args.manifest)
 
     run = resolve(args.manifest, args.run_id, args.head, args.checkout)
+
+    if args.print_key:
+        if args.print_key not in run:
+            die(f"no resolved value called {args.print_key!r}")
+        print(run[args.print_key])
+        return 0
 
     print(f"[check] {os.path.basename(args.manifest)} "
           f"({run['manifest_version']}) row {args.run_id}")

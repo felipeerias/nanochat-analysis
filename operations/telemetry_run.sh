@@ -222,6 +222,9 @@ echo "[preflight] attention backend: $ACTUAL_BACKEND (as expected)"
 GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)
 DRIVER=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -1)
 TORCH_KEY=$(python -c "import torch; print(torch.__version__, torch.version.cuda)")
+# The gates test a fixed cheap config, but the acceptance arm is the run's,
+# so the gate key and the gate run both need it.
+SHADOW=$("${RESOLVE[@]}" --print shadow)
 GATE_KEY="$HEAD_SHA|ctrl=$CTRL_TREE|gpu=$GPU_NAME|driver=$DRIVER|torch=$TORCH_KEY|expect=$EXPECT_BACKEND|actual=$ACTUAL_BACKEND|shadow=$SHADOW"
 GATE_STAMP="$VOLUME/.telemetry-gates-$(printf '%s' "$GATE_KEY" | sha256sum | cut -c1-16)"
 echo "[gates] key: $GATE_KEY"
@@ -271,5 +274,4 @@ fi
 # all belong to one program, which does them without a text round trip.
 echo "[run] starting $RUN_ID"
 "${RESOLVE[@]}" --telemetry-dir "$TELEMETRY_DIR"
-    ${RECIPE_EXPECTS[@]+"${RECIPE_EXPECTS[@]}"}
 echo "[telemetry_run] done; data in $TELEMETRY_DIR (network volume - survives pod stop)"
