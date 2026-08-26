@@ -168,7 +168,21 @@ if [ -n "${RUNPOD_POD_ID:-}" ] && [ "${STOP_POD:-0}" = "1" ]; then
     fi
 fi
 
+if [ ! -f "$VOLUME/nanochat-env.sh" ]; then
+    echo "FATAL: $VOLUME/nanochat-env.sh is missing. Run:"
+    echo "  bash $CTRL_DIR/telemetry_pod_setup.sh"
+    exit 1
+fi
 source "$VOLUME/nanochat-env.sh"
+# The venv lives on the pod's LOCAL disk, not the network volume, so a new
+# pod never has it even though the volume looks fully set up.
+if [ ! -f "$UV_PROJECT_ENVIRONMENT/bin/activate" ]; then
+    echo "FATAL: no environment at $UV_PROJECT_ENVIRONMENT."
+    echo "It lives on this pod's local disk, so a new pod needs setup again"
+    echo "even though the volume already holds the data. Run:"
+    echo "  bash $CTRL_DIR/telemetry_pod_setup.sh"
+    exit 1
+fi
 source "$UV_PROJECT_ENVIRONMENT/bin/activate"
 cd "$NANOCHAT_CHECKOUT"
 export PYTHONUNBUFFERED=1
