@@ -157,29 +157,34 @@ if not (0 <= ck <= 100):
     die(f"out-of-range checkpoints: {ck}")
 if hd != 128:
     die(f"this sweep requires head_dim=128 (upstream default), got {hd}")
-# Width as base_train derives it, so the verifier can assert the REALIZED
-# value instead of assuming 64*depth. A recipe may set aspect_ratio.
-aspect = strict_int(recipe.get("aspect_ratio", 64), "recipe.aspect_ratio")
-base_dim = depth * aspect
-model_dim = ((base_dim + hd - 1) // hd) * hd
-num_heads = model_dim // hd
-if model_dim != base_dim:
-    sys.stderr.write(f"note: width nudged {base_dim} -> {model_dim} "
-                     f"for head_dim={hd}\n")
-fixed = [depth, seed, shadow, pp, ck, sched, hd, m["nanochat_commit"],
-         model_dim, num_heads]
+# Width is NOT derived here. base_train owns that rule; the controller
+# asserts the inputs it asked for and lets the verifier, which lives beside
+# base_train, check that the built model is consistent with them.
+fixed = [depth, seed, shadow, pp, ck, sched, hd, m["nanochat_commit"]]
 print("\t".join(str(x) for x in fixed))
 for k in sorted(recipe):
-    print(f"--{k.replace('_', '-')}={recipe[k]}")
+    v = recipe[k]
+    # a float flag given as JSON 1 must be emitted as 1.0, or the recorded
+    # user_config value will not string-compare against what was passed
+    if RECIPE[k][0] == "float":
+        v = float(v)
+    print(f"{k}={v}")
 PYEOF
 )
-# First line is the fixed tuple; any remaining lines are recipe flags.
+# First line is the fixed tuple; any remaining lines are recipe key=value.
+# Each becomes both a base_train flag and an assertion that the flag was
+# actually received, checked against user_config in the run's provenance.
 RECIPE_ARGS=()
+RECIPE_EXPECTS=()
 {
     IFS=$'\t' read -r DEPTH SEED SHADOW PERIODIC_POINTS CHECKPOINTS \
-        DEEP_SCHEDULE HEAD_DIM NANOCHAT_COMMIT MODEL_DIM NUM_HEADS
+        DEEP_SCHEDULE HEAD_DIM NANOCHAT_COMMIT
     while IFS= read -r _line; do
-        [ -n "$_line" ] && RECIPE_ARGS+=("$_line")
+        [ -z "$_line" ] && continue
+        _k=${_line%%=*}
+        _v=${_line#*=}
+        RECIPE_ARGS+=("--${_k//_/-}=$_v")
+        RECIPE_EXPECTS+=(--expect "user_config.$_k=$_v")
     done
 } <<< "$ROW"
 
@@ -220,7 +225,6 @@ echo "[controller] $CTRL_COMMIT tree=$CTRL_TREE dir=$CTRL_DIR"
 if [ "${CHECK_ONLY:-0}" = "1" ]; then
     echo "[check] manifest $MANIFEST row $RUN_ID"
     echo "[check] depth=$DEPTH seed=$SEED shadow=$SHADOW points=$PERIODIC_POINTS ckpt=$CHECKPOINTS"
-    echo "[check] width=$MODEL_DIM heads=$NUM_HEADS head_dim=$HEAD_DIM"
     if [ "${#RECIPE_ARGS[@]}" -gt 0 ]; then
         echo "[check] recipe: ${RECIPE_ARGS[*]}"
     else
@@ -394,7 +398,7 @@ fi
 
 # ----------------------------------------------------------------------------
 # The instrumented run: exactly the recipe plus the manifest row.
-echo "[run] starting $RUN_ID (depth=$DEPTH seed=$SEED width=$MODEL_DIM)"
+echo "[run] starting $RUN_ID (depth=$DEPTH seed=$SEED head_dim=$HEAD_DIM)"
 if [ "${#RECIPE_ARGS[@]}" -gt 0 ]; then
     echo "[run] recipe: ${RECIPE_ARGS[*]}"
 fi
@@ -416,7 +420,8 @@ python runs/verify_telemetry_run.py "$TELEMETRY_DIR" --tag "$RUN_ID" \
     --expect "compute_dtype=torch.bfloat16" \
     --expect "telemetry_config.shadow_arm=$SHADOW" \
     --expect "model_config.n_layer=$DEPTH" \
-    --expect "model_config.n_embd=$MODEL_DIM" \
-    --expect "model_config.n_head=$NUM_HEADS" \
-    --expect "seed=$SEED"
+    --expect "user_config.depth=$DEPTH" \
+    --expect "user_config.head_dim=$HEAD_DIM" \
+    --expect "seed=$SEED" \
+    ${RECIPE_EXPECTS[@]+"${RECIPE_EXPECTS[@]}"}
 echo "[telemetry_run] done; data in $TELEMETRY_DIR (network volume - survives pod stop)"
