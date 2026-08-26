@@ -14,7 +14,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/analysis/loader")
+sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
 import telemetry_load as T  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))

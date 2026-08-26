@@ -8,11 +8,11 @@ be tracked. Q1 asks whether relative usefulness re-orders during training; this
 answers the strictly weaker question of whether relative DIFFICULTY re-orders.
 """
 import sys, os
-sys.path.insert(0,'/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0,'/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import numpy as np, pandas as pd, telemetry_load as T
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 ROOT='/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
-OUT='/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+OUT='/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
 SEGS=sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))
 def spearman(a,b):
     ra=pd.Series(a).rank().values; rb=pd.Series(b).rank().values

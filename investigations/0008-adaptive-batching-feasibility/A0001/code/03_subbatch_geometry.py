@@ -6,11 +6,11 @@ Exact algebra (spec section 6):
 So we can validate the SKETCHED pairwise cosines against an exact scalar.
 """
 import sys, os, json
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import pandas as pd, numpy as np, telemetry_load as T
 ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
 SEGS = sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))
-OUT = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+OUT = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
 
 recs = []
 for seg in SEGS:

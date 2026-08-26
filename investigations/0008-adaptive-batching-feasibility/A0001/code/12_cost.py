@@ -1,6 +1,6 @@
 """Measured telemetry cost, to price the proposed additional instrumentation."""
 import sys, os
-sys.path.insert(0,'/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0,'/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import numpy as np, pandas as pd, telemetry_load as T
 ROOT='/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
 SEGS=sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))

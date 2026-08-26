@@ -13,7 +13,7 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/analysis/loader")
+sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
 import telemetry_load as tl  # noqa: E402
 
 ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"

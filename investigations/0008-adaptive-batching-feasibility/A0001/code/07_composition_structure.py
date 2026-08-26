@@ -1,11 +1,11 @@
 """Structure of the only data-composition channel the dataset has, and whether
 composition over a window predicts progress on the FIXED probe."""
 import sys, os, pickle
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import numpy as np, pandas as pd, telemetry_load as T
 ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
-OUT = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
-SP = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
+OUT = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+SP = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
 out = pickle.load(open(SP,'rb'))
 c = out['d12-s7']
 print('=== is the batch stream stationary?  (loader is deterministic: no RNG, shard order) ===')

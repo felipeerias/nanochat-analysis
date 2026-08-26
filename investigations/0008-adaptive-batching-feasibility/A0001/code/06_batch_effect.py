@@ -8,11 +8,11 @@ That common component is an upper bound on any batch/group value signal
 recoverable from this dataset's loss channel.
 """
 import sys, os, pickle
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import numpy as np, pandas as pd, telemetry_load as T
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
-OUT = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
-SP = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
+OUT = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+SP = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
 out = pickle.load(open(SP, 'rb'))
 runs = sorted(out)
 W = 51

@@ -6,10 +6,10 @@ cosine between them is pure estimator noise. This gives an assumption-free
 noise floor for every sketch-derived cosine in the dataset.
 """
 import sys, os
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import pandas as pd, numpy as np, telemetry_load as T
 ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
-OUT = '/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+OUT = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
 SEGS = sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))
 rng = np.random.default_rng(20260825)
 

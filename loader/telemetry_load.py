@@ -20,7 +20,7 @@ import sys
 
 import pandas as pd
 
-# layout: ~/Igalia/nanochat/{analysis,nanochat}; REPO is the repo ROOT
+# layout: ~/Igalia/nanochat/{nanochat-analysis,nanochat}; REPO is the repo ROOT
 # (the dir CONTAINING the nanochat package, not the package itself)
 REPO = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__)))), "nanochat")

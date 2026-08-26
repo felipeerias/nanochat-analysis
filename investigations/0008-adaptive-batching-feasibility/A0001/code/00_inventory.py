@@ -1,5 +1,5 @@
 import sys, os, json
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import pandas as pd, numpy as np
 import telemetry_load as T
 
@@ -20,7 +20,7 @@ for s in SEGS:
                              ndef=int(g.loc[m,'ndef']), nsteps=int(g.loc[m,'nsteps']),
                              veclen=int(vec.loc[m])))
 inv = pd.DataFrame(rows)
-inv.to_csv('/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001/metric_inventory.csv', index=False)
+inv.to_csv('/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001/metric_inventory.csv', index=False)
 piv = inv.groupby(['tier','metric']).agg(segs=('seg','nunique'), n_tot=('n','sum'),
                                          def_frac=('ndef', lambda x: 0), veclen=('veclen','max'))
 piv['def_frac'] = (inv.groupby(['tier','metric'])['ndef'].sum() /

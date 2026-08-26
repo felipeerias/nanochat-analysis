@@ -1,7 +1,7 @@
 """Headline figures + the group-size arithmetic behind the instrumentation ask."""
 import numpy as np, pandas as pd
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
-OUT='/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+OUT='/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
 sb=pd.read_csv(f'{OUT}/subbatch_geometry.csv'); fl=pd.read_csv(f'{OUT}/sketch_floor.csv')
 uv=pd.read_csv(f'{OUT}/update_value.csv')
 m=sb.merge(fl[['run','step','analytic_full_sd','null_block_sd']],on=['run','step'],how='left')

@@ -1,5 +1,5 @@
 import sys, os
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/analysis/loader')
+sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
 import pandas as pd, numpy as np, telemetry_load as T
 ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
 SEG = 'd12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45'

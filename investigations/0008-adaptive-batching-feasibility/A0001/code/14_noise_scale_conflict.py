@@ -1,7 +1,7 @@
 """The within-device-batch noise-scale estimate does not reconcile with the
 observed across-step decorrelation of the logical-batch gradient."""
 import numpy as np, pandas as pd
-OUT='/home/felipe/Igalia/nanochat/analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+OUT='/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
 D=pd.read_csv(f'{OUT}/grad_change_decomposition.csv')
 sb=pd.read_csv(f'{OUT}/subbatch_geometry.csv')
 g=D.dropna(subset=['gap'])
