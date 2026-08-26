@@ -168,5 +168,26 @@ echo
 echo "Setup complete."
 echo "  env file : source $ENV_FILE"
 echo "  data     : $NANOCHAT_BASE_DIR"
-echo "  next     : git -C $REPO_DIR checkout <manifest's nanochat_commit>"
-echo "             bash operations/telemetry_run.sh operations/manifests/<manifest>.json <run_id>"
+# What is here, not what to type. The previous version recited a command
+# with <placeholders>; it silently became wrong the moment operations moved,
+# because a script cannot notice that its own documentation has rotted.
+OPS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SETUP_PY=$(command -v python3 || command -v python)
+echo "  manifests:"
+"$SETUP_PY" - "$OPS_DIR/manifests" <<'MEOF'
+import json, os, sys
+d = sys.argv[1]
+names = sorted(n for n in os.listdir(d) if n.endswith(".json")) if os.path.isdir(d) else []
+if not names:
+    print("    (none)")
+for name in names:
+    try:
+        m = json.load(open(os.path.join(d, name)))
+    except Exception as exc:
+        print(f"    {name:<24} unreadable ({exc.__class__.__name__})")
+        continue
+    pin = str(m.get("nanochat_commit") or "")[:7] or "UNPINNED"
+    n = len(m.get("runs") or {})
+    print(f"    {name:<24} -> {pin}  ({n} run{'' if n == 1 else 's'})")
+MEOF
+echo "  check out the commit a manifest pins before running it."
