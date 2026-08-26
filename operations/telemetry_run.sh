@@ -101,7 +101,7 @@ self_stop() {
     status=$?
     echo "[telemetry_run] exiting with status $status"
     if [ -n "${TEE_PID:-}" ]; then
-        echo "[telemetry_run] closing log $LOG; self-stop outcome appended (best effort)"
+        echo "[telemetry_run] closing log $LOG"
         exec 1>&3 2>&4
         for _ in $(seq 1 15); do
             kill -0 "$TEE_PID" 2>/dev/null || break
@@ -109,11 +109,9 @@ self_stop() {
         done
     fi
     timeout 20 sync || true
-    if [ -z "${RUNPOD_POD_ID:-}" ]; then
-        outcome="[telemetry_run] not on a Runpod pod; nothing to stop"
-    elif [ "${STOP_POD:-0}" != "1" ]; then
-        outcome="[telemetry_run] pod $RUNPOD_POD_ID left running"
-    elif ! command -v runpodctl &> /dev/null || [ -z "${RUNPOD_API_KEY:-}" ] \
+    # Nothing is printed when the pod is left running: that is the default.
+    [ -n "${RUNPOD_POD_ID:-}" ] && [ "${STOP_POD:-0}" = "1" ] || return 0
+    if ! command -v runpodctl &> /dev/null || [ -z "${RUNPOD_API_KEY:-}" ] \
             || ! timeout 60 runpodctl stop pod "$RUNPOD_POD_ID"; then
         outcome="[telemetry_run] STOP_POD=1 but stopping $RUNPOD_POD_ID failed; stop it manually"
     else
