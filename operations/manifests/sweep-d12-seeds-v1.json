@@ -1,0 +1,22 @@
+{
+  "manifest_version": "sweep-d12-seeds-v1",
+  "telemetry_schema": "3",
+  "nanochat_commit": "273c8bd559430b52887becdb0b613b8008daa996",
+  "defaults": {
+    "shadow": "fp32",
+    "deep_schedule": "pythia",
+    "periodic_points": 25,
+    "checkpoints": 3,
+    "head_dim": 128
+  },
+  "runs": {
+    "d12-s10": {
+      "depth": 12,
+      "seed": 10
+    },
+    "d12-s11": {
+      "depth": 12,
+      "seed": 11
+    }
+  }
+}
