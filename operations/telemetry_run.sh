@@ -7,7 +7,8 @@ set -euo pipefail
 # Usage (after runs/telemetry_pod_setup.sh):
 #   bash operations/telemetry_run.sh operations/manifests/sweep-d12-d16-v1.json d12-s7
 #   KEEP_POD=1 bash operations/telemetry_run.sh <manifest> <run_id>   # no self-stop
-# Env (booleans count only as "1"): KEEP_POD, SKIP_GATES, GATES_ONLY, ALLOW_DIRTY,
+# Env (booleans count only as "1"): CHECK_ONLY (portable checks then stop),
+#   GATES_ONLY (gates then stop), KEEP_POD, SKIP_GATES, ALLOW_DIRTY,
 #   ALLOW_EPHEMERAL, CONFIRM_VOLUME; EXPECT_BACKEND (default fa3),
 #   TELEMETRY_DIR, MIN_FREE_GB (default 60), NANOCHAT_CHECKOUT (default
 #   $VOLUME/nanochat) - the training checkout this controller drives.
@@ -33,6 +34,132 @@ VOLUME=${VOLUME:-/workspace}
 # checkout is named explicitly.
 MANIFEST=$(cd "$(dirname "$MANIFEST")" && pwd)/$(basename "$MANIFEST")
 NANOCHAT_CHECKOUT=${NANOCHAT_CHECKOUT:-$VOLUME/nanochat}
+
+# --------------------------------------------------------------------------
+# Portable checks FIRST: everything that needs neither a GPU nor a volume,
+# so a run configuration can be verified anywhere. CHECK_ONLY=1 stops here.
+# These used to sit behind the volume and Runpod guards, which meant a
+# malformed manifest could only be discovered on a paid pod.
+PY=$(command -v python3 || command -v python) || true
+if [ -z "$PY" ]; then echo "FATAL: no python interpreter found."; exit 1; fi
+# rev-parse, not a .git directory test: in a worktree .git is a FILE, and
+# worktrees are how two experiment branches get driven side by side.
+if ! git -C "$NANOCHAT_CHECKOUT" rev-parse --git-dir >/dev/null 2>&1; then
+    echo "FATAL: $NANOCHAT_CHECKOUT is not a git checkout."; exit 1
+fi
+
+# ----------------------------------------------------------------------------
+# Resolve this run's row (defaults overlaid by the row; manifest is the
+# single source of truth). The row is VALIDATED in python - types, allowed
+# keys, allowed values - and transferred as tab-separated values, never
+# through shell interpolation.
+ROW=$("$PY" - "$MANIFEST" "$RUN_ID" <<'PYEOF'
+import json
+import re
+import sys
+
+
+def die(msg):
+    raise SystemExit(f"manifest validation failed: {msg}")
+
+
+def strict_int(v, name):
+    # strict JSON integers only: no booleans, no coercible strings
+    if isinstance(v, bool) or not isinstance(v, int):
+        die(f"{name} must be a JSON integer, got {v!r}")
+    return v
+
+
+m = json.load(open(sys.argv[1]))
+rid = sys.argv[2]
+top_allowed = {"manifest_version", "telemetry_schema", "nanochat_commit",
+               "defaults", "runs"}
+if set(m) - top_allowed:
+    die(f"unknown top-level keys: {sorted(set(m) - top_allowed)}")
+if not isinstance(m.get("manifest_version"), str) or not m["manifest_version"]:
+    die("manifest_version must be a nonempty string")
+if int(m.get("telemetry_schema", 0)) != 3:
+    die(f"telemetry_schema must be 3, got {m.get('telemetry_schema')!r}")
+# The manifest pins the training code; the runner enforces it. Required, so a
+# new manifest cannot silently produce a run nobody can reproduce.
+if not re.fullmatch(r"[0-9a-f]{40}", str(m.get("nanochat_commit", ""))):
+    die("nanochat_commit must be a full 40-character commit id")
+if not re.fullmatch(r"[A-Za-z0-9_-]{1,48}", rid):
+    die(f"invalid run_id {rid!r}")
+if rid not in (m.get("runs") or {}):
+    die(f"run_id {rid!r} not in manifest run table")
+row = dict(m.get("defaults") or {})
+row.update(m["runs"][rid])
+allowed = {"depth", "seed", "shadow", "periodic_points", "checkpoints",
+           "deep_schedule", "head_dim"}
+if set(row) - allowed:
+    die(f"unknown row keys for {rid}: {sorted(set(row) - allowed)}")
+depth = strict_int(row["depth"], "depth")
+seed = strict_int(row["seed"], "seed")
+pp = strict_int(row.get("periodic_points", 25), "periodic_points")
+ck = strict_int(row.get("checkpoints", 0), "checkpoints")
+hd = strict_int(row.get("head_dim", 128), "head_dim")
+shadow = row.get("shadow", "fp32")
+sched = row.get("deep_schedule", "pythia")
+if shadow not in ("off", "fp32"):
+    die(f"shadow must be off|fp32, got {shadow!r}")
+if sched != "pythia":
+    die("official manifest rows must use deep_schedule=pythia ('every' is "
+        "development-only via scripts.base_train directly)")
+if not (1 <= depth <= 64 and 0 <= seed < 10**6 and 0 < pp <= 10**4):
+    die(f"out-of-range depth/seed/periodic_points: {depth}/{seed}/{pp}")
+if not (0 <= ck <= 100):
+    die(f"out-of-range checkpoints: {ck}")
+if hd != 128:
+    die(f"this sweep requires head_dim=128 (upstream default), got {hd}")
+if (64 * depth) % hd != 0:
+    die(f"64*depth={64 * depth} not divisible by head_dim={hd}")
+print(f"{depth}\t{seed}\t{shadow}\t{pp}\t{ck}\t{sched}\t{hd}\t{m['nanochat_commit']}")
+PYEOF
+)
+IFS=$'\t' read -r DEPTH SEED SHADOW PERIODIC_POINTS CHECKPOINTS DEEP_SCHEDULE HEAD_DIM NANOCHAT_COMMIT <<< "$ROW"
+
+DIRTY=0
+if [ -n "$(git -C "$NANOCHAT_CHECKOUT" status --porcelain)" ]; then
+    if [ "${ALLOW_DIRTY:-0}" != "1" ]; then
+        echo "FATAL: dirty checkout (or set ALLOW_DIRTY=1)."; exit 1
+    fi
+    DIRTY=1
+fi
+
+# The manifest pins the training code and this enforces it. Without this the
+# same manifest could be run against any checkout and the run would still look
+# well formed.
+HEAD_SHA=$(git -C "$NANOCHAT_CHECKOUT" rev-parse HEAD)
+if [ "$HEAD_SHA" != "$NANOCHAT_COMMIT" ]; then
+    echo "FATAL: manifest pins nanochat $NANOCHAT_COMMIT but HEAD is $HEAD_SHA."
+    exit 1
+fi
+
+# Controller identity, taken from wherever this script lives so it keeps
+# working once operations move to their own repository. The committed tree oid
+# does not change when the working tree does, so cleanliness is checked
+# directly rather than inferred from it.
+CTRL_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CTRL_COMMIT=$(git -C "$CTRL_DIR" rev-parse HEAD 2>/dev/null || echo "unavailable")
+CTRL_PREFIX=$(git -C "$CTRL_DIR" rev-parse --show-prefix 2>/dev/null || echo "")
+CTRL_TREE=$(git -C "$CTRL_DIR" rev-parse "HEAD:${CTRL_PREFIX%/}" 2>/dev/null || echo "unavailable")
+if [ -n "$(git -C "$CTRL_DIR" status --porcelain -- "$CTRL_DIR" 2>/dev/null)" ]; then
+    if [ "${ALLOW_DIRTY:-0}" != "1" ]; then
+        echo "FATAL: dirty controller tree at $CTRL_DIR (or set ALLOW_DIRTY=1)."
+        exit 1
+    fi
+    DIRTY=1
+fi
+echo "[controller] $CTRL_COMMIT tree=$CTRL_TREE dir=$CTRL_DIR"
+
+if [ "${CHECK_ONLY:-0}" = "1" ]; then
+    echo "[check] manifest $MANIFEST row $RUN_ID"
+    echo "[check] depth=$DEPTH seed=$SEED shadow=$SHADOW points=$PERIODIC_POINTS ckpt=$CHECKPOINTS"
+    echo "[check] nanochat $HEAD_SHA matches the manifest pin"
+    echo "[check] CHECK_ONLY=1 - configuration is valid, nothing was started"
+    exit 0
+fi
 
 # ----------------------------------------------------------------------------
 # Self-stop trap FIRST: any failure below must still stop the pod.
@@ -117,76 +244,6 @@ source "$UV_PROJECT_ENVIRONMENT/bin/activate"
 cd "$NANOCHAT_CHECKOUT"
 export PYTHONUNBUFFERED=1
 
-# ----------------------------------------------------------------------------
-# Resolve this run's row (defaults overlaid by the row; manifest is the
-# single source of truth). The row is VALIDATED in python - types, allowed
-# keys, allowed values - and transferred as tab-separated values, never
-# through shell interpolation.
-ROW=$(python - "$MANIFEST" "$RUN_ID" <<'PYEOF'
-import json
-import re
-import sys
-
-
-def die(msg):
-    raise SystemExit(f"manifest validation failed: {msg}")
-
-
-def strict_int(v, name):
-    # strict JSON integers only: no booleans, no coercible strings
-    if isinstance(v, bool) or not isinstance(v, int):
-        die(f"{name} must be a JSON integer, got {v!r}")
-    return v
-
-
-m = json.load(open(sys.argv[1]))
-rid = sys.argv[2]
-top_allowed = {"manifest_version", "telemetry_schema", "nanochat_commit",
-               "defaults", "runs"}
-if set(m) - top_allowed:
-    die(f"unknown top-level keys: {sorted(set(m) - top_allowed)}")
-if not isinstance(m.get("manifest_version"), str) or not m["manifest_version"]:
-    die("manifest_version must be a nonempty string")
-if int(m.get("telemetry_schema", 0)) != 3:
-    die(f"telemetry_schema must be 3, got {m.get('telemetry_schema')!r}")
-# The manifest pins the training code; the runner enforces it. Required, so a
-# new manifest cannot silently produce a run nobody can reproduce.
-if not re.fullmatch(r"[0-9a-f]{40}", str(m.get("nanochat_commit", ""))):
-    die("nanochat_commit must be a full 40-character commit id")
-if not re.fullmatch(r"[A-Za-z0-9_-]{1,48}", rid):
-    die(f"invalid run_id {rid!r}")
-if rid not in (m.get("runs") or {}):
-    die(f"run_id {rid!r} not in manifest run table")
-row = dict(m.get("defaults") or {})
-row.update(m["runs"][rid])
-allowed = {"depth", "seed", "shadow", "periodic_points", "checkpoints",
-           "deep_schedule", "head_dim"}
-if set(row) - allowed:
-    die(f"unknown row keys for {rid}: {sorted(set(row) - allowed)}")
-depth = strict_int(row["depth"], "depth")
-seed = strict_int(row["seed"], "seed")
-pp = strict_int(row.get("periodic_points", 25), "periodic_points")
-ck = strict_int(row.get("checkpoints", 0), "checkpoints")
-hd = strict_int(row.get("head_dim", 128), "head_dim")
-shadow = row.get("shadow", "fp32")
-sched = row.get("deep_schedule", "pythia")
-if shadow not in ("off", "fp32"):
-    die(f"shadow must be off|fp32, got {shadow!r}")
-if sched != "pythia":
-    die("official manifest rows must use deep_schedule=pythia ('every' is "
-        "development-only via scripts.base_train directly)")
-if not (1 <= depth <= 64 and 0 <= seed < 10**6 and 0 < pp <= 10**4):
-    die(f"out-of-range depth/seed/periodic_points: {depth}/{seed}/{pp}")
-if not (0 <= ck <= 100):
-    die(f"out-of-range checkpoints: {ck}")
-if hd != 128:
-    die(f"this sweep requires head_dim=128 (upstream default), got {hd}")
-if (64 * depth) % hd != 0:
-    die(f"64*depth={64 * depth} not divisible by head_dim={hd}")
-print(f"{depth}\t{seed}\t{shadow}\t{pp}\t{ck}\t{sched}\t{hd}\t{m['nanochat_commit']}")
-PYEOF
-)
-IFS=$'\t' read -r DEPTH SEED SHADOW PERIODIC_POINTS CHECKPOINTS DEEP_SCHEDULE HEAD_DIM NANOCHAT_COMMIT <<< "$ROW"
 TELEMETRY_DIR=${TELEMETRY_DIR:-$VOLUME/telemetry-data}
 EXPECT_BACKEND=${EXPECT_BACKEND:-fa3}
 LOG="$VOLUME/logs/${RUN_ID}-$(date +%Y%m%d-%H%M%S).log"
@@ -214,44 +271,11 @@ if [ "$ACTUAL_BACKEND" != "$EXPECT_BACKEND" ]; then
 fi
 echo "[preflight] attention backend: $ACTUAL_BACKEND (as expected)"
 
-# ----------------------------------------------------------------------------
-# Pre-collection gates: one FIXED cheap config (they test the instrument, not
-# the model size), stamped per full software path + shadow setting. A dirty
-# checkout runs gates but never stamps.
-DIRTY=0
-if [ -n "$(git status --porcelain)" ]; then
-    if [ "${ALLOW_DIRTY:-0}" != "1" ]; then
-        echo "FATAL: dirty checkout (or set ALLOW_DIRTY=1)."; exit 1
-    fi
-    DIRTY=1
-fi
 
-# The manifest pins the training code and this enforces it. Without this the
-# same manifest could be run against any checkout and the run would still look
-# well formed.
-HEAD_SHA=$(git rev-parse HEAD)
-if [ "$HEAD_SHA" != "$NANOCHAT_COMMIT" ]; then
-    echo "FATAL: manifest pins nanochat $NANOCHAT_COMMIT but HEAD is $HEAD_SHA."
-    exit 1
-fi
-
-# Controller identity, taken from wherever this script lives so it keeps
-# working once operations move to their own repository. The committed tree oid
-# does not change when the working tree does, so cleanliness is checked
-# directly rather than inferred from it.
-CTRL_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-CTRL_COMMIT=$(git -C "$CTRL_DIR" rev-parse HEAD 2>/dev/null || echo "unavailable")
-CTRL_PREFIX=$(git -C "$CTRL_DIR" rev-parse --show-prefix 2>/dev/null || echo "")
-CTRL_TREE=$(git -C "$CTRL_DIR" rev-parse "HEAD:${CTRL_PREFIX%/}" 2>/dev/null || echo "unavailable")
-if [ -n "$(git -C "$CTRL_DIR" status --porcelain -- "$CTRL_DIR" 2>/dev/null)" ]; then
-    if [ "${ALLOW_DIRTY:-0}" != "1" ]; then
-        echo "FATAL: dirty controller tree at $CTRL_DIR (or set ALLOW_DIRTY=1)."
-        exit 1
-    fi
-    DIRTY=1
-fi
-echo "[controller] $CTRL_COMMIT tree=$CTRL_TREE dir=$CTRL_DIR"
-
+# --------------------------------------------------------------------------
+# Pre-collection gates: one FIXED cheap config (they test the instrument,
+# not the model size), stamped per full software path plus shadow setting.
+# A dirty checkout runs gates but never stamps.
 GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)
 DRIVER=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -1)
 TORCH_KEY=$(python -c "import torch; print(torch.__version__, torch.version.cuda)")
