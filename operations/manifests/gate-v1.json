@@ -1,7 +1,7 @@
 {
   "manifest_version": "gate-v1",
   "telemetry_schema": "3",
-  "nanochat_commit": "fd681b89853f539ab5376dac6f300a9c08d71046",
+  "nanochat_commit": "8d3c1a6f758bf5cde28100d765f66c3af5a79e72",
   "defaults": {
     "shadow": "fp32",
     "deep_schedule": "pythia",
