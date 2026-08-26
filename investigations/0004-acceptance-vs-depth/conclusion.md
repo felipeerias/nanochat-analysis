@@ -53,16 +53,27 @@ ordering fails again, and these updates lie deep inside the absolute 40-step
 warmup where depths are least comparable (`DATASET.md` caveat 3). This is
 flagged as exploratory, not as a finding.
 
-## Consequence for the campaign: d18 and d20 will certify
+## Consequence for the campaign
 
-Gradient-direction pass rates **rise** with depth: 83-87% at d12 (25-26 of 30),
-87.5% at d14 (28 of 32), 87.9% at d16 (29 of 33). The non-certifying
-checkpoints are the same early ones (updates 0, 1, 2, 4) at every depth; at
-d16 two of them flip from inconclusive to failed. That is the only
-depth-related degradation visible and it costs two checkpoints out of 33.
+Gradient-direction pass rates appear to rise with depth: 83-87% at d12 (25-26
+of 30), 87.5% at d14 (28 of 32), 87.9% at d16 (29 of 33). **That rise is
+arithmetic, not empirical.** The failure count is pinned at the same four early
+updates at every depth, while the Pythia schedule adds tail checkpoints as runs
+get longer, so the rate is essentially (n - 4)/n, which reproduces 26/30, 28/32
+and 29/33 exactly. It would rise with any change that lengthened the schedule,
+including one with nothing to do with depth. These numbers say nothing about
+whether d18 or d20 will certify.
 
-**No threshold change is indicated.** Deeper runs are worth doing if
-gradient-direction curvature is what you need.
+The genuine content is the part that is not arithmetic: **the failing set stays
+{0, 1, 2, 4} at every depth measured**, and at d16 two of them flip from
+inconclusive to failed. That is a real observation about where certification
+fails, and it lives entirely in the first 64 updates, so a cheap prefix run can
+test whether it holds deeper. E08 Stage 0 proposes exactly that, at about $12
+rather than the cost of full deep runs.
+
+**No threshold change is indicated.** The verdict above rests on the
+`e_sym_gradient` medians rather than on these pass rates, so it is unaffected.
+Deeper runs are worth doing if gradient-direction curvature is what you need.
 
 I0001's finding extends unchanged to the new depths: random and update
 directions pass at **0 of 215 checkpoints across every depth**. Certified
