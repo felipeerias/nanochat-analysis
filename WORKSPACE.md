@@ -51,6 +51,9 @@ smoke data, `NANOCHAT_BASE_DIR`), `nanochat_agent_key.txt` (Runpod API key).
 - A manifest pins the training code with `nanochat_commit`. The runner refuses
   to start without it, or against a different HEAD. Every segment embeds its
   own copy, so the external file may change afterwards.
+- A manifest row may carry a `recipe` of upstream `base_train` flags, from a
+  fixed table with declared ranges. Anything outside that table goes on an
+  experiment branch instead, identified by its commit.
 - Never edit `uv.lock`. Always use `uv sync --frozen`.
 - Never commit `nanochat_agent_key.txt`. Never copy it to the GPU volume.
 - The `telemetry` branch is not for upstream. It stays a research branch.
@@ -76,8 +79,9 @@ stops the pod when it finishes. This limits cost.
 
 - `telemetry-v4-plan.md` — what the instrument should record next, and why.
   Read it before changing the instrument.
-- `experiments/` — one file per design. None are frozen. None can run yet: the
-  manifest allowlist permits six knobs and every design needs a seventh.
+- `experiments/` — one file per design. None are frozen. E02 and E03 can now be
+  expressed as manifest recipes; E04 and E05 still need code, so they belong on
+  experiment branches.
 
 The instrument serves many experiments, so it is justified by the questions it
 makes answerable. An experiment is justified by one question and a power

@@ -37,6 +37,19 @@ m = json.loads(json.dumps(base)); m["runs"]["d14-s7"]["depth"] = 999
 json.dump(m, open(os.path.join(tmp, "badrange.json"), "w"))
 m = json.loads(json.dumps(base)); m["runs"]["d14-s7"]["aspect_ratio"] = 48
 json.dump(m, open(os.path.join(tmp, "badkey.json"), "w"))
+
+# recipe variants: a manifest may set upstream base_train flags, but only
+# the ones in the runner's table, only in range, and only with right types
+def recipe(name, r):
+    m = json.loads(json.dumps(base))
+    m["runs"]["d14-s7"]["recipe"] = r
+    json.dump(m, open(os.path.join(tmp, name), "w"))
+
+recipe("r-width.json",   {"aspect_ratio": 48})
+recipe("r-sched.json",   {"warmdown_ratio": 0.35, "final_lr_frac": 1.0})
+recipe("r-range.json",   {"aspect_ratio": 99999})
+recipe("r-unknown.json", {"softcap": 10})
+recipe("r-type.json",    {"warmdown_ratio": "0.35"})
 PYEOF
 
 pass=0; fail=0
@@ -65,6 +78,23 @@ check "checkout is not a git repo"            1 run /tmp        manifests/sweep-
 check "manifest without nanochat_commit"      1 run "$TMP/wt-a" "$TMP/unpinned.json" d14-s7
 check "depth out of range"                    1 run "$TMP/wt-a" "$TMP/badrange.json" d14-s7
 check "unknown row key (aspect_ratio)"        1 run "$TMP/wt-a" "$TMP/badkey.json" d14-s7
+
+check "recipe sets width (E03 shape)"         0 run "$TMP/wt-a" "$TMP/r-width.json" d14-s7
+check "recipe sets the schedule (E02 shape)"  0 run "$TMP/wt-a" "$TMP/r-sched.json" d14-s7
+check "recipe value out of range"             1 run "$TMP/wt-a" "$TMP/r-range.json" d14-s7
+check "recipe key not in the table (softcap)" 1 run "$TMP/wt-a" "$TMP/r-unknown.json" d14-s7
+check "recipe value of the wrong type"        1 run "$TMP/wt-a" "$TMP/r-type.json" d14-s7
+
+# a recipe that changes width must change the width the verifier is told to
+# expect, or a wrong model would pass verification
+w=$(CHECK_ONLY=1 ALLOW_DIRTY=1 NANOCHAT_CHECKOUT="$TMP/wt-a" \
+    bash "$OPS/telemetry_run.sh" "$TMP/r-width.json" d14-s7 2>&1 \
+    | sed -n 's/.*width=\([0-9]*\) .*/\1/p')
+if [ "$w" = "768" ]; then
+    pass=$((pass + 1)); printf "  ok    %-40s width=%s\n" "aspect_ratio 48 at depth 14 -> 768" "$w"
+else
+    fail=$((fail + 1)); printf "  FAIL  %-40s width=%s want=768\n" "aspect_ratio 48 at depth 14" "$w"
+fi
 
 if [ -n "$(git -C "$OPS" status --porcelain -- "$OPS")" ]; then
     check "dirty controller tree refused"     1 strict "$TMP/wt-a" manifests/sweep-d12-d16-v1.json d14-s7

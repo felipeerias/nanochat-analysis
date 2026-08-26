@@ -91,9 +91,54 @@ if rid not in (m.get("runs") or {}):
 row = dict(m.get("defaults") or {})
 row.update(m["runs"][rid])
 allowed = {"depth", "seed", "shadow", "periodic_points", "checkpoints",
-           "deep_schedule", "head_dim"}
+           "deep_schedule", "head_dim", "recipe"}
 if set(row) - allowed:
     die(f"unknown row keys for {rid}: {sorted(set(row) - allowed)}")
+
+# The recipe: upstream base_train flags a run may set. Every one already
+# exists in nanochat; nothing here adds a knob to the training code. A flag
+# NOT in this table cannot be set from a manifest at all - put the change on
+# an experiment branch instead, where the commit identifies it.
+RECIPE = {
+    "aspect_ratio":            ("int",   8, 512),
+    "window_pattern":          ("pat",   r"[SL]{1,32}", None),
+    "max_seq_len":             ("int",   128, 8192),
+    "warmup_steps":            ("int",   0, 100000),
+    "warmdown_ratio":          ("float", 0.0, 1.0),
+    "final_lr_frac":           ("float", 0.0, 1.0),
+    "embedding_lr":            ("float", 0.0, 10.0),
+    "unembedding_lr":          ("float", 0.0, 10.0),
+    "matrix_lr":               ("float", 0.0, 10.0),
+    "scalar_lr":               ("float", 0.0, 10.0),
+    "weight_decay":            ("float", 0.0, 10.0),
+    "device_batch_size":       ("int",   1, 1024),
+    "total_batch_size":        ("int",   1, 1 << 24),
+    "num_iterations":          ("int",   1, 10**6),
+    "target_param_data_ratio": ("float", 0.1, 1000.0),
+}
+# defaults' recipe overlaid by the row's, so an arm states only what differs
+recipe = dict((m.get("defaults") or {}).get("recipe") or {})
+recipe.update((m["runs"][rid].get("recipe")) or {})
+if not isinstance(recipe, dict):
+    die("recipe must be an object")
+unknown = sorted(set(recipe) - set(RECIPE))
+if unknown:
+    die(f"recipe keys not permitted from a manifest: {unknown}")
+for k in sorted(recipe):
+    kind, lo, hi = RECIPE[k]
+    v = recipe[k]
+    if kind == "int":
+        v = strict_int(v, f"recipe.{k}")
+        if not (lo <= v <= hi):
+            die(f"recipe.{k}={v} outside [{lo}, {hi}]")
+    elif kind == "float":
+        if isinstance(v, bool) or not isinstance(v, (int, float)):
+            die(f"recipe.{k} must be a JSON number, got {v!r}")
+        if not (lo <= float(v) <= hi):
+            die(f"recipe.{k}={v} outside [{lo}, {hi}]")
+    else:
+        if not isinstance(v, str) or not re.fullmatch(lo, v):
+            die(f"recipe.{k}={v!r} does not match {lo}")
 depth = strict_int(row["depth"], "depth")
 seed = strict_int(row["seed"], "seed")
 pp = strict_int(row.get("periodic_points", 25), "periodic_points")
@@ -112,12 +157,31 @@ if not (0 <= ck <= 100):
     die(f"out-of-range checkpoints: {ck}")
 if hd != 128:
     die(f"this sweep requires head_dim=128 (upstream default), got {hd}")
-if (64 * depth) % hd != 0:
-    die(f"64*depth={64 * depth} not divisible by head_dim={hd}")
-print(f"{depth}\t{seed}\t{shadow}\t{pp}\t{ck}\t{sched}\t{hd}\t{m['nanochat_commit']}")
+# Width as base_train derives it, so the verifier can assert the REALIZED
+# value instead of assuming 64*depth. A recipe may set aspect_ratio.
+aspect = strict_int(recipe.get("aspect_ratio", 64), "recipe.aspect_ratio")
+base_dim = depth * aspect
+model_dim = ((base_dim + hd - 1) // hd) * hd
+num_heads = model_dim // hd
+if model_dim != base_dim:
+    sys.stderr.write(f"note: width nudged {base_dim} -> {model_dim} "
+                     f"for head_dim={hd}\n")
+fixed = [depth, seed, shadow, pp, ck, sched, hd, m["nanochat_commit"],
+         model_dim, num_heads]
+print("\t".join(str(x) for x in fixed))
+for k in sorted(recipe):
+    print(f"--{k.replace('_', '-')}={recipe[k]}")
 PYEOF
 )
-IFS=$'\t' read -r DEPTH SEED SHADOW PERIODIC_POINTS CHECKPOINTS DEEP_SCHEDULE HEAD_DIM NANOCHAT_COMMIT <<< "$ROW"
+# First line is the fixed tuple; any remaining lines are recipe flags.
+RECIPE_ARGS=()
+{
+    IFS=$'\t' read -r DEPTH SEED SHADOW PERIODIC_POINTS CHECKPOINTS \
+        DEEP_SCHEDULE HEAD_DIM NANOCHAT_COMMIT MODEL_DIM NUM_HEADS
+    while IFS= read -r _line; do
+        [ -n "$_line" ] && RECIPE_ARGS+=("$_line")
+    done
+} <<< "$ROW"
 
 DIRTY=0
 if [ -n "$(git -C "$NANOCHAT_CHECKOUT" status --porcelain)" ]; then
@@ -156,6 +220,12 @@ echo "[controller] $CTRL_COMMIT tree=$CTRL_TREE dir=$CTRL_DIR"
 if [ "${CHECK_ONLY:-0}" = "1" ]; then
     echo "[check] manifest $MANIFEST row $RUN_ID"
     echo "[check] depth=$DEPTH seed=$SEED shadow=$SHADOW points=$PERIODIC_POINTS ckpt=$CHECKPOINTS"
+    echo "[check] width=$MODEL_DIM heads=$NUM_HEADS head_dim=$HEAD_DIM"
+    if [ "${#RECIPE_ARGS[@]}" -gt 0 ]; then
+        echo "[check] recipe: ${RECIPE_ARGS[*]}"
+    else
+        echo "[check] recipe: none (upstream defaults)"
+    fi
     echo "[check] nanochat $HEAD_SHA matches the manifest pin"
     echo "[check] CHECK_ONLY=1 - configuration is valid, nothing was started"
     exit 0
@@ -324,7 +394,10 @@ fi
 
 # ----------------------------------------------------------------------------
 # The instrumented run: exactly the recipe plus the manifest row.
-echo "[run] starting $RUN_ID (depth=$DEPTH seed=$SEED)"
+echo "[run] starting $RUN_ID (depth=$DEPTH seed=$SEED width=$MODEL_DIM)"
+if [ "${#RECIPE_ARGS[@]}" -gt 0 ]; then
+    echo "[run] recipe: ${RECIPE_ARGS[*]}"
+fi
 python -m scripts.base_train \
     --depth="$DEPTH" --seed="$SEED" --model-tag="$RUN_ID" --run=dummy \
     --telemetry-dir="$TELEMETRY_DIR" \
@@ -335,14 +408,15 @@ python -m scripts.base_train \
     --telemetry-manifest="$MANIFEST" \
     --telemetry-manifest-run="$RUN_ID" \
     --telemetry-controller-commit="$CTRL_COMMIT" \
-    --telemetry-controller-tree="$CTRL_TREE"
+    --telemetry-controller-tree="$CTRL_TREE" \
+    ${RECIPE_ARGS[@]+"${RECIPE_ARGS[@]}"}
 
 python runs/verify_telemetry_run.py "$TELEMETRY_DIR" --tag "$RUN_ID" \
     --expect "attention_backend=$EXPECT_BACKEND" \
     --expect "compute_dtype=torch.bfloat16" \
     --expect "telemetry_config.shadow_arm=$SHADOW" \
     --expect "model_config.n_layer=$DEPTH" \
-    --expect "model_config.n_embd=$((64 * DEPTH))" \
-    --expect "model_config.n_head=$((64 * DEPTH / HEAD_DIM))" \
+    --expect "model_config.n_embd=$MODEL_DIM" \
+    --expect "model_config.n_head=$NUM_HEADS" \
     --expect "seed=$SEED"
 echo "[telemetry_run] done; data in $TELEMETRY_DIR (network volume - survives pod stop)"
