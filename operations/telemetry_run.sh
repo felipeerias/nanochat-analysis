@@ -6,9 +6,10 @@ set -euo pipefail
 #
 # Usage (after runs/telemetry_pod_setup.sh):
 #   bash operations/telemetry_run.sh operations/manifests/sweep-d12-d16-v1.json d12-s7
-#   KEEP_POD=1 bash operations/telemetry_run.sh <manifest> <run_id>   # no self-stop
+#   STOP_POD=1 bash operations/telemetry_run.sh <manifest> <run_id>   # self-stop at the end
 # Env (booleans count only as "1"): CHECK_ONLY (portable checks then stop),
-#   GATES_ONLY (gates then stop), KEEP_POD, SKIP_GATES, ALLOW_DIRTY,
+#   GATES_ONLY (gates then stop), STOP_POD (stop the pod when done),
+#   SKIP_GATES, ALLOW_DIRTY,
 #   ALLOW_EPHEMERAL, CONFIRM_VOLUME; EXPECT_BACKEND (default fa3),
 #   TELEMETRY_DIR, MIN_FREE_GB (default 60), NANOCHAT_CHECKOUT (default
 #   $VOLUME/nanochat) - the training checkout this controller drives.
@@ -108,10 +109,15 @@ self_stop() {
         done
     fi
     timeout 20 sync || true
-    if [ "${KEEP_POD:-0}" = "1" ]; then
-        outcome="[telemetry_run] KEEP_POD=1 - leaving the pod running"
-    elif [ -z "${RUNPOD_POD_ID:-}" ]; then
-        outcome="[telemetry_run] not on a Runpod pod; no self-stop"
+    if [ -z "${RUNPOD_POD_ID:-}" ]; then
+        outcome="[telemetry_run] not on a Runpod pod; nothing to stop"
+    elif [ "${STOP_POD:-0}" != "1" ]; then
+        outcome="##############################################################
+# THE POD IS STILL RUNNING AND STILL BILLING.               #
+# Stop it when you are done (console or:                    #
+#   runpodctl stop pod $RUNPOD_POD_ID).                     #
+# Pass STOP_POD=1 to have a run stop it for you.            #
+##############################################################"
     elif ! command -v runpodctl &> /dev/null || [ -z "${RUNPOD_API_KEY:-}" ] \
             || ! timeout 60 runpodctl stop pod "$RUNPOD_POD_ID"; then
         outcome="##############################################################
@@ -155,12 +161,12 @@ if [ "$AVAIL_GB" -lt "$MIN_FREE_GB" ]; then
     echo "checkpoints are large). Grow the volume, clean up, or lower MIN_FREE_GB."
     exit 1
 fi
-if [ -n "${RUNPOD_POD_ID:-}" ] && [ "${KEEP_POD:-0}" != "1" ]; then
+if [ -n "${RUNPOD_POD_ID:-}" ] && [ "${STOP_POD:-0}" = "1" ]; then
     if ! command -v runpodctl &> /dev/null; then
-        echo "FATAL: runpodctl not found; self-stop would fail (or KEEP_POD=1)."; exit 1
+        echo "FATAL: STOP_POD=1 but runpodctl is not installed."; exit 1
     fi
     if [ -z "${RUNPOD_API_KEY:-}" ]; then
-        echo "FATAL: RUNPOD_API_KEY unset; self-stop would fail (or KEEP_POD=1)."; exit 1
+        echo "FATAL: STOP_POD=1 but RUNPOD_API_KEY is unset."; exit 1
     fi
     # exit 0 = account-scope key; "Unauthorized" = the injected pod-scoped
     # key (stop works, account reads do not) - accepted; anything else
@@ -168,7 +174,7 @@ if [ -n "${RUNPOD_POD_ID:-}" ] && [ "${KEEP_POD:-0}" != "1" ]; then
     if probe_out=$(timeout 30 runpodctl get pod "$RUNPOD_POD_ID" 2>&1); then
         :
     elif ! printf '%s' "$probe_out" | grep -qi "unauthorized"; then
-        echo "FATAL: runpodctl API probe failed: $probe_out (or run KEEP_POD=1)"; exit 1
+        echo "FATAL: STOP_POD=1 but the runpodctl API probe failed: $probe_out"; exit 1
     fi
 fi
 

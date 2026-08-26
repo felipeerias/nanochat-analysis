@@ -73,8 +73,13 @@ bash operations/telemetry_run.sh operations/manifests/sweep-d12-d16-v1.json d12-
 ```
 
 `GATES_ONLY=1` runs the acceptance gates and stops, which is how a controller
-change is proved on real hardware without paying for a full run. The run script
-stops the pod when it finishes. This limits cost.
+change is proved on real hardware without paying for a full run.
+
+**A run leaves the pod running when it finishes**, and says so loudly, because
+the common case is doing something else afterwards. Stop it yourself, or pass
+`STOP_POD=1` to have the run stop it for you. That flag makes the runner check
+up front that `runpodctl` and the API key are present, so a self-stop cannot
+fail silently at the end.
 
 ## Next round
 
