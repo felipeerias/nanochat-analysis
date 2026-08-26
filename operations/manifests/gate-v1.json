@@ -1,7 +1,7 @@
 {
   "manifest_version": "gate-v1",
   "telemetry_schema": "3",
-  "nanochat_commit": "cb754e9d1eb41fedccb7580f50561d59dd9122d7",
+  "nanochat_commit": "537066b7849867e7e599b5ba3def1c547eaaf688",
   "defaults": {
     "shadow": "fp32",
     "deep_schedule": "pythia",
@@ -10,6 +10,9 @@
     "head_dim": 128
   },
   "runs": {
-    "d12-gate": { "depth": 12, "seed": 7 }
+    "d12-gate": {
+      "depth": 12,
+      "seed": 7
+    }
   }
 }
