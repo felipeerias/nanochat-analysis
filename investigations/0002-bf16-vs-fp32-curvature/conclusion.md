@@ -31,7 +31,7 @@ distortion is 3.94% along the gradient direction but **688x along random
 directions and 1,854x along update directions**, with sign agreement at those
 directions no better than a coin flip (53.0% and 49.8% disagreement).
 
-So the mechanism behind `DATASET.md` caveat 4 is now precise. The native arm
+So the mechanism behind `DATASET.md` caveat 6 is now precise. The native arm
 fails its self-consistency checks not because the Hessian-vector products are
 wrong in bf16, but because the finite-difference cross-checks used to
 *validate* them are unresolvable at bf16 precision — catastrophically so along

@@ -39,7 +39,7 @@ universe: >
   e_curv_gradient) plus 8 supporting (curvature/gg, Hg_norm, eta_star_rho,
   curv_snr_gradient, e_fd_gradient, e_sym_gradient, e_lin_gradient,
   update/direction_norm). The other 44 in-scope scored channels are tabulated
-  in out/universe.csv, and are exploratory under DATASET caveat 9.
+  in out/universe.csv, and are exploratory under DATASET caveat 10.
 code: >
   75801be (analysis-repo HEAD this run started from; the code itself is
   uncommitted — the coordinator commits):
@@ -75,7 +75,7 @@ compared between runs — limited by I0001).
 zero checkpoints in all five d12 runs, exactly as
 `0001-seed-variation/conclusion.md@4ac11f3` reported. Nothing in this result
 describes curvature along them, and the native arm — failed at 450 of 450
-direction-checks — is out of scope by the protocol and by DATASET caveat 4.
+direction-checks — is out of scope by the protocol and by DATASET caveat 6.
 There is also **no checkpoint-level certification at all**: certified curvature
 in this dataset exists only as a per-direction record along the gradient.
 
@@ -273,16 +273,17 @@ per run that certify:
 
 **What could make this wrong.**
 
-- **Probe sampling (DATASET caveat 6).** Every quantity here is measured on the
-  frozen `probe_short` batch, drawn per seed. Within a run the comparison is
-  same-probe and internally consistent, which is precisely why the SHAPE claims
-  are the strong ones and the LEVEL claims are not. A different probe batch
-  could shift the levels; it is unlikely to invent a 15x rise locked to a
+- **Curvature scope (DATASET caveat 4).** Every curvature quantity is local to
+  the one 256-token sequence consumed by the HVP path, not the training loss.
+- **Shared-probe scope (DATASET caveat 7).** Every quantity here is measured on
+  the same frozen `probe_short` batch across all seven runs. That removes
+  probe-selection variance from the comparison, but a different probe batch
+  could shift the levels. It is unlikely to invent a 15x rise locked to a
   schedule landmark in five independent runs.
 - **The shadow arm is not the training surface.** `shadow_fp32` is a disposable
   IEEE-fp32 upcast at theta_s, measured with TF32 off and math-SDPA. The bf16
   surface the optimizer actually experiences fails acceptance everywhere
-  (caveat 4), so certified curvature is necessarily a statement about a surface
+  (caveat 6), so certified curvature is necessarily a statement about a surface
   the optimizer does not run on. Whether the two surfaces agree is a different
   investigation.
 - **The warmdown co-timing is a coincidence of schedule, not a demonstrated
@@ -290,7 +291,7 @@ per run that certify:
   d14 and d16, but nothing here varies the schedule, so "warmdown causes
   sharpening" is not established — only that the two co-occur, at the same
   normalized progress, at three depths.
-- **Multiple comparisons (caveat 9).** Five channels were declared in advance;
+- **Multiple comparisons (caveat 10).** Five channels were declared in advance;
   I scored 57. The 52 undeclared ones are exploratory and are reported only in
   `out/universe.csv`.
 - **Redundancy in the declared universe.** `eta_star`, `vhv_gradient` and

@@ -75,7 +75,7 @@ in every run, from -0.718 to -0.836. Across the five d12 seeds, the late-minus-
 early median-cosine change is -0.167 with across-seed SD 0.021; all five
 changes are negative. The d12 late/early `B_noise` ratio ranges from 9.98 to
 13.17. That is far larger than I0001's 26% sd-relative seed spread for
-`noise/b_noise`, although caveat 8 makes `B_noise` descriptive rather than a
+`noise/b_noise`, although caveat 9 makes `B_noise` descriptive rather than a
 critical-batch estimate.
 
 Thus the directions of random sub-batch gradients become much less mutually
@@ -222,20 +222,21 @@ intervention runs; this observational sweep cannot validate the policy.
 
 ## Limitations
 
-- Dataset caveat 8 is decisive: the noise diagnostic covers one device batch,
+- Dataset caveat 9 is decisive: the noise diagnostic covers one device batch,
   batch size never varies, and no loader sidecar exists.
-- This is exploratory work over many available channels. Caveat 9 applies;
+- This is exploratory work over many available channels. Caveat 10 applies;
   the proxy findings need frozen confirmation on new runs.
 - CountSketch inner products are approximate. The raw random-slice sketches
   and exact slice inner products were not persisted, so their error cannot be
   calibrated post hoc in these events.
-- Probe quantities use seed-specific frozen samples (caveat 6). Within-run
-  comparisons share a probe; cross-seed comparisons also include probe
-  sampling variance.
+- Probe quantities use the same frozen samples across the collection (caveat
+  7). Their cross-seed comparisons contain no probe-selection variance, but
+  remain local to those samples.
 - The five d12 seeds provide the only seed reference. d14 and d16 each have
   one seed, and caveats 1–3 prohibit attributing differences to depth or
   transferring the d12 noise floor without qualification.
-- Native bf16 curvature was not used. Shadow-fp32 curvature was conditioned
+- All curvature is scoped to one 256-token sequence (caveat 4). Native bf16
+  curvature was not used. Shadow-fp32 curvature was conditioned
   on the relevant per-direction verdict. The attractive quadratic update
   result remains explicitly uncertified because the update direction passed
   zero checkpoints.

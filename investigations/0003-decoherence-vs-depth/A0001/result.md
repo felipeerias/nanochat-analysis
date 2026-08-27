@@ -260,7 +260,7 @@ correspondingly noisy, not where the effect is absent (its offset is still
    reference; it is *not* evidence that deeper models train better, worse, or
    differently. Nothing in this run connects decoherence to loss or to any
    downstream quantity.
-9. **DATASET caveat 9.** This was declared confirmatory before the data was
+9. **DATASET caveat 10.** This was declared confirmatory before the data was
    opened, on one pre-named channel, so it is not multiple-comparison
    inflated. The per-matrix structure section is **exploratory** — it was
    found by searching within the channel under study, and its role/layer/shape

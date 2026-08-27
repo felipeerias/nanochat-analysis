@@ -10,8 +10,8 @@ data: sweep-d12-d16-v1 and sweep-d12-seeds-v1; segments d12-s7, d12-s8,
   d12-s9, d12-s10, d12-s11 (schema v3)
 selection: defined rows only; scalar-valued records; channels keyed by
   metric, acceptance arm, param role, parameter name, layer, head, optimizer
-  group and probe NAME (probe id is excluded because probes are drawn per
-  seed); points kept where at least 2 of 5 runs are defined
+  group and probe NAME (the opaque probe ids are shared across all five runs);
+  points kept where at least 2 of 5 runs are defined
 universe: 250 metric-by-arm families tested, 250 reported (239 have a
   defined relative spread); 3,392 channels; 69 vector-valued families were
   not analysed and are listed below
@@ -84,7 +84,7 @@ arithmetic for these quantities.
 ### Gradient noise scale
 
 `noise/s2` varies by 13.6% and `noise/b_noise` by 26.2% between seeds. Any
-claim about the noise scale needs a large effect, and see caveat 8 in
+claim about the noise scale needs a large effect, and see caveat 9 in
 `DATASET.md`: this quantity is measured on a device batch, not on the logical
 batch that drives the update.
 
@@ -131,9 +131,10 @@ are listed in `summary.json`.
 itself uncertain by roughly ±50%, so these spreads should be read as order
 of magnitude, not as precise error bars.
 
-**Probe-based families carry probe sampling variance**, because probes are
-drawn per seed. This affects `probe/*`, all `curvature/*`, and `update/*`.
-Their spread is therefore an upper bound on the trajectory variance alone.
+**Probe-based families use one shared frozen sample.** The probe ids are
+identical across all five runs, so their spread is not contaminated by probe
+selection. It remains local to that sample; a future run with a different data
+ordering needs its own floor.
 
 **This reference is d12 only.** Caveats 1 and 3 in `DATASET.md` apply: depth
 covaries with width, batch size and learning rate, and the warmup windows are

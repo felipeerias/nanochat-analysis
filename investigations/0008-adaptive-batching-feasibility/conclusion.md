@@ -61,7 +61,7 @@ identity).
 across-step decorrelation implies at least 1,400 rows where `noise/b_noise`
 reports 162, because the sub-batches are a *clustered* sample drawn from a
 1,000-document rolling buffer over consecutive row groups rather than an
-independent one. This sharpens `DATASET.md` caveat 8 considerably: `b_noise`
+independent one. This sharpens `DATASET.md` caveat 9 considerably: `b_noise`
 must not be used to size a per-group estimator.
 
 **A first-order value model is insufficient.** `s_k = lambda^T g_k` is

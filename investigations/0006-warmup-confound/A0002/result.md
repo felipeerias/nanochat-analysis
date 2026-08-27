@@ -158,5 +158,15 @@ The complete per-family results, including effect sizes, seed multiples, match c
 6. **Family medians hide within-family structure.** Collapsing layers, parameter roles, and probe variants by median makes unequal-depth row counts comparable but can miss layer-local effects. It is a family-level answer only.
 7. **Interpolation is an assumption.** Continuous/periodic interpolation stays inside observed support, but nonlinear changes between periodic checkpoints are unresolved. Sparse rows are kept direct, which avoids that assumption at the cost of large non-estimable regions.
 8. **The combined window cannot identify which warmup caused a response.** The primary `<=400` estimand deliberately combines the 40-step LR warmup and 400-step Muon ramp. Sparse cadence helps near the start but does not provide normalized matches at the transition landmarks; periodic cadence cannot isolate the first 40 steps.
-9. **Curvature certification and instrument caveats apply.** Native bf16 curvature is uncertified everywhere (DATASET caveat 4); Muon stage quantities are reference-frame measurements with 3--10% replay error (caveat 5); probe channels include probe sampling (caveat 6); noise metrics are descriptive only (caveat 8). Curvature diagnostics were included because the frozen universe says all defined scalar families, not because they are strong response variables.
-10. **Multiple comparisons and autocorrelation remain.** This is a 263-family search (DATASET caveat 9). Time points are highly correlated, so SD multiples are detector ratios, not independent-sample p-values. The result needs new runs with proportional warmups for confirmation.
+9. **Curvature certification and instrument caveats apply.** Curvature is
+   scoped to one 256-token sequence (DATASET caveat 4); Muon stage quantities
+   are reference-frame measurements with 3--10% replay error (caveat 5);
+   native bf16 curvature is uncertified everywhere (caveat 6); probe channels
+   use one shared frozen sample (caveat 7); noise metrics are descriptive only
+   (caveat 9). Curvature diagnostics were included because the frozen universe
+   says all defined scalar families, not because they are strong response
+   variables.
+10. **Multiple comparisons and autocorrelation remain.** This is a 263-family
+    search (DATASET caveat 10). Time points are highly correlated, so SD
+    multiples are detector ratios, not independent-sample p-values. The result
+    needs new runs with proportional warmups for confirmation.

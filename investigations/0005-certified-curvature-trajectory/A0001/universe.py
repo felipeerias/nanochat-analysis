@@ -2,7 +2,7 @@
 
 Every scalar channel present at the certified checkpoints is scored, so the
 result can state how many channels were tested rather than only the five the
-protocol names. Caveat 9 (multiple comparisons) applies: this is a
+protocol names. Caveat 10 (multiple comparisons) applies: this is a
 descriptive sweep, and only the five declared channels are headline.
 """
 import os

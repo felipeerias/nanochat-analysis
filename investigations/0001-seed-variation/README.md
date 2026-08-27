@@ -15,10 +15,10 @@ allowed inputs: ../../DATASET.md; the five d12
 
 How much does a d12 result vary between seeds, for each metric family?
 
-The five runs differ only in seed. They share depth, width, recipe, schedule
-and telemetry settings. Any difference between them is seed variation: a
-different initialization, a different data order, a different frozen probe,
-and the platform's own non-determinism.
+The five runs differ only in initialization seed. They share depth, width,
+recipe, schedule, data order, frozen probes and telemetry settings. Their
+remaining differences combine initialization variation with the platform's
+own non-determinism.
 
 ## Test
 
@@ -35,8 +35,9 @@ Report every family. Do not drop families that look uninteresting. The ranking
 is the product, so a partial ranking is a wrong answer.
 
 Note the known asymmetries before you start:
-- Probes are drawn per seed, so probe-based families include probe sampling
-  variance as well as trajectory variance. Say which families this affects.
+- Probes are shared across these runs, so probe-based families compare
+  trajectories on one fixed sample without probe-selection variance. They do
+  not establish a floor for a future run with a different data ordering.
 - The native bf16 acceptance arm is uncertified everywhere. Report its spread,
   but do not present its values as measurements.
 - Warmup is a fixed number of steps, so the early fraction of training is not

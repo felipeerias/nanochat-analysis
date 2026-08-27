@@ -41,7 +41,7 @@ The proposal cannot be tested on this dataset, and the reason is worse than the
 one the protocol anticipated. There are **two** blocking facts, not one.
 
 1. **No data-group labels.** As stated in the protocol and in `DATASET.md`
-   caveat 8. Nothing in the 283 recorded metric families identifies a document,
+   caveat 9. Nothing in the 283 recorded metric families identifies a document,
    a domain, or a source. `g_k` therefore has no `k`.
 
 2. **The dataset contains exactly one data ordering.** `nanochat/dataloader.py`
@@ -100,7 +100,7 @@ Read "proxy quality" as: how much of the theoretical quantity survives.
 | 2 | **‖g_k‖** | `noise/per_sub_sq_norm` — ‖g_i‖² for 8 disjoint 4-row slices, 175 checkpoints total. Plus `grad/norm`, `grad/rms`, `sketch/grad_sq_norm`, `noise/mean_grad_norm` per (role,layer) for the nominal gradient, and `calib/grad_norm` (exact) at deep steps. | **Fair for a random 4-row slice; none for a semantic group.** | Attribute a norm to any content. Note: the per-(role,layer) squared norms of each slice *are* computed (`role_sq` in `capture_subbatch_gradients`) and then dropped — a free fix. |
 | 3 | **g_iᵀg_j** | `noise/pairwise_cosines` — 28 sketched cosines per checkpoint between the 8 disjoint slices. **The single best proxy in the dataset.** Validated below against an exact algebraic identity. | **Good as an estimator, wrong as a grouping.** The sketch is unbiased (median relative error +0.2% against the exact value) with a per-checkpoint sd of 15% and a cosine floor of 0.009–0.016. | Give any semantic `i, j`. Give a corpus-level cosine: both slices come from the same clustered window, so this is a *within-window* alignment. |
 | 4 | **g_kᵀg_nominal** | Fully recoverable per slice from the noise records: `g_i·ḡ = (‖g_i‖² + Σ_{j≠i} g_i·g_j)/K`, with `‖ḡ‖² = signal_raw + s²/K`. Computed below. Also cos(fixed-probe gradient, batch gradient), but the two sketches only share a step at 0. | **The best-populated proxy.** 1400 slice-level measurements across 7 runs. | Same grouping problem. The fixed-probe version is unusable away from step 0: by any nonzero step gap the batch gradient has decorrelated to ~0 (see below). |
-| 5 | **H_k** — per-group Hessian | HVPs on **one** loss (the frozen short probe), along three directions (random / gradient / actual update): `curvature/vhv_*`, `gHg`, `dhd`, `Hg_norm`, `eta_star`, plus the FD/symmetry/linearity sweeps. Two acceptance arms. | **None for a group.** The machinery *can* apply H to a chosen direction, which is the piece a future instrument reuses. | Produce a group-restricted Hessian: there is no group-restricted loss to differentiate twice. Also, `DATASET.md` caveat 4 and I0001: native bf16 curvature is uncertified everywhere, and in the shadow arm only the **gradient** direction ever passes. |
+| 5 | **H_k** — per-group Hessian | HVPs on **one** loss (the frozen short probe), along three directions (random / gradient / actual update): `curvature/vhv_*`, `gHg`, `dhd`, `Hg_norm`, `eta_star`, plus the FD/symmetry/linearity sweeps. Two acceptance arms. | **None for a group.** The machinery *can* apply H to a chosen direction, which is the piece a future instrument reuses. | Produce a group-restricted Hessian: there is no group-restricted loss to differentiate twice. Also, `DATASET.md` caveat 4 limits curvature to one sequence, while caveat 6 and I0001 record that native bf16 curvature is uncertified everywhere and only the shadow **gradient** direction ever passes. |
 | 6 | **λ** — the costate | **Nothing.** Nearest surrogate: the *myopic* costate λ̂ = −∇L_probe(θ_s), implicit in `update/p1 = gᵀΔ`, at 30 deep checkpoints per run. | **Poor.** A myopic costate is by construction the object the optimizer already follows; it carries no information about the remaining trajectory. | Be estimated at all. λ is the adjoint of the *remaining* trajectory; recovering it needs either a backward pass over the whole run (checkpoints for that were deliberately excluded from this local copy) or, for validation, variation in the control — which does not exist (fact 2). |
 | 7 | **s_k = λᵀg_k** | The one-step *realized* analogue exists and is well populated: `update/actual` = L_probe(θ_s+Δ) − L_probe(θ_s), with `update/p1` (first order), `update/p2` (+ ½ΔᵀHΔ), residuals, and `update/normalized_residual`, per arm, 215 checkpoints per arm. | **Only as a one-step scoring rule for the *applied* update.** It scores Δ, not any g_k. | Score a counterfactual group. `actual` is measured on the update that *was* taken; there is no arm in which a different mixture was taken. |
 | 8 | **Lie bracket H_j g_i − H_i g_j** | **Structurally zero-dimensional.** One loss ⇒ one field ⇒ [v,v] = 0. | **None.** | Anything. **Explicit warning:** `curvature/e_sym_{random,gradient,update}` = \|uᵀHv − vᵀHu\|/max(...) is an *arithmetic symmetry-error diagnostic* of the HVP implementation, not a commutator; repurposing it as a bracket proxy would be a category error. The one legitimately related measurement is `update/normalized_residual`, which bounds how much the local quadratic model — on which the bracket approximation itself rests — misses. |
@@ -284,7 +284,7 @@ predict a 256-row batch-to-batch cosine of 0.61. That is not observed. The
 mechanism is in `dataloader.py`: rows within a device batch are packed from a
 1000-document rolling buffer over consecutive parquet row groups, so the K
 slices are a **clustered** sample, not independent corpus draws. This sharpens
-`DATASET.md` caveat 8: `noise/b_noise` is a *lower bound* on the corpus-level
+`DATASET.md` caveat 9: `noise/b_noise` is a *lower bound* on the corpus-level
 noise scale, off by at least 8×, and must not be used to size a per-group
 gradient estimator.
 
@@ -419,17 +419,19 @@ with **five seeds per arm**, and on nothing else: curvature channels need
   `sketch/probe_grad_cosine_prev` = 0.96 over 126 steps late), but it is a very
   small sample of the objective, and R² values in T11 are R² against that
   probe's loss change, not against validation loss.
-- **`DATASET.md` caveats that apply directly**: 8 (batch construction is
+- **`DATASET.md` caveats that apply directly**: 9 (batch construction is
   under-instrumented — this whole result is an elaboration of it, and T13b
-  sharpens it); 4 and the I0001 finding that only the shadow gradient direction
-  is certified (all headline curvature statements in T11/T12 are shadow-arm;
-  the native numbers are quoted alongside as uncertified); 6 (probe-derived
-  quantities carry sampling variance — T15's documents are one frozen draw per
-  run; note the val and short probes come from the held-out val shard, but the
+  sharpens it); 4 (the curvature surface is one short-probe sequence); 6 and
+  the I0001 finding that only the shadow gradient direction is certified (all
+  headline curvature statements in T11/T12 are shadow-arm; the native numbers
+  are quoted alongside as uncertified); 7 (probe-derived quantities use one
+  shared frozen draw across the collection, so their comparisons have no
+  probe-selection variance but remain sample-local; note the val and short
+  probes come from the held-out val shard, but the
   `train_stream` probe used in T15's second row is literally the first 16 rows
   of the training stream and is *not* held out); 3 (the absolute 40-step
   warmup, handled by dropping steps < 40 in T7 and by the drop-first-windows
-  robustness in T10); 9 (multiple comparisons — 16 tests, all reported, all
+  robustness in T10); 10 (multiple comparisons — 16 tests, all reported, all
   exploratory).
 - **T13's "data vs parameter motion" split uses the fixed 1–4-row probe
   gradient as a proxy for the stability of the mean gradient field.** A 1–4-row

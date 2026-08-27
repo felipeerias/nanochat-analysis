@@ -69,7 +69,7 @@ Shadow-fp32 arm — decisive:
 | `e_lin_gradient` | 4.96e-7 [4.95e-7, 5.32e-7] | 4.65e-7 | 5.12e-7 | 1.03x | **refuted** |
 | `e_lin_update`   | 7.25e-7 [7.15e-7, 7.52e-7] | 8.08e-7 | 8.63e-7 | 1.19x | **supported** |
 
-Native arm — reported, not decisive, and uncertified everywhere (caveat 4):
+Native arm — reported, not decisive, and uncertified everywhere (caveat 6):
 
 | channel | d12 median | d14 | d16 | decision |
 |---|---|---|---|---|
@@ -290,10 +290,12 @@ Raw outputs are in `analyze.out`, `tails.out`, `early.out`, `seedmatched.out`,
   the warmup, where the depths are least comparable. It is the reason I do not
   read the early transient as a depth effect. I0006 is the investigation for
   this.
-- *Caveat 4 (native bf16 uncertified).* The native-arm table is reported because
+- *Caveat 4 (single-sequence curvature).* Every acceptance result is local to
+  the one 256-token sequence used by the HVP path, not the training objective.
+- *Caveat 6 (native bf16 uncertified).* The native-arm table is reported because
   the protocol's universe requires it; those numbers are uncertified and are not
   used for any conclusion.
-- *Caveat 9 (multiple comparisons).* Twelve channels were declared and twelve
+- *Caveat 10 (multiple comparisons).* Twelve channels were declared and twelve
   tested; the three "supported" shadow results are individually above the seed
   floor, but with twelve channels and a rule that has no explicit false-positive
   control, the two `e_lin` ones should be read as what they are — a 14-19% shift

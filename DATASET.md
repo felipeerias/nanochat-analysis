@@ -142,6 +142,9 @@ transfer (70 GB → 999 MB). That is expected, not corruption.
 
 ## Caveats (please carry these into any analysis)
 
+These numbers are referenced throughout the repository. Keep existing numbers
+stable and append new caveats rather than renumbering this list.
+
 1. **This is a size ray, not a depth sweep.** Depth co-varies with width,
    head count, batch size, LR, weight decay, and horizon by design (nanochat's
    own scaling rules). Conclusions are about *the nanochat recipe at scale*,
@@ -169,9 +172,9 @@ transfer (70 GB → 999 MB). That is expected, not corruption.
 6. **Native bf16 curvature is uncertified everywhere** (see above). Do not
    quote native curvature numbers as measurements without the shadow arm or
    an explicit statement that they are uncertified.
-7. **Probes are identical across the five d12 seeds** (verified: same
-   probe ids in all five runs), because probe selection inherits the
-   deterministic loader. Probe-derived spread across those seeds is therefore
+7. **Probes are identical across all seven schema-v3 runs** (verified: the
+   same three probe ids), because probe selection inherits the deterministic
+   loader. Probe-derived spread across the five d12 seeds is therefore
    *not* contaminated by probe sampling — an earlier version of this card said
    otherwise and was wrong. A run with a different data ordering would draw
    different probes.

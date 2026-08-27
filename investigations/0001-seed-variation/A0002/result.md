@@ -20,7 +20,7 @@ saw: frozen I0001 README; analysis/README.md; telemetry-data/sweep/DATASET.md; a
 
 Seed sensitivity spans essentially zero for fixed controls to several hundred percent for zero-centered/sketch, noise, attention, curvature, and update-effect channels. The most useful trajectory headline is `loss/train_mean`: its median five-seed range is **0.004668 loss units, or 0.1557%**, while its worst aligned step is **0.420982, or 5.6627%**. The early median is **1.1423%** and the late median is **0.1407%**, so a single pooled number materially overstates late loss noise and understates early loss noise.
 
-`probe/loss` is also tight by the declared rule: median absolute/relative ranges are **0.014268 / 0.4532%**, worst **0.148396 / 3.2306%**, with **1.0911% early** and **0.4281% late**. This is a combined trajectory-plus-probe-sampling floor, not pure trajectory variance.
+`probe/loss` is also tight by the declared rule: median absolute/relative ranges are **0.014268 / 0.4532%**, worst **0.148396 / 3.2306%**, with **1.0911% early** and **0.4281% late**. This is trajectory variation on one shared fixed probe, without probe-selection variance.
 
 At the other end, representative median relative ranges are **68.11%** for `noise/b_noise`, **93.90%** for `noise/signal_raw`, **110.59%** for probe-based attention mean distance, **59.23%** for passing shadow `curvature/eta_star`, **70.58%** for passing shadow `curvature/gHg`, **171.81%** for shadow `update/actual`, **407.73%** for shadow `update/normalized_residual`, and **378–382%** for gradient-sketch components. Those are unsuitable for detecting modest changes from one run per condition.
 
@@ -29,7 +29,7 @@ Of the 366 arm-specific series, 302 have a numerical five-seed relative spread a
 ## Method
 
 - I explicitly retained only `is_defined == True` rows and matched the five runs at exact `normalized_progress` (rounded only to 12 decimal digits for a stable key; the schedules are identical).
-- A comparison element is a scalar or one vector component with the same metric, phase, aggregation, layer/head/role/parameter, probe type, optimizer metadata, dtype/backend, and other stable semantic metadata. Per-seed probe hashes were mapped to `train_stream`, `val`, and `short`; the two long probes were identified from the permitted profiles/final `probe/loss` ordering, and all other non-null hashes are the short probe. No duplicate semantic keys or vector-length mismatches occurred.
+- A comparison element is a scalar or one vector component with the same metric, phase, aggregation, layer/head/role/parameter, probe type, optimizer metadata, dtype/backend, and other stable semantic metadata. The shared opaque probe hashes were mapped to `train_stream`, `val`, and `short`; the two long probes were identified from the permitted profiles/final `probe/loss` ordering, and all other non-null hashes are the short probe. No duplicate semantic keys or vector-length mismatches occurred.
 - At each comparison element, absolute spread is `max(seed values) - min(seed values)`. Relative spread is absolute spread divided by `abs(median(seed values))`. For an exact zero median, `0/0` is recorded as zero and a positive range divided by zero as infinity.
 - “Typical” is the median over all aligned channel-progress elements in a family. “Worst” is their maximum. Ranking is ascending by typical relative spread; unavailable families are placed last. The table also gives typical/worst absolute spreads because ratios near zero can be pathological.
 - Early is `normalized_progress <= 400/2520 = 0.158730`, covering both the 40-step LR warmup and the full 400-step Muon momentum ramp. Late is everything after that boundary.
@@ -46,8 +46,8 @@ Representative numerical measurement families meeting the tight rule (native cur
 |---|---:|---:|---:|---:|---|
 | `loss/train_mean` | 0.1557% | 5.6627% | 1.1423% | 0.1407% | Best general trajectory channel; late training is especially tight. |
 | `optim/muon_second_momentum_norm` | 0.2159% | 6.6457% | 0.6337% | 0.1758% | Tight optimizer-state magnitude. |
-| `probe/loss` | 0.4532% | 3.2306% | 1.0911% | 0.4281% | Tight, but includes probe sampling variance. |
-| `probe/logit_lse_mean` | 0.8955% | 2.1136% | 0.8948% | 0.8994% | Tight probe/logit summary; probe-sampling caveat applies. |
+| `probe/loss` | 0.4532% | 3.2306% | 1.0911% | 0.4281% | Tight trajectory measure on the shared fixed probe. |
+| `probe/logit_lse_mean` | 0.8955% | 2.1136% | 0.8948% | 0.8994% | Tight probe/logit summary; fixed-probe scope applies. |
 | `probe/per_row_loss` | 0.9936% | 7.7286% | 1.4019% | 0.9435% | Still tight after retaining individual probe rows. |
 | `update/direction_norm [shadow_fp32]` | 1.6579% | 12.7347% | 4.4414% | 1.2516% | Useful update-magnitude channel; short-probe lineage flag applies. |
 | `update/loss_before [shadow_fp32]` | 2.9967% | 8.4201% | 0.7720% | 3.6742% | Useful baseline probe loss at deep checkpoints. |
@@ -64,20 +64,20 @@ Representative families failing even the 50% typical-spread criterion:
 | `noise/b_noise` | 68.11% | 246.30% | 72.99% | 67.62% | Noisy and one aligned point is lost; batch/noise caveat applies. |
 | `noise/pairwise_cosines` | 79.03% | 5,343.32% | 83.51% | 76.79% | Near-zero denominators create extreme point noise. |
 | `noise/signal_raw` | 93.90% | 420.15% | 125.07% | 92.36% | Too variable for modest effects. |
-| `attn/per_head_norm_entropy` | 61.28% | 171.19% | 23.07% | 69.02% | Probe sampling and late noise dominate. |
+| `attn/per_head_norm_entropy` | 61.28% | 171.19% | 23.07% | 69.02% | Probe-local measurement; late noise dominates. |
 | `attn/per_head_mean_distance` | 110.59% | 659.82% | 74.12% | 114.17% | Probe-dependent and order-one seed spread. |
-| `curvature/eta_star [shadow_fp32]` | 59.23% | 189.57% | 31.55% | 69.85% | Certified only on the 25 common passing gradient points; short-probe variance applies. |
+| `curvature/eta_star [shadow_fp32]` | 59.23% | 189.57% | 31.55% | 69.85% | Certified only on the 25 common passing gradient points; short-probe scope applies. |
 | `curvature/gHg [shadow_fp32]` | 70.58% | 248.44% | 37.94% | 82.15% | Same pass/probe restriction; order-one noise. |
 | `update/actual [shadow_fp32]` | 171.81% | 28,991.40% | 78.48% | 320.46% | Sign/near-zero sensitivity makes the relative channel unusable. |
 | `update/normalized_residual [shadow_fp32]` | 407.73% | 1,996.23% | 237.64% | 640.05% | Several-fold seed range. |
 | `sketch/grad` | 381.81% | infinity | 279.01% | 399.04% | Signed sketch components cross zero; relative spread is intrinsically ill-conditioned. |
-| `sketch/probe_grad` | 378.47% | infinity | 360.62% | 391.70% | Same, plus per-seed short probes. |
+| `sketch/probe_grad` | 378.47% | infinity | 360.62% | 391.70% | Same, on the shared short probe. |
 
 The full table is the decision surface: intermediate families can still detect effects larger than their observed spread, and “noisy” does not imply an implementation defect.
 
 ## Probe and certification asymmetries
 
-The `probe` flag marks every family with a non-null `probe_id`: all 20 periodic `attn/*` series, all 50 periodic `probe/*` series, 180 arm-specific sparse `curvature/*` series, three sparse `sketch/probe_grad*` series, and 18 arm-specific sparse `update/*` series—**271 of 366** reported series. Their spread combines trajectory differences with independent probe draws. A single-run comparison cannot separate those components.
+The `probe` flag marks every family with a non-null `probe_id`: all 20 periodic `attn/*` series, all 50 periodic `probe/*` series, 180 arm-specific sparse `curvature/*` series, three sparse `sketch/probe_grad*` series, and 18 arm-specific sparse `update/*` series—**271 of 366** reported series. All five runs use identical probe ids, so their spread combines trajectory and platform variation on the same fixed samples; it contains no independent probe-selection component. This makes the cross-seed comparison cleaner but limits it to those samples.
 
 Every native-arm family is flagged `uncertified`; its raw variability is a diagnostic about the failed bf16 acceptance arm, never a measurement recommendation. Shadow random/update direction families with no passing records are `NA`, not zero. Only passing shadow gradient quantities may be read as curvature measurements.
 
@@ -87,7 +87,7 @@ Every native-arm family is flagged `uncertified`; its raw variability is a diagn
 2. The protocol does not define “spread,” “typical,” the denominator sign convention, family-level channel pooling, the early/late boundary, or thresholds for “tight” and “noisy.” I used range, median, absolute median denominator, equal weighting of channel-progress elements, the end of the 400-step ramp, and the declared 5%/20%/50% rules. Other defensible choices can change ranks near cutoffs.
 3. Relative spread is not a reliable scale measure for signed or near-zero families. The absolute-spread columns are essential for those rows; infinity and very large ratios should not be interpreted as infinite absolute instability.
 4. Vector components are treated as channels. This makes comparisons exhaustive and preserves head/row/token/sketch indices, but “typical family” weights every component-progress element equally. It may hide a small subset of unstable layers/heads; the worst column partially exposes that.
-5. Probe hashes are per seed and do not encode human-readable probe type in parquet. I mapped the two `probe/loss` hashes via the final train-stream/validation ordering documented in the permitted profiles; the remaining hash is `short`. This is deterministic here but would need provenance metadata in a general loader.
+5. Probe hashes do not encode human-readable probe type in parquet, although they are identical across all five runs. I mapped the two `probe/loss` hashes via the final train-stream/validation ordering documented in the permitted profiles; the remaining hash is `short`. A general loader should use provenance metadata for these names.
 6. The native raw-spread exception is required to satisfy “report its spread” despite zero passing native directions. All native-arm rows remain explicitly uncertified. Nine native curvature series still have no five-seed common defined comparison and are reported unavailable.
 7. This is a descriptive range over five seeds on one platform, not an estimated population variance or confidence interval. Worst values are especially sensitive to n, multiple channels, and the number of training points. Threshold classifications are exploratory and effect-size-dependent.
 8. Configuration, categorical verdict, finite/skip, and timing families are mechanically ranked because the protocol requires every family. A zero range for a fixed control does not make it a scientifically useful outcome variable, and categorical code ratios have no interval-scale interpretation.
@@ -95,7 +95,7 @@ Every native-arm family is flagged `uncertified`; its raw variability is a diagn
 
 ## Complete family ranking
 
-Sorted by typical relative seed spread. `n` is the number of fully aligned scalar/vector elements; key coverage is common semantic row keys divided by their five-run union. Absolute values retain each metric's native units. Flags: `probe` includes independent probe sampling, `uncertified` is native bf16-arm raw data, `pass-only` is shadow per-direction-passing data, and `zero-median` means at least one positive range had a zero median. `NA` families are included at the end.
+Sorted by typical relative seed spread. `n` is the number of fully aligned scalar/vector elements; key coverage is common semantic row keys divided by their five-run union. Absolute values retain each metric's native units. Flags: `probe` marks dependence on the collection's shared fixed probes, `uncertified` is native bf16-arm raw data, `pass-only` is shadow per-direction-passing data, and `zero-median` means at least one positive range had a zero median. `NA` families are included at the end.
 
 | rank | family | n | key cov. | typ. abs | worst abs | typ. rel | worst rel | early rel | late rel | band | flags |
 |---|---|---|---|---|---|---|---|---|---|---|---|

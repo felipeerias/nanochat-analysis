@@ -21,7 +21,7 @@ five-seed range relative to the median. Cite which one you used.
 | family | sd-relative | range-relative | usable? |
 |---|---:|---:|---|
 | `loss/train_mean` | 0.06% | 0.16% | best detector in the dataset |
-| `probe/loss` | 0.16% | 0.45% | tight; includes probe sampling |
+| `probe/loss` | 0.16% | 0.45% | tight; shared fixed probe |
 | `param/norm` | 1.0% | ~2.5% | tight |
 | `muon/replay_update_relerr` | 3.5% | ~8% | tight; a real response channel |
 | `muon/cos_raw_final` | 7.3% | ~18% | usable for large effects |
@@ -109,11 +109,12 @@ The reference is **d12 only**. Caveats 1 and 3 in `DATASET.md` apply: depth
 covaries with width, batch size and learning rate, and warmup is a fixed step
 count, so this spread should not be assumed to transfer to d14 or d16.
 
-## Correction after I0008 (2026-08-25)
+## Provenance clarification after I0008 (2026-08-25)
 
-The protocol for this investigation stated that the five runs differ by "a
-different initialization, a different data order, a different frozen probe,
-and the platform's own non-determinism". **Two of those three are wrong.**
+The original protocol for this investigation stated that the five runs differ
+by "a different initialization, a different data order, a different frozen
+probe, and the platform's own non-determinism". **The data-order and probe
+parts of that original description were wrong.**
 
 I0008 established, and I verified independently, that the loader contains no
 RNG: the batch stream is bitwise identical across all five seeds at every one
@@ -122,9 +123,9 @@ runs. The seed changes **initialization only**.
 
 Two consequences:
 
-1. The limitation recorded above — that probe-based families carry probe
-   sampling variance — is **incorrect**. Probes are shared. That makes the
-   reference cleaner than advertised, not dirtier.
+1. Probe-based families do not carry probe-selection variance in this
+   collection. Probes are shared. That makes the reference cleaner than the
+   original protocol advertised, not dirtier.
 2. The reference is **narrower** than advertised. It bounds initialization
    noise, not run-to-run noise in general. I0008 measures the
    batch-selection contribution to step-to-step loss variance at roughly 10x

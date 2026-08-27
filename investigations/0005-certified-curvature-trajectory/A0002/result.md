@@ -281,24 +281,24 @@ scientific observables.
    be weak; and the absolute 40/400-step warmups confound cross-size early
    comparisons. No depth or scale comparison is made here.
 
-5. **Caveat 4 (arithmetic surface).** Native bf16 curvature is uncertified
-   everywhere and was excluded. Shadow fp32 is a disposable measurement
-   surface, so the conclusion does not say the optimizer experiences the
-   same certified curvature numerically in bf16.
+5. **Caveats 4 and 6 (probe and arithmetic surfaces).** Every curvature
+   quantity is local to one 256-token sequence. Native bf16 curvature is
+   uncertified everywhere and was excluded. Shadow fp32 is a disposable
+   measurement surface, so the conclusion does not say the optimizer
+   experiences the same certified curvature numerically in bf16.
 
-6. **Caveats 5–6 (updates and probes).** No Muon reference-stage quantity is
+6. **Caveats 5 and 7 (updates and probes).** No Muon reference-stage quantity is
    interpreted, avoiding a claim through its recorded replay decoherence.
-   Probe-derived eta* carries frozen-probe sampling variation between seeds;
-   its within-run comparisons use the same probe and are internally
-   consistent, while its between-run comparisons retain the I0001 25%
-   limitation.
+   Probe-derived eta* uses the same frozen probe across the five seeds, so its
+   spread contains no probe-selection variance. It remains local to that
+   sample, and its between-run comparisons retain the I0001 25% limitation.
 
-7. **Caveats 7–8 (execution and batches).** Compiled GPU training is not
+7. **Caveats 8–9 (execution and batches).** Compiled GPU training is not
    bit-reproducible at the last bit. No batch-noise or critical-batch claim is
    made, so the under-instrumented batch-construction caveat is not used as
    evidence.
 
-8. **Caveat 9 (multiplicity and evidence).** The universe was fixed to all 22
+8. **Caveat 10 (multiplicity and evidence).** The universe was fixed to all 22
    in-scope scalar channels and all are reported, including diagnostics and
    inconsistent trajectories. Nevertheless, the protocol specified a
    descriptive question rather than a numerical sharpening decision rule;

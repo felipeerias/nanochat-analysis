@@ -98,7 +98,7 @@ the 215 checkpoints — those channels are set *by* the arm's arithmetic and are
 definitional, not measurements. The symmetry and linearity residuals
 (`e_sym_*`, `e_lin_*`) are roughly 6,800–14,500× larger in bf16, and the probe SNRs
 collapse by ~99.8 % (a ~500× loss). This is the mechanism behind DATASET.md's
-caveat 4: the native arm fails everywhere because its *error bars* explode, not
+caveat 6: the native arm fails everywhere because its *error bars* explode, not
 because its *values* are wrong.
 
 **Availability loss is a separate, harder failure.** Nine of the 62 paired
@@ -287,18 +287,20 @@ values < 1 as percentages.
    at `normalized_progress < 0.01`, where the curvature is near zero and the
    ratio is unstable by construction. "bf16 curvature is good to 0.3 %" is true
    typically and false at initialization.
-5. **DATASET.md caveats that bite.** Caveat 4 (native curvature is uncertified
-   everywhere) is the subject here rather than a limitation, and the protocol
+5. **DATASET.md caveats that bite.** Caveat 4 limits every curvature quantity
+   here to one 256-token sequence rather than the training objective. Caveat 6
+   (native curvature is uncertified everywhere) is the subject here rather
+   than a limitation, and the protocol
    explicitly forbade conditioning on it — I complied, and reported the
    sensitivity check separately. Caveat 1 and 2 (size ray, n = 3 depths) are why
    the depth answer is inconclusive; depth co-varies with width, batch size, LR
    and horizon, so even a resolved trend would not be "depth causes X". Caveat 3
    (absolute warmups: 40-step LR warmup is 1.6 % of d12 progress but 0.7 % of
    d16) contaminates precisely the early-transient region where the quadratic
-   tail lives. Caveat 9 (multiple comparisons): 62 families were tested; the
+   tail lives. Caveat 10 (multiple comparisons): 62 families were tested; the
    per-family ρ values marked `*` are not corrected for 53 simultaneous tests,
    and I lean on the 7-of-7 within-run sign agreement rather than on p-values for
-   the trend claim. Caveat 7 (compiled training is not bit-reproducible) means
+   the trend claim. Caveat 8 (compiled training is not bit-reproducible) means
    the ~1 ulp optimizer-moment race is inside my "native" arm; it is far below
    the 0.3 % effect.
 6. **The shadow arm is not ground truth, it is a better-conditioned estimate.**

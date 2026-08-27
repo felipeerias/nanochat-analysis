@@ -153,12 +153,12 @@ The **only two families that are genuinely warmup-dominated when the schedule
 and the data are held fixed** are `curvature/e_sym_gradient|native` (|z| 3.49
 in-window vs 0.74 after) and `curvature/fd_floor_random|native` (4.34 vs 0.35).
 Both are native-arm *acceptance-test internals* -- an HVP symmetry error and a
-finite-difference noise floor -- not observables; `DATASET.md` caveat 4 says the
+finite-difference noise floor -- not observables; `DATASET.md` caveat 6 says the
 native arm is uncertified everywhere, and I0001 puts the neighbouring
 `curvature/c_fd_*` / `curv_floor_*` channels in the "instrument noise
 diagnostics, not observables" row. **No observable is warmup-dominated in the
 protocol's sense.** Across 248 families, two crossings of a 3-sigma line is the
-same order as chance alone would produce (caveat 9), so this pair should not be
+same order as chance alone would produce (caveat 10), so this pair should not be
 read as a finding.
 
 ### 5. The measurement cadence blocks the test for a third of the universe
@@ -255,7 +255,7 @@ For a cross-depth claim in this dataset:
   finding, only the shadow *gradient* direction ever passes; restricting would
   delete most curvature channels from the universe, and the protocol asked for
   "every scalar family present in all three depths". Curvature numbers here are
-  therefore **uncertified** (caveat 4) and describe channel behaviour, not
+  therefore **uncertified** (caveat 6) and describe channel behaviour, not
   certified curvature. This mirrors the A0001/A0002 split in I0001.
 - `ANSWER_SHEET.md`, the self-test contract `DATASET.md` points at, is not
   present in this analysis repo, so the pipeline could not be validated against
@@ -294,11 +294,12 @@ For a cross-depth claim in this dataset:
 **`DATASET.md` caveats that apply.** 1 (size ray, not a depth sweep -- every
 "depth" statement here is about the nanochat recipe at scale); 2 (n=3 depths,
 n=1 seed at d14/d16, so d16-vs-d12 rests on a single d16 trajectory);
-3 (the confound under study); 4 (native curvature uncertified -- both
-warmup-dominated families are native-arm); 5 (Muon replay error is a
-reference-frame quantity); 6 (probe sampling is per-seed, inflating the
-`probe/*` seed band -- and `probe/*` is the largest untestable block); 8
-(`noise/*` descriptive only); 9 (multiple comparisons: 992 family-region-
+3 (the confound under study); 4 (all curvature is local to one short-probe
+sequence); 5 (Muon replay error is a reference-frame quantity); 6 (native
+curvature uncertified -- both warmup-dominated families are native-arm); 7
+(all runs use the same probes, so `probe/*` is sample-local but its seed band
+has no probe-selection variance -- and `probe/*` is the largest untestable block); 9
+(`noise/*` descriptive only); 10 (multiple comparisons: 992 family-region-
 alignment tests were run, so the two 3-sigma warmup-dominated crossings should
 be read as consistent with chance).
 

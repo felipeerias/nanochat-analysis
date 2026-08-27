@@ -252,9 +252,11 @@ This does not turn the size-ray comparison into a controlled depth effect.
   their raw absolute differences and sign comparisons remain. Near-zero but
   nonzero shadow finite differences produce very large valid ratios, so raw
   differences are reported alongside them.
-- **Uncertified native arm (data-card caveat 4):** all native checkpoint
-  verdicts fail. This analysis deliberately describes disagreement with the
-  paired fp32 reference; it does not claim the native curvature is certified.
+- **Curvature scope and native certification (data-card caveats 4 and 6):**
+  all HVP quantities are local to one 256-token sequence, and all native
+  checkpoint verdicts fail. This analysis deliberately describes disagreement
+  with the paired fp32 reference; it does not claim the native curvature is
+  certified.
   Flags and verdict codes are categorical even though the frozen universe
   requires treating every shared scalar family numerically.
 - **Trend rule was underspecified:** the protocol required comparison against
@@ -269,15 +271,17 @@ This does not turn the size-ray comparison into a controlled depth effect.
   d16 have one each. The absolute 40-step LR and 400-step Muon warmups occupy
   different normalized fractions. “With depth” here means along this recipe
   size ray, not that depth causes the change.
-- **Sampling and execution (caveats 6–7):** probe sampling and compiled-GPU
-  nondeterminism affect which model states were reached. The same-state arm
-  pairing removes them from the immediate contrast, but not from
-  generalization of progress or size-ray patterns.
-- **Muon reference and noise-scale caveats (5 and 8):** no `muon/*` or
+- **Probe scope and execution (caveats 7–8):** all seven runs share the same
+  probes, so probe selection adds no variance to these comparisons, though the
+  result remains local to those samples. Compiled-GPU nondeterminism affects
+  which model states were reached. Same-state arm pairing removes it from the
+  immediate arithmetic contrast, but not from generalization of progress or
+  size-ray patterns.
+- **Muon reference and noise-scale caveats (5 and 9):** no `muon/*` or
   gradient-noise-scale family was tested. The update direction is the actual
   applied update, so no claim about an eager Muon reference decomposition or
   critical batch size is made.
-- **Multiple comparisons (caveat 9):** all 53 shared scalar families were
+- **Multiple comparisons (caveat 10):** all 53 shared scalar families were
   prespecified and all are reported, avoiding outcome selection. The
   distinction between direct HVP values, finite differences, and acceptance
   diagnostics is an interpretive subgrouping; channel-specific trend and

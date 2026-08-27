@@ -38,8 +38,8 @@ TIERS = ("continuous", "periodic", "sparse")
 N_STEPS = 2520
 EARLY_CUTOFF = 400 / N_STEPS
 
-# Columns sufficient to construct stable cross-seed channels.  Hash-like
-# probe_id values are relabelled below because probes are redrawn per seed.
+# Columns sufficient to construct stable cross-seed channels. Hash-like
+# probe_id values are shared across these runs and relabelled semantically.
 READ_COLUMNS = [
     "metric",
     "tier",
@@ -122,7 +122,7 @@ def norm_key_value(value: Any) -> Any:
 
 
 def make_probe_maps(periodic: dict[str, pd.DataFrame]) -> dict[str, dict[str, str]]:
-    """Map per-seed probe hashes to the stable train_stream/val labels.
+    """Map opaque probe hashes to the stable train_stream/val labels.
 
     The profiles identify the lower final probe loss as train_stream and the
     higher as val in every run.  Every other non-null probe hash is the short

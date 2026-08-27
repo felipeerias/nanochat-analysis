@@ -27,7 +27,7 @@ Can this dataset support any of it, and if not, what instrumentation would?
 ## Start from the honest constraint
 
 **This dataset records no data-group labels.** There is no loader sidecar: no
-document identity, no domain or source, no crop flags. See caveat 8 in
+document identity, no domain or source, no crop flags. See caveat 9 in
 DATASET.md. Any notion of "group" must therefore be constructed from what
 exists, or declared unavailable.
 

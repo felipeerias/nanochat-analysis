@@ -131,15 +131,15 @@ carried as a limitation rather than filled with architectural assumptions.
   scale are not independently varied.
 - Compiled GPU training is not bit-reproducible. Seed spread includes both
   trajectory variation and the documented atomic-accumulation nondeterminism
-  (caveat 7).
+  (caveat 8).
 - The relative-layer, role-variance, and correlation summaries are secondary
   descriptive analyses requested by the protocol; they have no predeclared
   inferential threshold. The only confirmatory verdict is the one-family
   frozen decision above. No other metric family was searched, limiting the
   multiple-comparison concern but not eliminating over-interpretation of the
-  structural diagnostics (caveat 9).
-- Curvature certification, probe sampling, and noise-scale instrumentation
-  caveats (4, 6, and 8) do not enter this metric. Data-card caveat 5 is the
+  structural diagnostics (caveat 10).
+- Curvature certification, fixed-probe scope, and noise-scale instrumentation
+  caveats (6, 7, and 9) do not enter this metric. Data-card caveat 5 is the
   phenomenon measured here: the values quantify compiled bf16 Muon updates'
   3–10% per-matrix disagreement with the eager reference rather than an error
   in the analysis pipeline.

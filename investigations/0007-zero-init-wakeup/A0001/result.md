@@ -281,7 +281,7 @@ distinguishable across depths at n=5 seeds.
    that cannot change a zero into a nonzero. Caveat 5 (Muon decoherence is a
    reference-frame quantity with a recorded error bar) is the basis of the
    magnitude discussion in section 5 and is why that section is exploratory.
-   Caveat 7 (compiled training is not bit-reproducible; ~1 ulp from the
+   Caveat 8 (compiled training is not bit-reproducible; ~1 ulp from the
    embedding-backward atomic race) is unusually harmless here: the tier-B
    matrices are *structurally* zero, not numerically small, and 1 ulp of
    nondeterminism in an embedding gradient cannot create gradient where the
