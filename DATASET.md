@@ -198,8 +198,9 @@ bash operations/telemetry_run.sh \
 
 Manifests live in `operations/manifests/` and pin the training code with
 `nanochat_commit`; the runner refuses to start against a different commit.
-Every segment embeds its own copy, so the external file may change later. Official runs accept no extra training arguments — an
-official run is exactly the recipe plus the manifest row. Full model+optimizer
+Every segment embeds its own copy, so the external file may change later.
+Official runs accept no extra training arguments: an official run is exactly
+the resolved flat manifest row. Full model+optimizer
 lineage checkpoints (θ₀ + 3 interiors + the final triplet, hash-inventoried)
 remain on the Runpod network volume `nanochat_experiment` (AP-JP-1, ~70 GB)
 for offline-tier work.

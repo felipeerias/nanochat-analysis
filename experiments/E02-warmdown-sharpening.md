@@ -1,7 +1,7 @@
 # E02 — warmdown onset versus certified sharpening
 
-Status: **draft, not frozen**. Runs on schema v3 as it stands, plus a manifest
-and runner extension for two schedule fields (see instrument dependencies).
+Status: **draft, not frozen**. Runs on schema v3 as it stands, with a new
+immutable manifest for two existing schedule fields.
 
 ## Question
 
@@ -278,28 +278,22 @@ eta_star, verdict_code_gradient}` at sparse deep checkpoints, and a deep
 schedule that already unions in `warmdown_start` as a landmark. No new metric
 is required.
 
-What is required is an **operations extension**, and without it these are not
-official runs. `runs/telemetry_run.sh` refuses extra `base_train` arguments by
-design, and the manifest row allowlist is `{depth, seed, shadow,
-periodic_points, checkpoints, deep_schedule, head_dim}`. Freezing needs:
+The current operations runner already reads `warmdown_ratio` and
+`final_lr_frac` from the pinned trainer's parser, validates their types, passes
+them from a flat manifest row, and asserts their recorded `user_config`
+values. Freezing therefore needs a new immutable manifest at
+`operations/manifests/sweep-d12-warmdown-v1.json`; existing manifests remain
+untouched. Before freezing, decide whether the input assertions are enough for
+this contrast or whether to add checks for the realized LR and Muon-momentum
+warmdown landmarks. That is a design-specific strengthening, not a runner
+format dependency.
 
-1. A new immutable manifest — `runs/manifests/sweep-d12-warmdown-v1.json` —
-   with `warmdown_ratio` and `final_lr_frac` as validated float row keys in
-   range, and the runner passing them through. Existing manifests are untouched.
-2. `runs/verify_telemetry_run.py` extended to `--expect` the realized
-   `derived.lr_schedule.warmdown_ratio` and `.final_lr_frac` and the resolved
-   deep-step landmark, so the **treatment is verified in the artifact rather
-   than assumed** — the failure mode that produced the wrong statement in the
-   first dataset card.
-
-From telemetry v4: item 5 (per-direction certification in the loader) is wanted,
-since the entire analysis conditions on the gradient verdict; without it the
-filter is applied by hand, as I0005 did. Item 1 (separated init and data seeds)
-is wanted so the design matrix is machine-checkable, and if v4 has landed the
-`data_seed` reproducing the legacy ordering must be fixed across all arms. Items
-2, 3, 4, 6, 7 and 8 are **not** needed: no data-side treatment, no controller,
-no sketch comparison, and no quoted noise scale, so v4's gate on `b_noise` is
-not triggered.
+From telemetry v4: item 5 (per-direction certification in the loader) is now
+complete. Item 1 (separated init and data seeds) is wanted so the design matrix
+is machine-checkable, and if v4 has landed the `data_seed` reproducing the
+legacy ordering must be fixed across all arms. Items 2, 3, 4, 6, 7 and 8 are
+**not** needed: no data-side treatment, no controller, no sketch comparison,
+and no quoted noise scale, so v4's gate on `b_noise` is not triggered.
 
 ## Open questions before freezing
 

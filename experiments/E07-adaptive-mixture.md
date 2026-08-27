@@ -571,11 +571,12 @@ out:**
 
 **Not required:** Tier 2 group-restricted HVPs, unless A2 is added.
 
-**Runner and manifest:** the schema-v3 official runner cannot carry a
-controller, a policy version, a third seed axis or partition manifests. A v4
-immutable manifest and runner path must bind `policy_version`, the partition
-manifest hashes, the taxonomy version, β and all frozen policy hyperparameters,
-and must verify them post hoc.
+**Runner and manifest:** the runner automatically accepts flags declared by a
+pinned experiment branch, but the schema-v3 trainer does not yet declare or
+implement a controller, policy version, third seed axis, or partition
+manifests. A v4 experiment branch and immutable manifest must bind
+`policy_version`, the partition-manifest hashes, the taxonomy version, β and
+all frozen policy hyperparameters, and must verify them post hoc.
 
 ## Open questions before freezing
 

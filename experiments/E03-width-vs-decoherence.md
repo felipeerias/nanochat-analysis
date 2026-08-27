@@ -164,11 +164,13 @@ sketches cannot. The new loader/manifest mode must pass v4's non-perturbation
 gate and bind the realized model config, derived training quantities,
 optimizer-group LRs and exact checkpoint grid into provenance.
 
-The current schema-v3 official runner is not sufficient: it rejects aspect
-ratios other than 64, derives verification expectations from `64 * depth`,
-and cannot carry the schedule and LR overrides above. Before freezing, a new
-immutable v4 manifest format and runner path must support and verify these
-fields. The old sweep manifests remain unchanged.
+The current runner can carry the existing `aspect_ratio`, schedule, and LR
+flags in a flat manifest row. It reads their types from the pinned trainer,
+asserts the recorded `user_config`, and the verifier recomputes width and head
+count from `aspect_ratio`, depth, and `head_dim`. Before freezing, create a new
+immutable manifest and decide whether the primary contrast also requires
+explicit realized optimizer-group LR provenance. The old sweep manifests
+remain unchanged.
 
 ## Open questions before freezing
 

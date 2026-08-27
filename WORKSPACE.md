@@ -55,7 +55,9 @@ smoke data, `NANOCHAT_BASE_DIR`), `nanochat_agent_key.txt` (Runpod API key).
   read from the pinned checkout's own parsers, so no list exists here to
   drift. Changing the trainer itself still goes on an experiment branch,
   identified by its commit.
-- Never edit `uv.lock`. Always use `uv sync --frozen`.
+- Never edit `nanochat/uv.lock`. The analysis repository has its own generated
+  lockfile; reproduce it with `uv sync --frozen` and update it with `uv lock`,
+  never by hand.
 - Never commit `nanochat_agent_key.txt`. Never copy it to the GPU volume.
 - The `telemetry` branch is not for upstream. It stays a research branch.
 - Commit messages use plain language and state that AI wrote the change.
@@ -85,7 +87,7 @@ at the end.
 - `telemetry-v4-plan.md` — what the instrument should record next, and why.
   Read it before changing the instrument.
 - `experiments/` — one file per design. None are frozen. E02 and E03 can now be
-  expressed as manifest recipes; E04 and E05 still need code, so they belong on
+  expressed as flat manifest rows; E04 and E05 still need code, so they belong on
   experiment branches.
 
 The instrument serves many experiments, so it is justified by the questions it

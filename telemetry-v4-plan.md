@@ -22,7 +22,7 @@ attach the outcome, and verify the join?* Everything else waits for v5.
 | No data-group or document identity | no data-side question is answerable at all (I0008) | the lineage sidecar |
 | One data ordering, one seed axis | data-order variance is unmeasurable; "would emphasizing X have helped" is unanswerable in principle | separate seeds |
 | No join between a batch and its outcome | cannot attribute any measurement to the data that produced it | `batch_id` on loss and gradient events |
-| Certification applied at the wrong granularity | analysts must bypass the headline verdict (all eight investigations did) | loader direction-certification fix |
+| Certification applied at the wrong granularity | analyses needing certified HVP quantities had to select direction verdicts by hand | loader direction-certification fix (completed 2026-08-27) |
 | No example-level interference measurement | interference and alignment questions have no instrument | sampled row-gradient Gram |
 | Spectral quantities absent | landscape geometry has no λ_max, no subspace structure | probe bank plus model-only checkpoints for offline work |
 | Noise estimator invalid | ≥8x optimistic; unusable for sizing anything (I0008) | independent-draw estimator, old one renamed |
@@ -58,10 +58,11 @@ attach the outcome, and verify the join?* Everything else waits for v5.
    concern.)
 
 5. **Fix direction certification in the loader**, without a new schema column.
-   Gradient quantities use the gradient verdict; update curvature uses the
-   update verdict; `p1` and the realized loss change are filtered by no HVP
-   verdict. The current `certified()` applies the worst checkpoint verdict to
-   everything, which is the wrong dependency.
+   Completed 2026-08-27 in analysis commit `8950b04`: gradient quantities use
+   the gradient verdict, update curvature uses the update verdict, and `p1`
+   and the realized loss change use no HVP verdict. Unknown future deep metrics
+   fail closed until their dependency is declared. Definedness remains a
+   separate, explicit filter.
 
 6. **Sidecar verifier.** Four layers — physical (atomic chunks, per-chunk
    SHA-256, ordered inventory bound into provenance), structural (counts,
@@ -196,29 +197,31 @@ changes — keyed off configuration, not model name.
 
 ## 5. Requirements discovered by the experiment drafts
 
-Six designs were drafted against this plan. Reading across them surfaces one
-requirement none of them raised individually.
+Nine designs have now been drafted against this plan. Reading across them
+surfaced one cross-cutting operations requirement.
 
-**The runner is now the bottleneck, not the instrument.** The manifest
-validator allows exactly `depth`, `seed`, `shadow`, `periodic_points`,
-`checkpoints`, `deep_schedule` and `head_dim`, and official runs accept no
-extra training arguments. That was the right design for a depth sweep. **Every
-drafted experiment needs a knob outside that list** — width (E03), the
-schedule (E02), attention pattern and softcap (E04), Muon execution mode
-(E05), packing and composition (E01). As it stands, none of them can run.
+**Runner status, updated 2026-08-27.** A manifest row is now flat and contains
+the arguments for that run. The runner discovers valid names and types from
+the pinned checkout's `base_train` and telemetry parsers, instead of carrying
+a fixed allowlist or a nested `recipe` block. It rejects runner-owned flags,
+passes the resolved argument vector directly, records the exact manifest, and
+asks the verifier to assert every resolved input in `provenance.user_config`.
+The verifier also recomputes model width and head count from the recorded
+geometry inputs.
 
-The fix is a general one, not six special cases: manifest rows carry a
-validated `recipe` block of permitted `base_train` overrides, each with a
-declared type and range, and **the verifier checks the realized values in
-provenance rather than the command line**. Treatment verification must come
-from the artifact, since a flag can be passed and silently ignored.
+This removes the generic runner block for E02 and E03, and for E08's existing
+trainer overrides. Each campaign still needs a new immutable manifest. A knob
+that does not yet exist in the pinned trainer still belongs on an experiment
+branch; this is the remaining situation for E01, E04, E05, and E07.
 
-That in turn requires provenance to record **realized derived quantities**,
-not just inputs: the learning-rate schedule actually used, optimizer-group
-learning rates after the depth and width scalings, the window pattern per
-layer, and the Muon execution mode. E02 found that `--warmdown-ratio` moves
-both the learning-rate warmdown and the Muon momentum warmdown, so recording
-the input flag alone would misdescribe the treatment.
+Draft designs do not need a universal realized-treatment schema before their
+questions are settled. Before a design freezes, it should decide whether its
+primary contrast is adequately bound by recorded inputs and model config. If
+not, add only the realized derived quantities that matter for that treatment:
+for example optimizer-group learning rates, the effective warmdown landmarks,
+the window pattern per layer, or the Muon execution mode. E02 found that
+`--warmdown-ratio` moves both the learning-rate and Muon-momentum warmdowns,
+so it is a concrete case where a realized schedule may be worth recording.
 
 Other specific requirements from the drafts:
 
@@ -245,7 +248,7 @@ first; those are recorded in section 2 as deferred.
    `u_ij * theta_ij` is to zero, as a distribution. The cautious-decay term
    is discontinuous at that boundary and has no derivative bound, so it is
    the one decoherence source T02 cannot bound
-   (`theory/T02-muon-decoherence.md` §4, equation 9).
+   (`exploratory/T02-muon-decoherence.md` §4, equation 9).
    `cautious_mask_fraction` counts masked entries but not their margin.
    Take the margin against the reference path: it needs no extra model
    evaluation, though the reduction is not free. Comparing the production

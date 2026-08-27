@@ -112,11 +112,10 @@ unreadable across the boundary.
 The alternative is to pin the batch size and learning rates to d12's. That is
 possible (`--total-batch-size 524288`, and a `--weight-decay` argument to
 restore the scaled value) but it is **not the recipe**, and DATASET.md is
-explicit that "official runs accept no extra training arguments — an official
-run is exactly the recipe plus the manifest row". The manifest schema currently
-carries only `depth` and `seed` per row. So the pinned scenario is not merely a
-different design choice; it needs a manifest-schema change before it can be an
-official run at all.
+explicit that an official run is exactly its resolved manifest row. The
+current runner can carry these existing trainer flags, so the pinned scenario
+needs a new immutable manifest and a declared estimand, not a runner-schema
+change.
 
 Both scenarios are named below and must be declared before any run:
 
@@ -431,18 +430,17 @@ Two **operations** dependencies, both outside the instrument:
    `--telemetry-deep-steps` list (a one-line CLI affordance, and the honest ask)
    or `--telemetry-deep-every 1`, which costs 65 deep checkpoints per run and
    raises Stage 0 from ~$12 to ~$30. Prefer the flag.
-2. **Manifest fields for Scenario B and for the iso-token arm.** Manifest rows
-   currently carry `depth` and `seed` only. Both Scenario B and Stage 1-A need
-   `total_batch_size`, `num_iterations` and `weight_decay` expressible in the
-   manifest, or they cannot be official runs under DATASET.md's own definition.
-   New manifests (`probe-d18-d20-prefix-v1`, then `sweep-d18-d20-v1` or
-   `isotoken-d18-d20-v1`) since manifests are immutable once used.
+2. **New manifests for Scenario B and for the iso-token arm.** The current
+   runner already accepts parser-declared `total_batch_size`, `num_iterations`,
+   and `weight_decay` fields. Put them in new manifests
+   (`probe-d18-d20-prefix-v1`, then `sweep-d18-d20-v1` or
+   `isotoken-d18-d20-v1`), since manifests are immutable once used.
 
 Two v4 items would materially improve any Stage 1: item 1 (separated
 `init_seed`/`data_seed`, so the "differs only in X" claim is checkable rather
-than assumed) and item 5 (the loader's direction-certification fix, since every
-outcome here is gradient-direction-certified and all eight investigations had to
-bypass the headline verdict by hand).
+than assumed) and item 5 (the loader's direction-certification fix, completed
+in analysis commit `8950b04`, since every outcome here is
+gradient-direction-certified).
 
 ## Open questions before freezing
 
