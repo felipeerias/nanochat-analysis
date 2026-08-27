@@ -1,10 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-# Generic sweep runner: pre-collection gates, one instrumented training run
-# selected from a sweep manifest, artifact verification, then pod SELF-STOP.
+# Generic sweep runner: portable validation, pre-collection gates, one
+# instrumented training run selected from a manifest, and artifact verification.
+# The pod is left running unless STOP_POD=1 requests a self-stop.
 #
-# Usage (after runs/telemetry_pod_setup.sh):
+# Usage (after operations/telemetry_pod_setup.sh):
 #   bash operations/telemetry_run.sh operations/manifests/sweep-d12-d16-v1.json d12-s7
 #   STOP_POD=1 bash operations/telemetry_run.sh <manifest> <run_id>   # self-stop at the end
 # Env (booleans count only as "1"): CHECK_ONLY (portable checks then stop),
@@ -13,10 +14,10 @@ set -euo pipefail
 #   ALLOW_EPHEMERAL, CONFIRM_VOLUME; EXPECT_BACKEND (default fa3),
 #   TELEMETRY_DIR, MIN_FREE_GB (default 60), NANOCHAT_CHECKOUT (default
 #   $VOLUME/nanochat) - the training checkout this controller drives.
-# NO extra base_train arguments are accepted: an official manifest run is
-# exactly the recipe plus the row's telemetry settings - dev experiments
-# call scripts.base_train directly instead. The run_id doubles as the
-# model tag and segment tag. Long runs: launch under screen.
+# NO command-line base_train arguments are accepted: an official run is the
+# resolved flat manifest row. Dev experiments outside that contract call
+# scripts.base_train directly. The run_id doubles as the model tag and segment
+# tag. Long runs: launch under screen.
 # Manifests are IMMUTABLE once any run has used them; each segment embeds
 # its exact manifest bytes.
 # Self-stop uses the pod-scoped RUNPOD_API_KEY Runpod injects (it can stop
@@ -50,10 +51,9 @@ if ! git -C "$NANOCHAT_CHECKOUT" rev-parse --git-dir >/dev/null 2>&1; then
 fi
 
 # ----------------------------------------------------------------------------
-# Resolve this run's row (defaults overlaid by the row; manifest is the
-# single source of truth). The row is VALIDATED in python - types, allowed
-# keys, allowed values - and transferred as tab-separated values, never
-# through shell interpolation.
+# Resolve this run's row (defaults overlaid by the row; manifest is the single
+# source of truth). Python validates names and types from the pinned checkout's
+# own parsers, then later constructs and executes the argument vector directly.
 
 DIRTY=0
 if [ -n "$(git -C "$NANOCHAT_CHECKOUT" status --porcelain)" ]; then
@@ -96,7 +96,7 @@ if [ "${CHECK_ONLY:-0}" = "1" ]; then
 fi
 
 # ----------------------------------------------------------------------------
-# Self-stop trap FIRST: any failure below must still stop the pod.
+# Exit trap FIRST: always close the log; optionally self-stop on any exit.
 self_stop() {
     status=$?
     echo "[telemetry_run] exiting with status $status"
@@ -125,8 +125,8 @@ self_stop() {
 trap self_stop EXIT
 
 # ----------------------------------------------------------------------------
-# Fail-closed pre-flight: network volume attached, enough space, self-stop
-# plausible - all BEFORE any expensive work.
+# Fail-closed pre-flight: network volume attached, enough space, and optional
+# self-stop plausible - all BEFORE any expensive work.
 if [ "${ALLOW_EPHEMERAL:-0}" != "1" ]; then
     if [ "$(stat -c %d "$VOLUME" 2>/dev/null)" = "$(stat -c %d /)" ]; then
         echo "FATAL: $VOLUME is not a separate mount (set ALLOW_EPHEMERAL=1 to accept data loss)."
@@ -269,7 +269,7 @@ if [ "${GATES_ONLY:-0}" = "1" ]; then
 fi
 
 # ----------------------------------------------------------------------------
-# The instrumented run: exactly the recipe plus the manifest row.
+# The instrumented run: exactly the resolved flat manifest row.
 # Resolving the row, building the argument list and verifying what came out
 # all belong to one program, which does them without a text round trip.
 echo "[run] starting $RUN_ID"

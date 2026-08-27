@@ -82,6 +82,36 @@ stop the pod instead; that flag makes the runner check up front that
 `runpodctl` and the API key are present, so a self-stop cannot fail silently
 at the end.
 
+## Bringing run data home
+
+On the pod, make one archive without the large checkpoint tensors, inspect its
+size, and send it:
+
+```bash
+tar --exclude='*/checkpoints/*.pt' -cf /workspace/sweep-analysis.tar \
+    -C /workspace telemetry-data logs
+ls -lh /workspace/sweep-analysis.tar
+runpodctl send /workspace/sweep-analysis.tar
+```
+
+`runpodctl send` prints the code used by `receive`. Locally, give each delivery
+its own collection directory, receive the archive there, and extract it:
+
+```bash
+mkdir -p ~/Igalia/nanochat/telemetry-data/<collection-name>
+cd ~/Igalia/nanochat/telemetry-data/<collection-name>
+runpodctl receive <code>
+tar -xf sweep-analysis.tar
+```
+
+The loader root for that collection is then
+`<collection-name>/telemetry-data`; set `NANOCHAT_TELEMETRY_DATA_ROOT` to that
+path when it is not the default `sweep` collection. Checkpoint inventories and
+metadata are retained, but `checkpoints/*.pt` are intentionally absent, so the
+full verifier's lineage-hash check is expected to fail locally. Keep the
+archive until the extracted file inventory has been checked; remove it only
+after the extracted copy is confirmed complete.
+
 ## Next round
 
 - `telemetry-v4-plan.md` — what the instrument should record next, and why.
