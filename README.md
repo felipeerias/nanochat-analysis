@@ -1,6 +1,6 @@
 # Analysis
 
-The parquet data is in `../telemetry-data/sweep/`. Read `DATASET.md` here
+The parquet data is in `../telemetry-data/sweep/telemetry-data/`. Read `DATASET.md` here
 first. The instrument is in `../nanochat/` (branch `telemetry`); change it only
 for a strong reason, and change it on a branch that a manifest then pins.
 
