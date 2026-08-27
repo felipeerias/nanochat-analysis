@@ -86,16 +86,18 @@ One row per measurement. Key columns: `metric`, `tier`, `phase`, `step`,
 ## Loading
 
 ```python
-import sys; sys.path.insert(0, "<repo>")          # for nanochat.telemetry
-from nanochat.telemetry import read_telemetry
-df = read_telemetry(ROOT, SEGMENT, "sparse").to_pandas()
+from loader.telemetry_load import DEFAULT_DATA_ROOT, load_segment
+
+run = load_segment(DEFAULT_DATA_ROOT, SEGMENT)
+df = run["tiers"]["sparse"]
 ```
 
 A loader that encodes the filtering discipline (defined-row handling, per-arm
 selection, verdict-aware `certified()`) lives at
-`loader/telemetry_load.py`. Reading the parquet raw
-with pyarrow works equally well; several independent analyses have done so and
-agreed with the loader.
+`loader/telemetry_load.py`. `NANOCHAT_REPO` and
+`NANOCHAT_TELEMETRY_DATA_ROOT` override its default sibling layout. Reading the
+parquet raw with pyarrow works equally well; several independent analyses have
+done so and agreed with the loader.
 
 **Findings from this dataset are in `investigations/`**, one folder
 per investigation, each with a frozen protocol, two independent blind analyses,
@@ -158,15 +160,15 @@ transfer (70 GB → 999 MB). That is expected, not corruption.
    is a different function. This is the likely explanation for curvature's wide
    seed spread (25-29%), and it means curvature results are local in a stronger
    sense than "evaluated at a checkpoint": they are local in the data too.
-6. **Native bf16 curvature is uncertified everywhere** (see above). Do not
-   quote native curvature numbers as measurements without the shadow arm or
-   an explicit statement that they are uncertified.
 5. **Muon updates decohere from any reference**: the compiled bf16 optimizer
    applies updates ~3–10% (per-matrix relative L2) away from the eager
    reference decomposition, because Newton-Schulz amplifies rounding
    placement. `muon/replay_update_relerr` records this per matrix per deep
    checkpoint; Muon stage metrics should be read as reference-frame
    quantities with that recorded error bar.
+6. **Native bf16 curvature is uncertified everywhere** (see above). Do not
+   quote native curvature numbers as measurements without the shadow arm or
+   an explicit statement that they are uncertified.
 7. **Probes are identical across the five d12 seeds** (verified: same
    probe ids in all five runs), because probe selection inherits the
    deterministic loader. Probe-derived spread across those seeds is therefore

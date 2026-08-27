@@ -26,7 +26,7 @@ smoke data, `NANOCHAT_BASE_DIR`), `nanochat_agent_key.txt` (Runpod API key).
 | `nanochat/tests/test_telemetry*.py` | Tests for the instrument. |
 | `nanochat/docs/telemetry-spec.md` | What the instrument measures, and why. Its normative contract. |
 | `nanochat/docs/history/` | Old build plans. Finished work. |
-| `nanochat-analysis/DATASET.md` | **The dataset card. Start here.** Nine caveats. |
+| `nanochat-analysis/DATASET.md` | **The dataset card. Start here.** Ten caveats. |
 | `nanochat-analysis/loader/` | Code to read the data. |
 | `nanochat-analysis/profiles/` | What each run looks like. Descriptive only. |
 | `nanochat-analysis/investigations/` | One folder per question. Claims live here. |
@@ -35,7 +35,7 @@ smoke data, `NANOCHAT_BASE_DIR`), `nanochat_agent_key.txt` (Runpod API key).
 | `nanochat-analysis/operations/` | Runner, pod setup, sweep manifests. |
 | `nanochat-analysis/telemetry-v4-plan.md` | What the instrument should record next. |
 | `nanochat-analysis/telemetry-plan-v2.md` | The research plan. |
-| `telemetry-data/sweep/` | The parquet data. Seven schema-v3 runs. |
+| `telemetry-data/sweep/telemetry-data/` | Eight segments: seven schema-v3 runs and the schema-v1 shakedown. |
 
 ## To start work
 

@@ -238,7 +238,7 @@ Two honesty notes on this.
   more stable across seeds than gHg, 10% is too loose and the rule should be
   re-cut before any architecture study freezes.
 - If every arm shares the same bank — which they would, since probes are
-  already shared across seeds (DATASET caveat 6) — then bank sampling error is
+  already shared across seeds (DATASET caveat 7) — then bank sampling error is
   **common-mode and cancels** in the paired contrast. So why size at all? Because
   cancellation holds only for a *fixed* operator. The treatment moves θ, which
   moves H, and the finite-m bias is therefore treatment-dependent: it does not
@@ -260,7 +260,7 @@ This is what makes the pilot worth its cost beyond the sizing decision.
 | σ_seed | **five d12 seeds**, one fixed bank at m*, three anchors | 12 runs |
 
 σ_platform is not hypothetical: the compiled embedding backward contains an
-atomic-accumulation race (DATASET caveat 7), so identical inputs need not
+atomic-accumulation race (DATASET caveat 8), so identical inputs need not
 reproduce bitwise, and an HVP goes through that backward twice. Without the
 rerun control, platform jitter would be silently attributed to probe sampling.
 

@@ -128,7 +128,7 @@ independent observable, so it is not reported as a separate outcome. `gHg` and
 Direction: gradient only. Certified curvature exists along the gradient
 direction alone at every depth measured (I0001, I0004, telemetry-v4 §3), the
 random and update directions certify at zero checkpoints, and the native bf16
-arm certifies nowhere (DATASET caveat 4). Every claim here is about the fp32
+arm certifies nowhere (DATASET caveat 6). Every claim here is about the fp32
 shadow surface at θ_s, along the gradient.
 
 Estimator, precommitted. Per run, with y_k = ln `vhv_gradient` at the certified
@@ -193,7 +193,7 @@ Secondary rules, also precommitted:
   mechanistic version of the primary test.
 
 Everything else — per-layer structure, `dhd`, `update/*`, decoherence, loss —
-is exploratory and will be labelled as such (DATASET caveat 9).
+is exploratory and will be labelled as such (DATASET caveat 10).
 
 ## Power, honestly
 

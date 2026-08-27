@@ -52,6 +52,6 @@ Per direction:
 ## Data quality notes
 
 - Undefined rows are present and carry reasons: 974 periodic, 504 sparse. They are honest 'not measurable here' records, not missing data.
-- Every native (bf16) checkpoint verdict is `failed`. This is a property of bf16 arithmetic against fp32-era thresholds, documented in DATASET.md caveat 4. Native curvature values are not certified measurements.
+- Every native (bf16) checkpoint verdict is `failed`. This is a property of bf16 arithmetic against fp32-era thresholds, documented in DATASET.md caveat 6. Native curvature values are not certified measurements.
 - Shadow (IEEE fp32) checkpoint verdicts are the worst of three directions, so they understate what is usable; see the per-direction table above.
 - Lineage checkpoint tensors (`checkpoints/*.pt`) are absent from this local copy by design; they remain on the GPU volume. Verification of their hashes is not possible here.

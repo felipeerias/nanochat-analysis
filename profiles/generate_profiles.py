@@ -177,7 +177,7 @@ def write_profile(s, commit):
     if s["checkpoint_verdicts"].get("native", {}).get("failed"):
         notes.append("Every native (bf16) checkpoint verdict is `failed`. This "
                      "is a property of bf16 arithmetic against fp32-era "
-                     "thresholds, documented in DATASET.md caveat 4. Native "
+                     "thresholds, documented in DATASET.md caveat 6. Native "
                      "curvature values are not certified measurements.")
     if s["shadow"] != "off":
         notes.append("Shadow (IEEE fp32) checkpoint verdicts are the worst of "

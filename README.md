@@ -10,7 +10,7 @@ for a strong reason, and change it on a branch that a manifest then pins.
 - `exploratory/` — models and quick checks. Single-author, not citable.
 - `experiments/` — designs for data we do not have yet.
 - `operations/` — the runner, the pod setup and the sweep manifests.
-- `DATASET.md` — the canonical dataset card. Nine caveats. They matter.
+- `DATASET.md` — the canonical dataset card. Ten caveats. They matter.
 
 This is a git repository and findings cite commits, so commit your work.
 
@@ -114,13 +114,10 @@ Corrections these produced, now applied: the seed varies **initialization
 only** (one data ordering, shared probes), and cross-depth claims are far more
 limited than the seed floor alone suggests.
 
-## Backlog
+## Starting another analysis
 
-Ideas with no folder yet. Make a folder when you start one.
-
-- Which channels have a small seed spread? Those can detect a change.
-- Does Muon update decoherence change with depth?
-- What does certified curvature do over training? Use `shadow_fp32` records
-  with a passing per-direction verdict. Never mix the two arms.
-- Is the gradient-noise scale stable across seeds and depths? See caveat 8.
-- Do the absolute warmups (40 and 400 steps) distort cross-depth comparison?
+The former backlog is now I0001, I0003, I0005, I0006, and I0008. Read those
+conclusions before opening a new folder so an answered question is not
+silently restarted. New exploratory work goes under `exploratory/`; a new
+claim starts from `investigations/TEMPLATE-investigation.md` and freezes its
+protocol before inspecting outcomes.
