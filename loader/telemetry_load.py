@@ -18,14 +18,30 @@ s_deep + 1. normalized_progress is the cross-run x-axis.
 import json
 import os
 import sys
+from pathlib import Path
 
 import pandas as pd
 
-# layout: ~/Igalia/nanochat/{nanochat-analysis,nanochat}; REPO is the repo ROOT
-# (the dir CONTAINING the nanochat package, not the package itself)
-REPO = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-    os.path.abspath(__file__)))), "nanochat")
-assert os.path.isfile(os.path.join(REPO, "nanochat", "telemetry.py")), REPO
+# By default the two repositories and telemetry-data share one workspace.
+# Environment overrides make the same checkout usable in any layout.
+ANALYSIS_ROOT = Path(__file__).resolve().parents[1]
+WORKSPACE_ROOT = Path(os.environ.get(
+    "NANOCHAT_WORKSPACE_ROOT", ANALYSIS_ROOT.parent)).expanduser().resolve()
+NANOCHAT_REPO = Path(os.environ.get(
+    "NANOCHAT_REPO", WORKSPACE_ROOT / "nanochat")).expanduser().resolve()
+DEFAULT_DATA_ROOT = Path(os.environ.get(
+    "NANOCHAT_TELEMETRY_DATA_ROOT",
+    WORKSPACE_ROOT / "telemetry-data" / "sweep" / "telemetry-data",
+)).expanduser().resolve()
+
+# NANOCHAT_REPO is the directory containing the nanochat package.
+REPO = str(NANOCHAT_REPO)
+instrument = NANOCHAT_REPO / "nanochat" / "telemetry.py"
+if not instrument.is_file():
+    raise FileNotFoundError(
+        f"nanochat telemetry instrument not found at {instrument}; "
+        "set NANOCHAT_REPO to the nanochat checkout"
+    )
 sys.path.insert(0, REPO)
 from nanochat.telemetry import read_telemetry  # noqa: E402
 

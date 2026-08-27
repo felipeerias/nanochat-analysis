@@ -14,6 +14,29 @@ for a strong reason, and change it on a branch that a manifest then pins.
 
 This is a git repository and findings cite commits, so commit your work.
 
+## Environment
+
+The analysis repository has its own CPU environment and lockfile. From its
+root, reproduce it with:
+
+```bash
+uv sync --frozen
+uv run python -m unittest discover -s tests -v
+```
+
+The default workspace layout places `nanochat-analysis/`, `nanochat/`, and
+`telemetry-data/` beside one another. For another layout, point the loader at
+the checkout and extracted collection explicitly:
+
+```bash
+export NANOCHAT_REPO=/path/to/nanochat
+export NANOCHAT_TELEMETRY_DATA_ROOT=/path/to/collection/telemetry-data
+```
+
+`NANOCHAT_WORKSPACE_ROOT` can instead move all three default locations at
+once. The analysis lockfile is generated with `uv lock`; do not hand-edit it.
+The separate `nanochat/uv.lock` remains frozen.
+
 ## Profiles
 
 A profile describes one training run, or one collection of runs. It holds
