@@ -3,7 +3,7 @@
 Profiles are descriptive: fixed summaries and data-quality notes. No
 comparison, no ranking, no explanation - those belong in an investigation.
 
-Usage:  ../.venv/bin/python generate_profiles.py
+Usage from the repository root: uv run python profiles/generate_profiles.py
 """
 
 import collections
@@ -11,18 +11,21 @@ import datetime
 import json
 import os
 import subprocess
-import sys
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(HERE), "loader"))
-from telemetry_load import load_segment, defined, metric, arm  # noqa: E402
+from loader.telemetry_load import (  # noqa: E402
+    DEFAULT_DATA_ROOT,
+    arm,
+    defined,
+    load_segment,
+    metric,
+)
 
-ROOT = os.path.expanduser(
-    "~/Igalia/nanochat/telemetry-data/sweep/telemetry-data")
+ROOT = str(DEFAULT_DATA_ROOT)
 VERDICT = {0.0: "passed", 1.0: "inconclusive", 2.0: "failed"}
 DIRECTIONS = ("random", "gradient", "update")
 

@@ -7,12 +7,12 @@ that is COMMON to all five seeds is exactly the batch-attributable component.
 That common component is an upper bound on any batch/group value signal
 recoverable from this dataset's loss channel.
 """
-import sys, os, pickle
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
-import numpy as np, pandas as pd, telemetry_load as T
+import pickle
+import numpy as np, pandas as pd
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
-OUT = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
-SP = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
+from _paths import D12_CONT, OUTPUT_ROOT
+OUT = OUTPUT_ROOT
+SP = D12_CONT
 out = pickle.load(open(SP, 'rb'))
 runs = sorted(out)
 W = 51

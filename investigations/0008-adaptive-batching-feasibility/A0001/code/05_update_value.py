@@ -3,11 +3,12 @@ an applied update'.  p1 = g^T d is exactly s = lambda^T d with lambda replaced
 by the MYOPIC costate (minus the fixed-probe gradient at theta_s).
 Tests whether a first/second-order local model predicts the realized change.
 """
-import sys, os
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
-import pandas as pd, numpy as np, telemetry_load as T
-ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
-OUT = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+import os
+import pandas as pd, numpy as np
+from loader import telemetry_load as T
+from _paths import DATA_ROOT, OUTPUT_ROOT
+ROOT = DATA_ROOT
+OUT = OUTPUT_ROOT
 SEGS = sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))
 M = ['update/p1','update/p2','update/actual','update/residual_p1','update/residual_p2',
      'update/normalized_residual','update/direction_norm','update/loss_before','update/loss_after',

@@ -1,9 +1,9 @@
-import sys, os, json
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
+import os, json
 import pandas as pd, numpy as np
-import telemetry_load as T
+from loader import telemetry_load as T
+from _paths import DATA_ROOT, OUTPUT_ROOT
 
-ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
+ROOT = DATA_ROOT
 SEGS = sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))
 
 rows = []
@@ -20,7 +20,7 @@ for s in SEGS:
                              ndef=int(g.loc[m,'ndef']), nsteps=int(g.loc[m,'nsteps']),
                              veclen=int(vec.loc[m])))
 inv = pd.DataFrame(rows)
-inv.to_csv('/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001/metric_inventory.csv', index=False)
+inv.to_csv(f'{OUTPUT_ROOT}/metric_inventory.csv', index=False)
 piv = inv.groupby(['tier','metric']).agg(segs=('seg','nunique'), n_tot=('n','sum'),
                                          def_frac=('ndef', lambda x: 0), veclen=('veclen','max'))
 piv['def_frac'] = (inv.groupby(['tier','metric'])['ndef'].sum() /

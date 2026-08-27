@@ -1,6 +1,7 @@
 """Robustness of the window-composition / probe-progress association."""
 import numpy as np, pandas as pd
-OUT='/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+from _paths import OUTPUT_ROOT
+OUT=OUTPUT_ROOT
 df = pd.read_csv(f'{OUT}/probe_window.csv')
 def test(g, order, drop, pred='batch/bos_count', use_log=False):
     g = g.dropna().sort_values('step')

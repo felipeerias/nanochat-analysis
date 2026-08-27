@@ -1,13 +1,11 @@
 """I0003/A0001 — first look at muon/replay_update_relerr shape and columns."""
 import os
-import sys
 
 import pandas as pd
 
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
-import telemetry_load as tl  # noqa: E402
+from loader import telemetry_load as tl  # noqa: E402
 
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+ROOT = str(tl.DEFAULT_DATA_ROOT)
 SEGS = {
     "d12-s7": "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
     "d12-s8": "d12-s8-s0-2b2e72e4395440029b92226213d137bb",

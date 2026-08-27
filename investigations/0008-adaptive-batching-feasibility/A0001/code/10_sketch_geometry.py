@@ -9,12 +9,13 @@
     vs parameter motion alone (fixed-probe sketch).
 (c) per-role / per-layer share of the gradient over training.
 """
-import sys, os
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
-import numpy as np, pandas as pd, telemetry_load as T
+import os
+import numpy as np, pandas as pd
+from loader import telemetry_load as T
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
-ROOT='/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
-OUT='/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+from _paths import DATA_ROOT, OUTPUT_ROOT
+ROOT=DATA_ROOT
+OUT=OUTPUT_ROOT
 SEGS = sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))
 
 def gather(df_sk, df_sq):

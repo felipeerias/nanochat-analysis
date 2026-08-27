@@ -10,7 +10,6 @@ pessimistic than the per-direction verdict required by I0005.
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/i0005-a0002-matplotlib")
@@ -21,14 +20,11 @@ import pandas as pd
 
 
 HERE = Path(__file__).resolve().parent
-ANALYSIS_ROOT = HERE.parents[2]
-DATA_ROOT = ANALYSIS_ROOT.parent / "telemetry-data/sweep/telemetry-data"
 FIGURE_DIR = HERE / "figures"
-sys.path.insert(0, str(ANALYSIS_ROOT))
-
-from loader.telemetry_load import load_segment  # noqa: E402
+from loader.telemetry_load import DEFAULT_DATA_ROOT, load_segment  # noqa: E402
 
 
+DATA_ROOT = DEFAULT_DATA_ROOT
 SEGMENTS = {
     7: "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
     8: "d12-s8-s0-2b2e72e4395440029b92226213d137bb",

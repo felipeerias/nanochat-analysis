@@ -12,15 +12,13 @@ Matched checkpoints are the 20 uniform-tail points at nominal progress
 0.05 ... 1.00; the update-0 checkpoint with its structural zeros is excluded.
 """
 import os
-import sys
 
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
-import telemetry_load as tl  # noqa: E402
+from loader import telemetry_load as tl  # noqa: E402
 
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+ROOT = str(tl.DEFAULT_DATA_ROOT)
 OUT = os.path.dirname(os.path.abspath(__file__))
 METRIC = "muon/replay_update_relerr"
 SEGS = [

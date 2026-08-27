@@ -10,9 +10,11 @@ import numpy as np
 import pandas as pd
 import pyarrow.dataset as ds
 
+from loader.paths import DEFAULT_DATA_ROOT
+
 
 HERE = Path(__file__).resolve().parent
-ROOT = Path("/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data")
+ROOT = DEFAULT_DATA_ROOT
 SEGMENTS = {
     "d12-s7": "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
     "d12-s8": "d12-s8-s0-2b2e72e4395440029b92226213d137bb",

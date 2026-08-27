@@ -11,7 +11,6 @@ from __future__ import annotations
 import itertools
 import json
 import math
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -23,13 +22,15 @@ import pandas as pd
 
 
 HERE = Path(__file__).resolve().parent
-ANALYSIS_ROOT = HERE.parents[2]
-DATA_ROOT = ANALYSIS_ROOT.parent / "telemetry-data" / "sweep" / "telemetry-data"
-sys.path.insert(0, str(ANALYSIS_ROOT))
+from loader.telemetry_load import (  # noqa: E402
+    DEFAULT_DATA_ROOT,
+    defined,
+    metric,
+    read_telemetry,
+)
 
-from loader.telemetry_load import defined, metric, read_telemetry  # noqa: E402
 
-
+DATA_ROOT = DEFAULT_DATA_ROOT
 EARLY_DEEP_UPDATES = (0, 1, 2, 4, 8, 16, 32, 40, 64)
 OUTPUT_ROLES = {"attn_out", "mlp_out"}
 

@@ -9,16 +9,14 @@ Writes tidy CSVs into ./out/ for the reporting script. No claims here.
 """
 import json
 import os
-import sys
 
 import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
-import telemetry_load as tl  # noqa: E402
+from loader import telemetry_load as tl  # noqa: E402
 
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+ROOT = str(tl.DEFAULT_DATA_ROOT)
 OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
 

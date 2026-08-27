@@ -18,21 +18,15 @@ s_deep + 1. normalized_progress is the cross-run x-axis.
 import json
 import os
 import sys
-from pathlib import Path
 
 import pandas as pd
 
-# By default the two repositories and telemetry-data share one workspace.
-# Environment overrides make the same checkout usable in any layout.
-ANALYSIS_ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE_ROOT = Path(os.environ.get(
-    "NANOCHAT_WORKSPACE_ROOT", ANALYSIS_ROOT.parent)).expanduser().resolve()
-NANOCHAT_REPO = Path(os.environ.get(
-    "NANOCHAT_REPO", WORKSPACE_ROOT / "nanochat")).expanduser().resolve()
-DEFAULT_DATA_ROOT = Path(os.environ.get(
-    "NANOCHAT_TELEMETRY_DATA_ROOT",
-    WORKSPACE_ROOT / "telemetry-data" / "sweep" / "telemetry-data",
-)).expanduser().resolve()
+from loader.paths import (  # noqa: F401
+    ANALYSIS_ROOT,
+    DEFAULT_DATA_ROOT,
+    NANOCHAT_REPO,
+    WORKSPACE_ROOT,
+)
 
 # NANOCHAT_REPO is the directory containing the nanochat package.
 REPO = str(NANOCHAT_REPO)

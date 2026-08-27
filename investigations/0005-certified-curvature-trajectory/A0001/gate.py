@@ -6,17 +6,15 @@ Gate 2 (instrument): the eta* reliable-sign gate "reliable-sign-v2" -
   8 * arith_eps. Its exclusions are reported here and are NEVER interpolated.
 """
 import os
-import sys
 
 import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
-import telemetry_load as tl  # noqa: E402
+from loader import telemetry_load as tl  # noqa: E402
 
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+ROOT = str(tl.DEFAULT_DATA_ROOT)
 SEGS = {
     "d12-s7": "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
     "d12-s8": "d12-s8-s0-2b2e72e4395440029b92226213d137bb",

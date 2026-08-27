@@ -4,7 +4,7 @@
 # kept in the repository; everything else here is produced by this script.
 set -euo pipefail
 cd "$(dirname "$0")"
-PY=/home/felipe/Igalia/nanochat/nanochat-analysis/.venv/bin/python
+PY="${PYTHON:-python}"
 
 $PY -W ignore extract.py                       # -> series.parquet, runs.json
 $PY -W ignore structure.py    > structure.txt  # schedule/grid geometry

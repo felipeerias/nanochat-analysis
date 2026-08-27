@@ -2,7 +2,8 @@
 autocorrelated 24-point series do by accident?  Circular-shift null (preserves
 the autocorrelation of both series)."""
 import numpy as np, pandas as pd
-OUT='/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+from _paths import OUTPUT_ROOT
+OUT=OUTPUT_ROOT
 df = pd.read_csv(f'{OUT}/probe_window.csv')
 print('note: all seven runs consume the IDENTICAL batch stream, so these are NOT')
 print('seven independent tests -- d12x5 are literally the same windows.\n')

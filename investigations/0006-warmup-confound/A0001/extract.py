@@ -11,15 +11,13 @@ Output: one parquet with columns
 
 import json
 import os
-import sys
 
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
-import telemetry_load as T  # noqa: E402
+from loader import telemetry_load as T  # noqa: E402
 
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+ROOT = str(T.DEFAULT_DATA_ROOT)
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "series.parquet")
 META = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs.json")
 

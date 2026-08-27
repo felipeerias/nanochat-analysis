@@ -1,7 +1,8 @@
-import sys, os
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
-import pandas as pd, numpy as np, telemetry_load as T
-ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
+import os
+import pandas as pd, numpy as np
+from loader import telemetry_load as T
+from _paths import D12_CONT, DATA_ROOT
+ROOT = DATA_ROOT
 D12 = sorted(d for d in os.listdir(ROOT) if d.startswith('d12-s'))
 cols = ['batch/bos_count','batch/mean_segment_length','batch/segments_per_row_mean',
         'batch/segments_per_row_max','batch/valid_targets','loss/train_mean']
@@ -32,4 +33,4 @@ print('\nvalid_targets constant?', {k: (out[k]['batch/valid_targets'].nunique())
 print('bos_count describe (d12-s7):'); print(out['d12-s7']['batch/bos_count'].describe())
 print('mean_segment_length describe (d12-s7):'); print(out['d12-s7']['batch/mean_segment_length'].describe())
 import pickle
-pickle.dump(out, open('/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl','wb'))
+pickle.dump(out, open(D12_CONT, 'wb'))

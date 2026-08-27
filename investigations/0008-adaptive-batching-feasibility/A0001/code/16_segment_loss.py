@@ -7,12 +7,13 @@ SAME documents at every checkpoint of a run, so their RELATIVE difficulty can
 be tracked. Q1 asks whether relative usefulness re-orders during training; this
 answers the strictly weaker question of whether relative DIFFICULTY re-orders.
 """
-import sys, os
-sys.path.insert(0,'/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
-import numpy as np, pandas as pd, telemetry_load as T
+import os
+import numpy as np, pandas as pd
+from loader import telemetry_load as T
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
-ROOT='/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
-OUT='/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
+from _paths import DATA_ROOT, OUTPUT_ROOT
+ROOT=DATA_ROOT
+OUT=OUTPUT_ROOT
 SEGS=sorted(d for d in os.listdir(ROOT) if not d.startswith('d12-iter'))
 def spearman(a,b):
     ra=pd.Series(a).rank().values; rb=pd.Series(b).rank().values

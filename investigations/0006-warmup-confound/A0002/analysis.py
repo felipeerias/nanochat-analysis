@@ -47,7 +47,6 @@ import json
 import math
 import os
 import re
-import sys
 from collections import Counter
 from pathlib import Path
 
@@ -59,13 +58,14 @@ import pandas as pd
 
 
 HERE = Path(__file__).resolve().parent
-ANALYSIS_ROOT = HERE.parents[2]
-DATA_ROOT = ANALYSIS_ROOT.parent / "telemetry-data" / "sweep" / "telemetry-data"
-sys.path.insert(0, str(ANALYSIS_ROOT))
+from loader.telemetry_load import (  # noqa: E402
+    DEFAULT_DATA_ROOT,
+    defined,
+    load_segment,
+)
 
-from loader.telemetry_load import defined, load_segment  # noqa: E402
 
-
+DATA_ROOT = DEFAULT_DATA_ROOT
 WARMUP_END = 400
 D12_STEPS = 2520
 D16_STEPS = 5376

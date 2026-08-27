@@ -1,7 +1,7 @@
-import sys, os
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
-import pandas as pd, numpy as np, telemetry_load as T
-ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
+import pandas as pd, numpy as np
+from loader import telemetry_load as T
+from _paths import DATA_ROOT
+ROOT = DATA_ROOT
 SEG = 'd12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45'
 d = T.load_segment(ROOT, SEG)
 per = d['tiers']['periodic']; sp = d['tiers']['sparse']

@@ -9,16 +9,14 @@
 
 import json
 import os
-import sys
 
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, "/home/felipe/Igalia/nanochat/nanochat-analysis/loader")
-import telemetry_load as T  # noqa: E402
+from loader import telemetry_load as T  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+ROOT = str(T.DEFAULT_DATA_ROOT)
 S = pd.read_parquet(os.path.join(HERE, "series.parquet"))
 F = pd.read_csv(os.path.join(HERE, "families.csv"))
 META = json.load(open(os.path.join(HERE, "runs.json")))

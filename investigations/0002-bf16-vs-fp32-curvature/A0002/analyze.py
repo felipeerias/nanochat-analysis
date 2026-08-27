@@ -21,10 +21,11 @@ import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 
+from loader.paths import DEFAULT_DATA_ROOT
+
 
 HERE = Path(__file__).resolve().parent
-ANALYSIS_ROOT = HERE.parents[2]
-DATA_ROOT = ANALYSIS_ROOT.parent / "telemetry-data" / "sweep" / "telemetry-data"
+DATA_ROOT = DEFAULT_DATA_ROOT
 FIGURE_DIR = HERE / "figures"
 
 EXPECTED = {

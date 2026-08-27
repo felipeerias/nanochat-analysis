@@ -11,16 +11,13 @@ Writes a tidy CSV to rows.csv next to this file.
 """
 
 import os
-import sys
 
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ANALYSIS = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-sys.path.insert(0, os.path.join(ANALYSIS, "loader"))
-import telemetry_load as T  # noqa: E402
+from loader import telemetry_load as T  # noqa: E402
 
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+ROOT = str(T.DEFAULT_DATA_ROOT)
 
 DIRECTIONS = ("random", "gradient", "update")
 FAMILIES = ("e_sym", "e_lin")

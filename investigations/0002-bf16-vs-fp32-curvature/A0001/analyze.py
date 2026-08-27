@@ -33,7 +33,9 @@ import numpy as np
 import pandas as pd
 import pyarrow.dataset as pds
 
-ROOT = "/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data"
+from loader.paths import DEFAULT_DATA_ROOT
+
+ROOT = str(DEFAULT_DATA_ROOT)
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIG = os.path.join(HERE, "figures")
 os.makedirs(FIG, exist_ok=True)

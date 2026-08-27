@@ -9,7 +9,6 @@ Follows the frozen protocol in ../README.md. Produces:
 
 import json
 import os
-import sys
 
 import matplotlib
 matplotlib.use("Agg")
@@ -18,11 +17,9 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(HERE, "..", "..", "..", "loader")))
-from telemetry_load import load_segment  # noqa: E402
+from loader.telemetry_load import DEFAULT_DATA_ROOT, load_segment  # noqa: E402
 
-ROOT = os.path.expanduser(
-    "~/Igalia/nanochat/telemetry-data/sweep/telemetry-data")
+ROOT = str(DEFAULT_DATA_ROOT)
 RUNS = ["d12-s7", "d12-s8", "d12-s9", "d12-s10", "d12-s11"]
 TIERS = ("continuous", "periodic", "sparse")
 # columns that identify a time series within a run; probe_id is deliberately

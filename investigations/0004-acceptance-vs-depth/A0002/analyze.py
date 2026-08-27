@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 import tempfile
 from pathlib import Path
 
@@ -29,13 +28,10 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 
 HERE = Path(__file__).resolve().parent
-ANALYSIS_ROOT = HERE.parents[2]
-DATA_ROOT = ANALYSIS_ROOT.parent / "telemetry-data" / "sweep" / "telemetry-data"
-sys.path.insert(0, str(ANALYSIS_ROOT))
-
 from loader import telemetry_load as tl  # noqa: E402
 
 
+DATA_ROOT = tl.DEFAULT_DATA_ROOT
 SEGMENTS = (
     "d12-s7-s0-6c217854f4174ce884dfb2b2dcc13c45",
     "d12-s8-s0-2b2e72e4395440029b92226213d137bb",

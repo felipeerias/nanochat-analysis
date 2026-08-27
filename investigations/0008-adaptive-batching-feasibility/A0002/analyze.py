@@ -20,10 +20,11 @@ import numpy as np
 import pandas as pd
 import pyarrow.dataset as ds
 
+from loader.paths import DEFAULT_DATA_ROOT
+
 
 HERE = Path(__file__).resolve().parent
-ANALYSIS = HERE.parents[2]
-DATA_ROOT = ANALYSIS.parent / "telemetry-data" / "sweep" / "telemetry-data"
+DATA_ROOT = DEFAULT_DATA_ROOT
 
 PERIODIC_METRICS = {
     "noise/pairwise_cosines",

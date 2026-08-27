@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 from pathlib import Path
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/codex-mpl-i0003-a0002")
@@ -19,13 +18,15 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 
 HERE = Path(__file__).resolve().parent
-ANALYSIS_ROOT = HERE.parents[2]
-DATA_ROOT = ANALYSIS_ROOT.parent / "telemetry-data" / "sweep" / "telemetry-data"
-sys.path.insert(0, str(ANALYSIS_ROOT))
+from loader.telemetry_load import (  # noqa: E402
+    DEFAULT_DATA_ROOT,
+    defined,
+    metric,
+    read_telemetry,
+)
 
-from loader.telemetry_load import defined, metric, read_telemetry  # noqa: E402
 
-
+DATA_ROOT = DEFAULT_DATA_ROOT
 METRIC = "muon/replay_update_relerr"
 RUN_IDS = (
     "d12-s7",

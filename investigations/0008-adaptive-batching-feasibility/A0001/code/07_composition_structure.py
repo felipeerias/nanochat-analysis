@@ -1,11 +1,12 @@
 """Structure of the only data-composition channel the dataset has, and whether
 composition over a window predicts progress on the FIXED probe."""
-import sys, os, pickle
-sys.path.insert(0, '/home/felipe/Igalia/nanochat/nanochat-analysis/loader')
-import numpy as np, pandas as pd, telemetry_load as T
-ROOT = '/home/felipe/Igalia/nanochat/telemetry-data/sweep/telemetry-data'
-OUT = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001'
-SP = '/home/felipe/Igalia/nanochat/nanochat-analysis/investigations/0008-adaptive-batching-feasibility/A0001/d12_cont.pkl'
+import os, pickle
+import numpy as np, pandas as pd
+from loader import telemetry_load as T
+from _paths import D12_CONT, DATA_ROOT, OUTPUT_ROOT
+ROOT = DATA_ROOT
+OUT = OUTPUT_ROOT
+SP = D12_CONT
 out = pickle.load(open(SP,'rb'))
 c = out['d12-s7']
 print('=== is the batch stream stationary?  (loader is deterministic: no RNG, shard order) ===')
@@ -59,7 +60,6 @@ for run, g in df.groupby('run'):
         cs.append(np.corrcoef(x, r)[0,1])
     print(f'  {run:8s} n={len(g):3d}  corr(bos)={cs[0]:+.3f}  corr(seglen)={cs[1]:+.3f}')
 print('\n=== is the DOCUMENT STREAM identical across all seven runs? ===')
-import telemetry_load as T2
 ref = None
 for seg in SEGS:
     d = T.load_segment(ROOT, seg); run = d['provenance']['manifest_run_id']
