@@ -105,6 +105,18 @@ run as one queue. Results are analysed under `exploratory/` and are not
 citable. Only a result surprising enough to be worth confirming graduates to
 a frozen design in `experiments/`.
 
+Ideas are authored in parallel through worktrees of the fork, one per idea:
+
+```bash
+git -C nanochat worktree add ../worktrees/<slug> -b exp/<slug> telemetry
+```
+
+Give each authoring agent its own worktree, a distinct slug, and a distinct
+flag prefix — nothing checks flag names across branches. An authoring agent
+writes only to its branch of the fork. It returns the manifest and the
+exploratory note as report text, and the coordinator commits them here, so
+parallel agents never touch this repository.
+
 ## Bringing run data home
 
 On the pod, make one archive without the large checkpoint tensors, inspect its
