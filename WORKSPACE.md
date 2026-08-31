@@ -82,6 +82,29 @@ stop the pod instead; that flag makes the runner check up front that
 `runpodctl` and the API key are present, so a self-stop cannot fail silently
 at the end.
 
+Several manifests, each pinning its own branch, run back to back with:
+
+```bash
+bash operations/telemetry_queue.sh \
+    operations/manifests/exp-alpha-v1.json \
+    operations/manifests/exp-beta-v1.json:d12-s7
+```
+
+A manifest without `:run_id` runs every row it holds. The queue checks out
+each pin in a temporary worktree (no manual checkout, HEAD never moves),
+validates every item before the first run starts, and keeps going past a
+failed item. `STOP_POD=1` stops the pod after the whole queue; `CHECK_ONLY=1`
+validates the queue anywhere, before a pod exists.
+
+## Exploratory runs
+
+An idea can be tried before it deserves a design. The shape of an
+exploratory campaign: one branch off `telemetry` per idea, pushed; one small
+manifest per branch pinning its commit, usually a single d12 row; the lot
+run as one queue. Results are analysed under `exploratory/` and are not
+citable. Only a result surprising enough to be worth confirming graduates to
+a frozen design in `experiments/`.
+
 ## Bringing run data home
 
 On the pod, make one archive without the large checkpoint tensors, inspect its

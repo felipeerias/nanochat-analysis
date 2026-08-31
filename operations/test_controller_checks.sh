@@ -54,7 +54,7 @@ PYEOF
 # static first: the gate and run sections only execute on a GPU, so nothing
 # below reaches them
 "${PY:-python3}" "$OPS/check_shell_vars.py" "$OPS/telemetry_run.sh" \
-    "$OPS/telemetry_pod_setup.sh" || exit 1
+    "$OPS/telemetry_pod_setup.sh" "$OPS/telemetry_queue.sh" || exit 1
 
 pass=0; fail=0
 check() {
@@ -88,6 +88,16 @@ check "key no parser declares"                1 run "$TMP/wt-a" "$TMP/badkey.jso
 check "key the runner owns"                   1 run "$TMP/wt-a" "$TMP/r-owned.json" d14-s7
 check "value of the wrong type"               1 run "$TMP/wt-a" "$TMP/r-type.json" d14-s7
 check "a nested recipe block is refused"      1 run "$TMP/wt-a" "$TMP/r-nested.json" d14-s7
+
+# The queue makes its own worktrees at each manifest's pin, so it is handed
+# the real checkout, not wt-a/wt-b.
+queue() { CHECK_ONLY=1 ALLOW_DIRTY=1 NANOCHAT_CHECKOUT="$CHECKOUT" \
+          bash "$OPS/telemetry_queue.sh" "$@"; }
+
+check "queue: two manifests, two pins"        0 queue manifests/sweep-d12-d16-v1.json:d14-s7 manifests/sweep-d12-seeds-v1.json:d12-s10
+check "queue: bare manifest expands its rows" 0 queue manifests/gate-v1.json
+check "queue: a bad item blocks the queue"    1 queue manifests/sweep-d12-d16-v1.json:d99-s1 manifests/gate-v1.json
+check "queue: unpinned manifest refused"      1 queue "$TMP/unpinned.json"
 
 if [ -n "$(git -C "$OPS" status --porcelain -- "$OPS")" ]; then
     check "dirty controller tree refused"     1 strict "$TMP/wt-a" manifests/sweep-d12-d16-v1.json d14-s7

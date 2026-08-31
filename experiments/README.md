@@ -23,6 +23,11 @@ engineering.
 A design is frozen before the first run. Changing it afterwards makes a new
 design with a new id, not an edit.
 
+Not every run needs a design. A quick exploratory run — one branch, one
+pinned manifest, typically one d12 row — skips this file entirely; see
+"Exploratory runs" in `../WORKSPACE.md`. Its results live under
+`../exploratory/` and are not citable.
+
 ## Status
 
 | id | design | runs | status |
